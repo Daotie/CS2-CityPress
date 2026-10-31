@@ -3,13 +3,13 @@
 <h1 align="center">CityPress 城市日报</h1>
 <p align="center">为 <strong>《都市：天际线 II》</strong> 留下每天的城市新闻。</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.2-00a8bb" alt="0.2.0-beta.2">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.3-00a8bb" alt="0.2.0-beta.3">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta 预发行">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
 <p align="center"><a href="https://github.com/Daotie/CS2-CityPress/releases">下载</a> · <a href="https://github.com/Daotie/CS2-CityPress/issues">反馈问题</a> · <a href="CHANGELOG.md">更新日志</a> · <a href="SECURITY.md">隐私说明</a></p>
 
-**0.2.0-beta.2：** 增加便携核心/导出检查与公开 CI，继续提供城市采集、新闻编辑、游戏内阅读和可编辑 Word 归档。见[版本说明](RELEASE_NOTES.md)。目前界面、默认编辑方针和 Word 版签使用简体中文，项目公开文档提供中英双语。
+**0.2.0-beta.3：** 修复报纸中文方框、档案行分散排版和初始化空日期残留。见[版本说明](RELEASE_NOTES.md)。目前界面、默认编辑方针和 Word 版签使用简体中文，项目公开文档提供中英双语。
 
 ## 主要功能
 

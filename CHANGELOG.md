@@ -1,5 +1,25 @@
 # Changelog / 更新日志
 
+## 0.2.0-beta.3
+
+### English
+
+- Fixed missing Chinese glyphs in the newspaper by using the game's registered UI font instead of Windows-only font names. Newspaper layout and editable Word export are retained; exact typefaces can differ by renderer.
+- Kept archive summaries as complete text elements so Cohtml cannot spread the date, count and label across the row. Kept the title subtitle on one line and made the panel background opaque.
+- Removed unobserved historical initialization days, including a stale default date such as 2021-01-06. Real early-year activity, metric-only history and the current day are retained.
+- Hid issues mistakenly generated for those empty initialization days; the suppression persists in save data without deleting local newspaper files.
+- Added source/UI/release version consistency checks. Save envelope remains version 1, with an additive empty-day suppression field.
+- Validation: core/export and callback checks, UI types/build and browser layout regression checks. Native in-game display still requires confirmation after restarting the updated mod.
+
+### 简体中文
+
+- 报纸改用游戏已注册的中文字体，修复 Windows 字体无法在游戏网页界面加载而出现方框的问题。保留报纸版式和可编辑 Word；不同渲染环境的字形可能存在差异。
+- 档案摘要使用完整文本元素，修复日期、记录数量和文字被 Cohtml 分散排布；标题副行保持单行，面板底板改为不透明。
+- 清理没有任何观测数据的过去初始化日期，例如遗留的 2021-01-06；保留真实早期操作、仅指标的历史和当前日期。
+- 对这些空日期误生成的报纸隐藏档案入口，标记随存档保存，不删除本地报纸文件。
+- 新增源码、UI 与发行说明版本一致性检查。存档外层版本保持 1，追加空日期隐藏字段。
+- 验证：核心/导出、回调、UI 类型/构建与浏览器排版回归检查；原生游戏显示需更新后重启确认。
+
 ## 0.2.0-beta.2
 
 ### English

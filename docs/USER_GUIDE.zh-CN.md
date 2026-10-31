@@ -1,10 +1,10 @@
 # CityPress 城市日报
 
-都市：天际线 II 新闻模组，开发版 0.2.0-beta.2。已在本机游戏程序集上编译；尚未完成游戏内实测，不保证覆盖所有玩家动作。
+都市：天际线 II 新闻模组，开发版 0.2.0-beta.3。已在本机游戏程序集上编译；尚未完成游戏内实测，不保证覆盖所有玩家动作。
 
 ## 使用
 
-解压 `dist/CityPress-0.2.0-beta.2.zip` 全部内容到 `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\Mods\CityPress`，在本地模组环境启用。不要只复制 DLL，界面资源和 Templates 目录也必须安装。发行包不自动安装、不修改游玩集。
+解压 `dist/CityPress-0.2.0-beta.3.zip` 全部内容到 `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\Mods\CityPress`，在本地模组环境启用。不要只复制 DLL，界面资源和 Templates 目录也必须安装。发行包不自动安装、不修改游玩集。
 
 进入城市后点左侧报纸按钮，打开“编辑部设置”，输入 DeepSeek API Key 并保存。也支持启动游戏前设置 `DEEPSEEK_API_KEY`。密钥不会出现在城市存档、日志或界面状态回传中，输入框不会回显已保存密钥。
 
@@ -58,7 +58,7 @@
 
 `npm run typecheck --prefix UI` 与 `npm run build --prefix UI` 检查界面。
 
-界面参考本机 RouteFilter 源码的主题变量、54rem 标题栏、10rem 圆角、青色活动态、分段导航和内嵌表单。报纸正文使用统一纸色与宋体，按相同规则分成一至三栏；Word 保留可编辑文字，长篇内容分页时可能产生换行差异。
+界面参考本机 RouteFilter 源码的主题变量、54rem 标题栏、10rem 圆角、青色活动态、分段导航和内嵌表单。报纸正文使用统一纸色与游戏注册的中文字体，按相同规则分成一至三栏；Word 保留可编辑文字，长篇内容分页时可能产生换行差异。
 
 接口依据：[DeepSeek JSON Output](https://api-docs.deepseek.com/guides/json_mode/) 与 [Context Caching](https://api-docs.deepseek.com/guides/kv_cache/)。游戏挂钩针对本机程序集反射检查和编译，不依赖第三方事件模组。
 
@@ -66,3 +66,5 @@
 
 
 旧日志保留，但生成时会重新过滤自动改名状态和没有具体内容的纯编号政策。没有资产的对象工具记录排除，拆除/地形/水体工具则按操作意图保留。筛选后没有有效动作也没有指标变化时，本地保存简短空刊，不调用 DeepSeek。筛选规则版本进入缓存键，旧版噪声成稿不复用。
+
+0.2.0-beta.3 修复报纸中文方框与档案行分散排版，报纸改用游戏已注册字体。过去无操作、无指标的初始化日期从历史中移除，已误生成报纸只隐藏入口、不删除本地文件；真实早期日期和仅指标历史保留。Word 保留可编辑版式，其字体由本机 Word 渲染。
