@@ -24,6 +24,7 @@ namespace CityPress.Core {
   public string Id = Guid.NewGuid().ToString("N");
   public Preferences Override;
   public List<DayLog> Days = new List<DayLog>();
+  public List<string> OmittedEmptyDays = new List<string>();
  }
  public sealed class Article { public string Section, Title, Body; }
  public sealed class Newspaper { public string Name, Day, Headline, Deck; public List<Article> Articles; public int CacheHitTokens, CacheMissTokens; public bool LocalCache, LocalOnly; }

@@ -74,6 +74,17 @@ class Program {
    Check(!GameCalendar.IsReady(DateTime.MinValue)&&!GameCalendar.IsValidDay("0001-01-01")&&!GameCalendar.IsValidDay("2027-99-12")&&GameCalendar.IsReady(new DateTime(2027,1,12,10,30,0)),"加载期默认日期无效，真实游戏时间可用");
    var legacyDays=new SaveState();legacyDays.Days.Add(new DayLog{Day="0001-01-01"});legacyDays.Days.Add(new DayLog{Day="2027-01-12"});
    Check(GameCalendar.RemoveInvalidDays(legacyDays)==1&&legacyDays.Days.Single().Day=="2027-01-12","旧存档移除虚假日期并保留正常历史");
+   var emptyHistory=new SaveState();
+   emptyHistory.Days.Add(new DayLog{Day="2021-01-06"});
+   var earlyReal=new DayLog{Day="2021-01-07"};Aggregator.Add(earlyReal,"建设","学校","10:00");emptyHistory.Days.Add(earlyReal);
+   var metricOnly=new DayLog{Day="2027-01-11"};Aggregator.Sample(metricOnly,"population","人口","人",100,"10:00");emptyHistory.Days.Add(metricOnly);
+   emptyHistory.Days.Add(new DayLog{Day="2027-01-12"});
+   Check(GameCalendar.PruneEmptyHistory(emptyHistory,"2027-01-12")==1&&emptyHistory.Days.All(d=>d.Day!="2021-01-06"),"清除加载期间遗留的过去空记录，不硬编码禁止 2021 年");
+   Check(emptyHistory.Days.Count==3&&emptyHistory.Days.Contains(earlyReal)&&emptyHistory.Days.Contains(metricOnly),"保留早期真实建设、仅指标历史和当前尚未采集的日期");
+   Check(GameCalendar.PruneEmptyHistory(emptyHistory,"")==0,"城市时间尚未就绪时不清理历史");
+   var reloadedHistory=JsonConvert.DeserializeObject<SaveState>(JsonConvert.SerializeObject(emptyHistory));
+   Check(!GameCalendar.IsVisibleIssue(reloadedHistory,"2021-01-06","2027-01-12")&&GameCalendar.IsVisibleIssue(reloadedHistory,"2021-01-07","2027-01-12"),"空日期已误生成的报纸隐藏且标记随存档保留，不删除本地归档");
+   Check(GameCalendar.IsVisibleIssue(reloadedHistory,"2021-01-06","2021-01-06"),"实际读取到同日期的早期城市时允许正常阅读");
    bool invalidDayRejected=false;try{await service.Generate("invalid-day","汐澜",new DayLog{Day="0001-01-01"},prefs,"test",CancellationToken.None);}catch(InvalidOperationException){invalidDayRejected=true;}
    Check(invalidDayRejected&&handler.Calls==0,"无效日期不会发起 API 请求或生成报纸");
    var uneven=new[]{new Article{Title="A",Body=new string('a',500)},new Article{Title="B",Body=new string('b',100)},new Article{Title="C",Body=new string('c',100)},new Article{Title="D",Body=new string('d',100)}};

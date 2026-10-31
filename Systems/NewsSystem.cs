@@ -65,6 +65,7 @@ namespace CityPress.Systems {
   protected override void OnGameLoadingComplete(Purpose purpose,GameMode mode){base.OnGameLoadingComplete(purpose,mode);loaded=mode==GameMode.Game;if(loaded)try{GameplayBindings.Scan(this);}catch{Mod.Log.Warn("管理操作入口尚未就绪，将自动重试。");}}
   void Rollover(string day) {
    if(!GameCalendar.IsValidDay(day))return;
+   if(state.OmittedEmptyDays?.Remove(day)==true)dirty=true;
    if(state.Days.LastOrDefault()?.Day==day)return;
    var previous=state.Days.LastOrDefault();
    if(previous!=null && Effective.AutoGenerate && string.CompareOrdinal(day,previous.Day)>0)queue.Enqueue(JsonConvert.DeserializeObject<DayLog>(JsonConvert.SerializeObject(previous)));
@@ -101,7 +102,7 @@ namespace CityPress.Systems {
    pending=service.Generate(state.Id,city,snapshot,prefs,key,lifetime.Token);
   }
   string Issues=>Path.Combine(Storage.Root,"cities",state.Id,"issues");
-  void OpenIssue(string day){ if(!GameCalendar.IsValidDay(day))return;try{paper=Storage.Read<Newspaper>(Path.Combine(Issues,day+".json"));}catch{status="存档读取失败";} }
+  void OpenIssue(string day){ if(!GameCalendar.IsValidDay(day))return;if(!GameCalendar.IsVisibleIssue(state,day,TryGetGameTime(out var now)?now.ToString("yyyy-MM-dd"):"")){status="该历史日期没有有效采集记录。";return;}try{paper=Storage.Read<Newspaper>(Path.Combine(Issues,day+".json"));}catch{status="存档读取失败";} }
   protected override void OnUpdate() {
    base.OnUpdate();
    if(DateTime.UtcNow<nextUi)return;nextUi=DateTime.UtcNow.AddMilliseconds(250);
@@ -112,7 +113,7 @@ namespace CityPress.Systems {
    city=World.GetOrCreateSystemManaged<Game.City.CityConfigurationSystem>().cityName;
    if(string.IsNullOrWhiteSpace(city))city="城市";
    bool timeReady=TryGetGameTime(out var now);
-   if(timeReady)Rollover(now.ToString("yyyy-MM-dd"));
+   if(timeReady){var currentDay=now.ToString("yyyy-MM-dd");if(GameCalendar.PruneEmptyHistory(state,currentDay)>0)dirty=true;Rollover(currentDay);}
    if(pending?.IsCompleted==true){
     try {var result=pending.GetAwaiter().GetResult();
      if(pendingId==state.Id && pendingEpoch==epoch){
@@ -129,7 +130,7 @@ namespace CityPress.Systems {
     try{Storage.Write(Path.Combine(Storage.Root,"cities",state.Id,"journal.json"),JsonConvert.SerializeObject(state));dirty=false;}catch{status="操作日志保存失败";}
     nextFlush=DateTime.UtcNow.AddSeconds(5);
    }
-   binding.Update(JsonConvert.SerializeObject(new {city,day=timeReady?now.ToString("yyyy-MM-dd"):"",gameTime=timeReady?now.ToString("yyyy-MM-dd HH:mm:ss"):"",timeReady,preferences=Effective,scope=state.Override==null?"global":"save",busy=pending!=null,status,popup,paper,days=state.Days.Where(x=>GameCalendar.IsValidDay(x.Day)).Select(x=>new{x.Day,count=x.Actions.Sum(a=>a.Count)}),issues=Directory.Exists(Issues)?Directory.GetFiles(Issues,"*.json").Select(Path.GetFileNameWithoutExtension).Where(GameCalendar.IsValidDay).OrderByDescending(x=>x).ToArray():Array.Empty<string>(),coverage=ActionHooks.Coverage.Concat(new[]{"管理操作入口："+GameplayBindings.Count+" 个；未接入："+GameplayBindings.Failed,CityObserver.Report}),keyConfigured=!string.IsNullOrWhiteSpace(key)||File.Exists(Path.Combine(Storage.Root,"key.dpapi"))}));
+   binding.Update(JsonConvert.SerializeObject(new {city,day=timeReady?now.ToString("yyyy-MM-dd"):"",gameTime=timeReady?now.ToString("yyyy-MM-dd HH:mm:ss"):"",timeReady,preferences=Effective,scope=state.Override==null?"global":"save",busy=pending!=null,status,popup,paper,days=state.Days.Where(x=>GameCalendar.IsValidDay(x.Day)).Select(x=>new{x.Day,count=x.Actions.Sum(a=>a.Count),metrics=x.Metrics?.Count(m=>m.Samples>0)??0}),issues=Directory.Exists(Issues)?Directory.GetFiles(Issues,"*.json").Select(Path.GetFileNameWithoutExtension).Where(day=>GameCalendar.IsVisibleIssue(state,day,timeReady?now.ToString("yyyy-MM-dd"):"" )).OrderByDescending(x=>x).ToArray():Array.Empty<string>(),coverage=ActionHooks.Coverage.Concat(new[]{"管理操作入口："+GameplayBindings.Count+" 个；未接入："+GameplayBindings.Failed,CityObserver.Report}),keyConfigured=!string.IsNullOrWhiteSpace(key)||File.Exists(Path.Combine(Storage.Root,"key.dpapi"))}));
   }
   public void Serialize<TWriter>(TWriter writer) where TWriter:IWriter {writer.Write(1);writer.Write(JsonConvert.SerializeObject(state));}
   public void Deserialize<TReader>(TReader reader) where TReader:IReader {
