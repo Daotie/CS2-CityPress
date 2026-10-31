@@ -1,0 +1,20 @@
+{
+  "paperWidth": 788,
+  "paddingX": 26,
+  "paddingTop": 20,
+  "paddingBottom": 18,
+  "background": "F5F2E9",
+  "ink": "191915",
+  "columnGap": 22,
+  "maxColumns": 3,
+  "sparseColumns": 2,
+  "articleOverhead": 60,
+  "titleWeight": 2,
+  "mastheadSize": 54,
+  "headlineSize": 27,
+  "articleTitleSize": 17,
+  "bodySize": 12.5,
+  "bodyLineHeight": 1.8,
+  "deckSize": 13,
+  "labelSize": 9
+}
