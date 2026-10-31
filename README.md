@@ -3,13 +3,13 @@
 <h1 align="center">CityPress</h1>
 <p align="center">Your city's daily newspaper for <strong>Cities: Skylines II</strong>.</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.1-00a8bb" alt="0.2.0-beta.1">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.2-00a8bb" alt="0.2.0-beta.2">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
 <p align="center"><a href="https://github.com/Daotie/CS2-CityPress/releases">Downloads</a> · <a href="https://github.com/Daotie/CS2-CityPress/issues">Issues</a> · <a href="CHANGELOG.md">Changelog</a> · <a href="SECURITY.md">Privacy</a></p>
 
-**0.2.0-beta.1:** First public beta: daily observation, editorial generation, in-game newspaper reading and editable Word archives. See [release notes](RELEASE_NOTES.md). The interface, default editorial policy and Word furniture currently use Simplified Chinese; public documentation is bilingual.
+**0.2.0-beta.2:** Portable core/export checks and public CI, alongside daily observation, in-game newspaper reading and editable Word archives. See [release notes](RELEASE_NOTES.md). The interface, default editorial policy and Word furniture currently use Simplified Chinese; public documentation is bilingual.
 
 ## What it does
 
@@ -49,6 +49,8 @@ Windows, .NET SDK 10, Node.js 20+ and a local game installation are required for
 ```
 
 Alternatively set `CSII_MANAGED_PATH`. See [architecture](docs/ARCHITECTURE.md), [contributing](CONTRIBUTING.md) and [releasing](RELEASING.md).
+
+Core/cache/Word checks run without game files or an API key: `dotnet run --project Tests/CityPress.Tests.csproj -- --core-only`. This explicitly skips native game-assembly integration; the public CI runs these core checks and the UI build/audit.
 
 ## License and credits
 

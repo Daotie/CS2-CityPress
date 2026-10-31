@@ -34,6 +34,7 @@ class Program {
    return;
   }
   var temp=Path.Combine(Path.GetTempPath(),"CityPress-tests-"+Guid.NewGuid().ToString("N"));
+  bool coreOnly=args.Contains("--core-only");
   var handler=new Fake();using var service=new NewsService(handler,temp);
   try {
    var log=new DayLog{Day="2026-10-31"};Aggregator.Add(log,"道路","公路","10:00");Aggregator.Add(log,"道路","公路","11:00");
@@ -95,7 +96,7 @@ class Program {
    handler.Invalid=true;bool rejected=false;try{await service.Generate("bad","汐澜",log,prefs,"test",CancellationToken.None);}catch(InvalidOperationException){rejected=true;}
    Check(rejected&&!Directory.Exists(Path.Combine(temp,"cities","bad","cache")),"无效结果不缓存");
    var root=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../"));
-   using(var binary=File.OpenRead(Path.Combine(root,"bin/Release/net48/CityPress.dll")))
+   if(!coreOnly)using(var binary=File.OpenRead(Path.Combine(root,"bin/Release/net48/CityPress.dll")))
    using(var pe=new PEReader(binary)) {
     var metadata=pe.GetMetadataReader();
     var calls=metadata.MemberReferences.Select(h=>metadata.GetString(metadata.GetMemberReference(h).Name)).ToArray();
@@ -107,6 +108,7 @@ class Program {
    using(var zip=ZipFile.OpenRead(output)){using var reader=new StreamReader(zip.GetEntry("word/document.xml").Open());var xml=reader.ReadToEnd();Check(xml.Contains("城区建设持续推进")&&!xml.Contains("{{"),"Word 使用模板排版并替换示例正文");}
    // Reproduce the game's actual Assembly.Load(byte[]) behavior, not the
    // normal on-disk test assembly that hid the empty-location regression.
+   if(!coreOnly) {
    var loaded=System.Reflection.Assembly.Load(File.ReadAllBytes(Path.Combine(root,"bin/Release/net48/CityPress.dll")));
    Check(string.IsNullOrEmpty(loaded.Location),"复现游戏内存加载时程序集路径为空");
    var exporter=loaded.GetType("CityPress.Core.DocxExporter");
@@ -121,6 +123,12 @@ class Program {
     var footer=doc.Descendants(w+"p").First(p=>(string)p.Element(w+"pPr")?.Element(w+"pStyle")?.Attribute(w+"val")=="CPFooter");
     Check(string.Concat(footer.Descendants(w+"t").Select(t=>t.Value)).Contains(paper.Name)&&!footer.ToString().Contains("{{"),"版脚与预览一致并替换实际报纸名称");
     Check(doc.Descendants(w+"tblCaption").Any(c=>(string)c.Attribute(w+"val")=="CityPress.Masthead")&&doc.Descendants(w+"t").Any(t=>t.Value=="电子刊")&&(string)doc.Root.Element(w+"background")?.Attribute(w+"color")=="F5F2E9","Word 保留左右版签、可编辑报头与纸色背景");
+   }
+   } else {
+    DocxExporter.TemplatePath=Path.Combine(temp,"missing-template.docx");
+    var fallback=Path.Combine(temp,"embedded-only.docx");DocxExporter.Save(fallback,paper);
+    using(var zip=ZipFile.OpenRead(fallback)){using var reader=new StreamReader(zip.GetEntry("word/document.xml").Open());Check(reader.ReadToEnd().Contains("城区建设持续推进"),"无需游戏程序集的核心检查可验证内嵌模板回退");}
+    Console.WriteLine("SKIP game-assembly metadata and byte-loading integration (--core-only)");
    }
    Console.WriteLine("All tests passed");
   }finally{if(Directory.Exists(temp))Directory.Delete(temp,true);}

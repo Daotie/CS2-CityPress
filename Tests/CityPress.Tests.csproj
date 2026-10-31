@@ -1,1 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup><ItemGroup><Compile Include="Program.cs;..\Core\*.cs"/><EmbeddedResource Include="..\Resources\paper-layout.json" LogicalName="CityPress.paper-layout.json"/><Reference Include="Newtonsoft.Json"><HintPath>D:\SteamLibrary\steamapps\common\Cities Skylines II\Cities2_Data\Managed\Newtonsoft.Json.dll</HintPath></Reference></ItemGroup></Project>
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup>
+ <ItemGroup>
+  <Compile Include="Program.cs;..\Core\*.cs"/>
+  <EmbeddedResource Include="..\Resources\paper-layout.json" LogicalName="CityPress.paper-layout.json"/>
+  <EmbeddedResource Include="..\Templates\newspaper.docx" LogicalName="CityPress.Templates.newspaper.docx"/>
+  <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+ </ItemGroup>
+</Project>

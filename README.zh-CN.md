@@ -3,13 +3,13 @@
 <h1 align="center">CityPress 城市日报</h1>
 <p align="center">为 <strong>《都市：天际线 II》</strong> 留下每天的城市新闻。</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.1-00a8bb" alt="0.2.0-beta.1">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.2-00a8bb" alt="0.2.0-beta.2">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta 预发行">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
 <p align="center"><a href="https://github.com/Daotie/CS2-CityPress/releases">下载</a> · <a href="https://github.com/Daotie/CS2-CityPress/issues">反馈问题</a> · <a href="CHANGELOG.md">更新日志</a> · <a href="SECURITY.md">隐私说明</a></p>
 
-**0.2.0-beta.1：** 首个公开测试版，包含城市采集、新闻编辑、游戏内阅读和可编辑 Word 归档。见[版本说明](RELEASE_NOTES.md)。目前界面、默认编辑方针和 Word 版签使用简体中文，项目公开文档提供中英双语。
+**0.2.0-beta.2：** 增加便携核心/导出检查与公开 CI，继续提供城市采集、新闻编辑、游戏内阅读和可编辑 Word 归档。见[版本说明](RELEASE_NOTES.md)。目前界面、默认编辑方针和 Word 版签使用简体中文，项目公开文档提供中英双语。
 
 ## 主要功能
 
@@ -49,6 +49,8 @@
 ```
 
 也可设置环境变量 `CSII_MANAGED_PATH`。二次开发见[架构](docs/ARCHITECTURE.md)、[贡献指南](CONTRIBUTING.md)与[发布流程](RELEASING.md)。
+
+不依赖游戏文件或 API 密钥的检查：`dotnet run --project Tests/CityPress.Tests.csproj -- --core-only`。它验证汇总、缓存和 Word 导出，明确跳过游戏程序集集成部分；公开 CI 同时检查 UI 类型、构建与运行依赖。
 
 ## 许可证与致谢
 

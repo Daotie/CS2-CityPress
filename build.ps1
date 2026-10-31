@@ -12,6 +12,12 @@ try {
  if(Test-Path -LiteralPath $archive){throw "Archive already exists: $archive. Use a new version for a new release."}
  dotnet build CityPress.csproj -c Release "-p:ManagedPath=$ManagedPath"
  if($LASTEXITCODE -ne 0){throw 'C# build failed'}
+ dotnet run --project Tests/CityPress.Tests.csproj -c Release
+ if($LASTEXITCODE -ne 0){throw 'Core/export and game-assembly integration checks failed'}
+ dotnet build tools/BindingsSmoke.csproj -c Release "-p:ManagedPath=$ManagedPath"
+ if($LASTEXITCODE -ne 0){throw 'Binding harness build failed'}
+ dotnet tools/bin/Release/net10.0/BindingsSmoke.dll $ManagedPath "$PSScriptRoot/bin/Release/net48/CityPress.dll"
+ if($LASTEXITCODE -ne 0){throw 'Gameplay callback harness failed'}
  npm ci --prefix UI --no-audit --no-fund
  if($LASTEXITCODE -ne 0){throw 'UI install failed'}
  npm run typecheck --prefix UI
