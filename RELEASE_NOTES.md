@@ -1,21 +1,21 @@
-# CityPress 0.2.0-beta.1
+# CityPress 0.2.0-beta.2
 
 ## English
 
-First public beta for daily city newspapers: optional DeepSeek editing, in-game paper layout, Word/JSON archives, per-save/global mastheads, broad gameplay and city observation, and noise filtering. Generation is manual by default. The UI and default newspaper furniture currently use Simplified Chinese.
+- Added game-free core/cache/Word checks and embedded-template fallback coverage.
+- Added public Windows CI for core tests, UI types/build and runtime dependency audit.
+- Full local packaging now requires game-assembly/export and callback harness checks. Build instructions document which checks need the game.
 
-Download `CityPress-0.2.0-beta.1.zip` and its `.sha256` file. Extract the entire package into the local `Mods/CityPress` folder while the game is closed, then restart. Keep `Templates/` and `images/` beside the DLLs. GitHub source archives are for developers.
+Gameplay, the Chinese UI, editorial behavior and version-1 save envelope remain unchanged from beta.1. Expanded collection still needs a complete live-game acceptance pass; CI does not run the proprietary game. Generation remains manual by default and DeepSeek receives the eligible facts only when generating.
 
-Verified locally: C# Release build, UI types/production build, core aggregation/cache/Word checks and callback/browser harnesses. Expanded collection has not completed a full in-game acceptance pass. Third-party internal actions and brief intermediate states may be missed. DeepSeek generation sends eligible facts to the provider; review `SECURITY.md`.
-
-Save envelope remains version 1, with additive metric fields. Existing archives are retained; collection begins with observed gameplay and cannot reconstruct past days. See `CHANGELOG.md` and the bilingual READMEs for details.
+Install the complete `CityPress-0.2.0-beta.2.zip` in the local `Mods/CityPress` directory while the game is closed; keep `Templates/` and `images/`. Restart after upgrading. The accompanying `.sha256` verifies the archive. Existing journals, preferences and issues remain in `ModsData/CityPress`.
 
 ## 简体中文
 
-首个公开 Beta，提供 DeepSeek 新闻编辑、游戏内报纸、Word/JSON 归档、自定义报头、单存档/全局设置、广泛城市采集与降噪。默认手动生成；当前界面与默认版签为简体中文。
+- 新增不依赖游戏文件的核心/缓存/Word 检查，覆盖内嵌模板回退。
+- 新增公开 Windows CI，检查核心、UI 类型/构建和运行依赖。
+- 完整本地打包必须通过游戏程序集/导出与回调检查；构建说明明确各项检查的适用范围。
 
-下载 `CityPress-0.2.0-beta.1.zip` 和 `.sha256` 校验文件，退出游戏后完整解压到本地 `Mods/CityPress`，重启生效。保留 `Templates/`、`images/` 与 DLL 的相对位置，源码包不等于安装包。
+游戏行为、中文界面、编辑逻辑与版本 1 存档结构保持不变。扩大采集仍待完整真实游戏验收，CI 不运行游戏。默认手动生成，仅在生成时向 DeepSeek 发送有效素材。
 
-已通过本地 C# Release、UI 类型/构建、汇总/缓存/Word、回调与浏览器模拟检查。扩大采集尚未完成完整游戏内验收，其他模组内部动作和短暂状态可能缺失。生成时会向 DeepSeek 发送有效素材，隐私说明见 `SECURITY.md`。
-
-存档外层版本保持 1，指标字段为追加扩展，已有报纸保留。采集从实际观测开始，不能补回安装前历史。
+退出游戏后将完整 `CityPress-0.2.0-beta.2.zip` 解压到本地 `Mods/CityPress`，保留 `Templates/`、`images/`，升级后重启。随包 `.sha256` 可验证下载文件；原有日志、设置和报纸位于 `ModsData/CityPress`，继续保留。
