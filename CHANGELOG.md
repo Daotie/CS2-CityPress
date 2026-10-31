@@ -5,6 +5,7 @@
 ### English
 
 - Added offline core/cache/Word verification without proprietary game assemblies or API credentials; embedded-template fallback is checked explicitly.
+- Excluded nested build outputs from assembly discovery, preventing the modern offline test JSON library from shadowing the game's .NET Framework-compatible reference.
 - Added public Windows CI for core tests, UI types/build and runtime dependency audit.
 - Full local packaging now runs the game-assembly/export checks and callback harness as required gates. Documented the distinction between offline, harness and live-game validation.
 - Game behavior and save envelope are unchanged from beta.1; full in-game collector acceptance remains pending.
@@ -12,6 +13,7 @@
 ### 简体中文
 
 - 核心/缓存/Word 检查可脱离游戏程序集和 API 密钥运行，并验证内嵌模板回退。
+- 排除嵌套构建产物的程序集扫描，避免现代测试依赖覆盖游戏所需的 .NET Framework 引用。
 - 增加公开 Windows CI，检查核心、UI 类型/构建和运行依赖。
 - 完整本地打包增加游戏程序集/导出检查和回调检查门槛，明确离线、模拟与真实游戏验收的区别。
 - 相较 beta.1，游戏行为与存档结构保持不变，完整游戏内采集验收仍待完成。

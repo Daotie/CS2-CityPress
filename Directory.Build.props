@@ -1,5 +1,6 @@
 <Project>
  <PropertyGroup>
+  <DefaultItemExcludes>$(DefaultItemExcludes);**/bin/**;**/obj/**;**/node_modules/**;**/artifacts/**;**/dist/**;UI/build/**</DefaultItemExcludes>
   <ManagedPath Condition="'$(ManagedPath)'=='' and '$(CSII_MANAGED_PATH)'!=''">$(CSII_MANAGED_PATH)</ManagedPath>
   <ManagedPath Condition="'$(ManagedPath)'==''">$(MSBuildProgramFiles32)\Steam\steamapps\common\Cities Skylines II\Cities2_Data\Managed</ManagedPath>
  </PropertyGroup>

@@ -3,6 +3,7 @@
 ## English
 
 - Added game-free core/cache/Word checks and embedded-template fallback coverage.
+- Fixed nested test outputs shadowing the game's JSON assembly during the .NET Framework mod build.
 - Added public Windows CI for core tests, UI types/build and runtime dependency audit.
 - Full local packaging now requires game-assembly/export and callback harness checks. Build instructions document which checks need the game.
 
@@ -13,6 +14,7 @@ Install the complete `CityPress-0.2.0-beta.2.zip` in the local `Mods/CityPress` 
 ## 简体中文
 
 - 新增不依赖游戏文件的核心/缓存/Word 检查，覆盖内嵌模板回退。
+- 修复嵌套测试产物覆盖游戏 JSON 程序集、导致 .NET Framework 模组编译失败的问题。
 - 新增公开 Windows CI，检查核心、UI 类型/构建和运行依赖。
 - 完整本地打包必须通过游戏程序集/导出与回调检查；构建说明明确各项检查的适用范围。
 
