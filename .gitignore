@@ -1,0 +1,22 @@
+**/bin/
+**/obj/
+**/node_modules/
+UI/build/
+/dist/
+/artifacts/
+/release-artifacts/
+/.vs/
+/.idea/
+*.user
+*.suo
+*.pdb
+*.tmp
+secrets*
+.env
+.env.*
+!.env.example
+*.dpapi
+settings.json
+journal.json
+# Local browser harness and session evidence, not public development dependencies.
+/tools/preview.cjs

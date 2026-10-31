@@ -1,0 +1,28 @@
+name: Bug report / 缺陷报告
+description: Report a reproducible CityPress issue / 报告可复现问题
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: CityPress and game versions / 模组与游戏版本
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior / 预期与实际行为
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps / 复现步骤
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant errors and other mods / 相关错误与其他模组
+      description: Remove API keys and private content. Do not attach key.dpapi. / 请移除密钥和私人内容，不要上传 key.dpapi。

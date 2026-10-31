@@ -1,0 +1,11 @@
+name: Feature request / 功能建议
+description: Suggest a CityPress improvement / 提出改进建议
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and proposed behavior / 问题与期望行为
+    validations:
+      required: true
