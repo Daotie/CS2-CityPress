@@ -2,6 +2,7 @@ param([string]$ManagedPath=$env:CSII_MANAGED_PATH)
 $ErrorActionPreference='Stop'
 Push-Location $PSScriptRoot
 try {
+ & "$PSScriptRoot/tools/verify-version.ps1"
  if([string]::IsNullOrWhiteSpace($ManagedPath)){
   $ManagedPath=Join-Path ${env:ProgramFiles(x86)} 'Steam/steamapps/common/Cities Skylines II/Cities2_Data/Managed'
  }
