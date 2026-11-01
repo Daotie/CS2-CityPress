@@ -25,11 +25,15 @@ export function paragraphs(text:string):string[]{
  const lines=(text??'').split('\n').map(line=>line.trim()).filter(Boolean);if(lines.length!==1||lines[0].length<=450)return lines;
  const result:string[]=[];let current='';for(const char of lines[0]){current+=char;if('。！？'.includes(char)&&current.length>=220){result.push(current);current='';}}if(current)result.push(current);return result;
 }
+export function isSubhead(text:string):boolean{return (text??'').trimStart().startsWith('## ');}
+export function subheadText(text:string):string{const value=(text??'').trim();return value.startsWith('## ')?value.slice(3).trim():value;}
 export function blockText(page:ComposedPage,block:LayoutBlock):string{
  if(block.Kind==='headline'||block.Kind==='vertical-headline')return page.Headline??'';if(block.Kind==='deck')return page.Deck??'';
  const story=page.Articles[block.Article];if(!story)return '';
  if(block.Kind==='section')return (story.Section??page.Theme)+(story.Genre==='评论'||story.Genre==='分析'?' · '+story.Genre:'');if(block.Kind==='title')return story.Title??'';
- const lines=paragraphs(story.Body).slice(block.Start);return (block.Count<0?lines:lines.slice(0,block.Count)).join('\n');
+ const lines=paragraphs(story.Body).slice(block.Start);
+ if(block.Kind==='subhead')return lines.length?subheadText(lines[0]):'';
+ return (block.Count<0?lines:lines.slice(0,block.Count)).join('\n');
 }
 export function compositionFor(page:ComposedPage):PageComposition{
  if(page.Composition?.Columns?.length)return page.Composition;

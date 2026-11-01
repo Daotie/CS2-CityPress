@@ -24,6 +24,20 @@ static class EditorialTests {
   }
  }
  static Article Story(string section,string title,string body,string genre="消息")=>new Article{Section=section,Title=title,Body=body,Genre=genre};
+ static string Compact(string text)=>string.Concat((text??"").Where(character=>!char.IsWhiteSpace(character)));
+ static string LongCommentaryBody()=>string.Join("\n",new[]{
+  "市库资金余额突破1800万，是这座城市财政运行中的一个节点。但余额上升只说明账面可用资金增加，并不自动等于公共服务水平提高，判断财政健康还需要结合收入、支出与长期服务需求。",
+  "## 资金存量不是服务成效",
+  "资金余额与月度预算收入、支出属于不同口径。余额增加可能来自收入节奏、结算时点或支出推迟，单看一个数字无法判断财政状况是否真正改善。把余额增长当成可以长期扩大支出的依据，是一种需要警惕的推断。",
+  "## 服务需求的持续时间",
+  "常住人口增至约41万，意味着学校、医疗和交通需求会持续存在。这些服务一旦投入使用，就会产生长期运营成本，城市在做投入决定时应把建设费用与后续维护、人员开支放在同一张账上考虑。",
+  "## 更长期的选择",
+  "衡量财政健康不能只看余额高低，还要看收入是否稳定、支出是否与真实需求匹配、公共服务是否形成可持续供给。资金充裕为城市提供选择空间，但选择本身仍需公共利益的衡量，并需要关注长期维护带来的财政压力。",
+  "对市民而言，真正重要的是这些资金能否转化为可感知、可负担、可长期维持的服务。城市管理的选择因此更应谨慎，把短期资金变化与长期服务能力区分开来，在预算安排中保留应对不确定支出的空间，并对服务质量的后续变化保持关注。",
+  "财政数字本身不构成结论，关键在于公共投入能否对应真实需求。收入结构、支出优先级和运营维护安排共同决定服务效果，任何一项短板都可能削弱资金的实际价值，这需要更长周期的观察与评估。"
+ });
+ static Article LongCommentaryArticle(string title="市库突破之后，城市更要回答钱怎么花"){var article=Story("评论",title,LongCommentaryBody(),"评论");article.CommentaryRole="长评";return article;}
+ static Article ShortCommentArticle(string title,string body){var article=Story("短评",title,body,"评论");article.CommentaryRole="短评";return article;}
  static DayLog MajorDay() {
   var day=new DayLog{Day="2027-01-12"};
   Aggregator.Sample(day,"city/population","常住人口","人",400381,"08:00");
@@ -172,6 +186,58 @@ static class EditorialTests {
   var shortComment=new Newspaper{Headline="评论长度核验",Articles=new List<Article>{Story("城市","城市新闻","城市公共服务的安排需要考虑设施分布与居民需求，这是一个持续的过程。"),Story("评论","过短的评论","公共投入需要更加重视服务效果。","评论")}};
   Check(QualityControl.Review(shortComment,new EditorialBrief(),facts).Issues.Any(issue=>issue.Code=="commentary-too-short"),"过短的评论不能冒充深度评论");
   foreach(var article in new[]{fabricated.Articles[0],traceable.Articles[0],mechanical.Articles[0]})article?.Issues.Clear();
+
+  // 8. Long commentary carries subheads; short comments share its edition.
+  Check(PaperLayout.BodyLength(LongCommentaryBody())>=500&&PaperLayout.Paragraphs(LongCommentaryBody()).Count(PaperLayout.IsSubhead)==3,"测试用长评论达到小标题门槛并含三个小标题");
+  var shortOne=ShortCommentArticle("资金要用在服务上","资金余额上升说明城市拥有更多选择，但真正影响市民的是这些钱能否变成可负担、可持续的公共服务。关键在于预算安排是否对应真实需求，而不是只看余额数字。长期维护成本同样需要提前考虑，否则短期充裕可能变成未来的财政压力，公共服务的质量也就难以稳定。城市在做预算选择时，应把服务覆盖范围、人员配置与后续维护放在同一张账上权衡，避免把一次性投入当成长期能力。");
+  var shortTwo=ShortCommentArticle("人口增长提出新要求","人口增至约41万意味着学校、医院和交通的压力会持续存在，设施布局与人员配置需要同步跟上。长期看，服务能力取决于持续投入与维护，而不是一次性的工程数量。公共服务的衔接需要更细致的安排：新建设施能否真正开放、服务半径是否覆盖新增人口、运营成本是否可承受，都会影响市民的实际体验，也决定城市扩张的质量。这些判断需要结合后续可核实的数据，不能只靠工程数量下结论。");
+  var leadCommentary=LongCommentaryArticle();
+  var commentaryPage=new NewspaperPage{Theme="评论",Headline=leadCommentary.Title,Deck="",Articles=new List<Article>{leadCommentary,shortOne,shortTwo}};
+  var mixedCommentary=new Newspaper{Name="汐澜日报",Day="2027-01-12",Headline="评论与短评校样",Deck="",Pages=new List<NewspaperPage>{new NewspaperPage{Theme="要闻",Headline="城市新闻",Articles=new List<Article>{Story("要闻","人口与资金变化","常住人口与市库资金余额出现新的变化，公共服务需要同步安排。")}},commentaryPage}};
+  mixedCommentary.Articles=mixedCommentary.Pages.SelectMany(page=>page.Articles).ToList();
+  PaperLayout.Assign(mixedCommentary,"auto");
+  Check(commentaryPage.Composition.Template=="opinion-mixed"&&commentaryPage.Composition.Columns.Count==3,"长评论与短评共用一版时使用主版加短评侧栏版式");
+  Check(commentaryPage.Composition.Columns.Last().Width<commentaryPage.Composition.Columns[0].Width,"短评位于窄侧栏，长评论占据大部分版面");
+  var mainBlocks=commentaryPage.Composition.Columns.Take(2).SelectMany(column=>column.Blocks).ToList();
+  Check(mainBlocks.Count(block=>block.Kind=="subhead")==3,"长评论小标题作为独立内容块进入排版");
+  var mainText=string.Concat(mainBlocks.Where(block=>block.Kind=="body"||block.Kind=="subhead").Select(block=>block.Kind=="subhead"?"## "+PaperLayout.BlockText(commentaryPage,block):PaperLayout.BlockText(commentaryPage,block)));
+  Check(Compact(mainText).Contains(Compact("资金存量不是服务成效"))&&Compact(mainText).Contains(Compact("服务需求的持续时间"))&&Compact(mainText).Contains(Compact("更长期的选择")),"小标题与正文完整进入主版");
+  Check(commentaryPage.Composition.Columns.Last().Blocks.Any(block=>block.Kind=="title"&&PaperLayout.BlockText(commentaryPage,block)==shortOne.Title),"短评标题位于侧栏");
+  var longReview=QualityControl.Review(new Newspaper{Headline="评论质量",Articles=new List<Article>{LongCommentaryArticle(),shortOne,shortTwo}},new EditorialBrief(),referenceDayForRevision());
+  Check(!longReview.Issues.Any(issue=>issue.Code=="commentary-no-subheads")&&!longReview.HasFatal,"带小标题的长评论与短评通过评论专项质量检查");
+  var plainLong=Story("评论","缺少层次的长评论",LongCommentaryBody().Replace("## ","").Replace("\n",""),"评论");
+  var plainReview=QualityControl.Review(new Newspaper{Headline="评论质量",Articles=new List<Article>{plainLong}},new EditorialBrief(),referenceDayForRevision());
+  Check(plainReview.Issues.Any(issue=>issue.Code=="commentary-no-subheads")&&plainReview.NeedsRevision,"长评论缺少小标题时触发修订要求");
+
+  // 9. A rich single topic receives extra editions instead of being crammed.
+  var repeated="市库资金余额与月度预算收支结构保持稳定，收入、支出与结余需要分别理解。产业、商业与就业数据的变化说明，财政安排应把建设投入与长期运营成本放在一起考虑，公共服务水平取决于持续投入与维护，而不是一次性的资金规模。";
+  var longBody=string.Join("\n",Enumerable.Repeat(repeated,4));
+  var economyArticles=new List<Article>();
+  for(int i=1;i<=11;i++)economyArticles.Add(Story("经济与财政","预算与产业观察之"+i,longBody));
+  var economyPaper=new Newspaper{Name="汐澜日报",Day="2027-01-12",Headline="经济与财政专版",Deck="",Articles=economyArticles};
+  var economyPlan=PagePlanner.Plan(economyPaper,new EditorialBrief());
+  Check(economyPlan.Pages.Count>=3&&economyPlan.Pages.All(page=>PagePlanner.BaseTheme(page.Theme)=="经济与财政")&&economyPlan.Pages.Skip(1).All(page=>page.Theme.StartsWith("经济与财政（续",StringComparison.Ordinal)),"同一主题素材多时连续加版并使用（续）版名");
+  Check(economyPaper.Articles.Count==11&&economyPlan.Pages.All(page=>page.Articles.Count>0),"加版不丢失稿件也不产生空版");
+
+  // 10. End-to-end: dedicated commentary returns a long piece with subheads and short comments.
+  var mixedCommentaryJson=JsonConvert.SerializeObject(new{title=leadCommentary.Title,deck="资金存量之后，服务能力才是长期问题",section="评论",body=LongCommentaryBody(),shortComments=new[]{new{title=shortOne.Title,body=shortOne.Body},new{title=shortTwo.Title,body=shortTwo.Body}}});
+  var mixedHandler=new Scripted{Respond=system=>system.Contains("评论编辑")?mixedCommentaryJson:JsonConvert.SerializeObject(FirstPaper())};
+  using(var service=new NewsService(mixedHandler,Path.Combine(temp,"mixed-commentary"))){
+   var result=await service.Generate("mixed","汐澜",MajorDay(),new Preferences(),"key",CancellationToken.None).ConfigureAwait(false);
+   var page=result.Pages.Last();
+   Check(mixedHandler.Calls==2&&page.Theme=="评论"&&page.Articles.Count==3,"独立评论任务可同时返回长评论与短评并放入同一评论版");
+   Check(page.Articles[0].CommentaryRole=="长评"&&page.Articles.Skip(1).All(article=>article.CommentaryRole=="短评"),"长评论与短评角色区分，长评论排在最前");
+   Check(page.Composition!=null&&page.Composition.Template=="opinion-mixed","评论版按长评论加短评版式排版");
+   Check(result.QualityScore>=70&&result.Articles.All(article=>!article.Issues.Any(issue=>issue.Severity=="fatal")),"长评论与短评通过质量检查");
+   var output=Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../")),"artifacts/sample/评论与短评校样.docx");
+   DocxExporter.Save(output,result);
+   using(var zip=ZipFile.OpenRead(output))using(var stream=zip.GetEntry("word/document.xml").Open()){
+    var doc=XDocument.Load(stream);XNamespace w="http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+    var text=string.Concat(doc.Descendants(w+"t").Select(node=>node.Value));
+    Check(text.Contains("资金存量不是服务成效")&&text.Contains("服务需求的持续时间")&&text.Contains(shortOne.Title)&&text.Contains(shortTwo.Title),"Word 导出保留小标题与短评标题");
+    Check(text.Split(new[]{"资金存量不是服务成效"},StringSplitOptions.None).Length-1==1,"小标题在 Word 中只出现一次，未与正文重复");
+   }
+  }
   Console.WriteLine("Editorial pipeline checks passed");
  }
 }

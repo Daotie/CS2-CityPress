@@ -1,5 +1,27 @@
 # Changelog / 更新日志
 
+## 0.2.0-beta.8
+
+### English
+
+- The commentary edition is now a real opinion page. One long commentary occupies the whole or most of the edition and may sit beside up to two short comments. Long commentary can carry 2–4 subheadings: they are written as ordinary body lines starting with `## `, rendered as distinct heading blocks in the game preview and Word (smaller Heading style with keep-with-next), and never repeated in the body text.
+- The dedicated commentary request can return `shortComments`. Long and short commentary are validated separately: the long piece must be substantial, analytical and layered; short comments only need a clear viewpoint and are dropped individually if invalid, without failing the issue. A failed long commentary still reports an explicit error and retries once.
+- Commentary quality standards follow the role: the lead long commentary is checked for length, analysis, paragraphing and 2–4 (max 6) subheadings of reasonable length; short comments use their own shorter standard instead of being judged as an insufficient long piece. A commentary edition without a lead long piece is rejected when the event requires commentary, so a page of only short notes cannot pass as analysis.
+- Page planning no longer limits an edition to one topic. A topic with enough copy continues onto extra editions labelled（续）/（续二）…, pages are split by an editorial capacity (~2400 characters), the paper can carry up to ten news editions, and thin pages are merged only when the limit is exceeded. Rich material therefore gets space instead of being crammed or dropped.
+- New `opinion-mixed` layout for a long commentary plus short comments: two balanced main columns carry the long piece and its subheads, a narrow sidebar carries the short comments. Subhead blocks, Word rendering and UI styles were added; existing single-commentary `opinion`, other templates and legacy issues keep their behaviour.
+- Cache policy advanced to v8. Old cached editions are not reused; archived issues remain readable and re-exportable in their original layout.
+- Validation: full offline suite with **155 checks**, including commentary with subheads plus short comments end to end, role-based quality rules, opinion-mixed composition (main text preserved exactly once, sidebar titles), same-topic continuation editions and multi-page Word export with subheads. Not verified here: browser preview (local sandbox blocks browser spawn) and native in-game display; those still need a game restart and player acceptance.
+
+### 简体中文
+
+- 评论版改为真正的评论专版：一篇长评论占据该版全部或大部分篇幅，可与至多两篇短评同版。长评论可以用 2 至 4 个小标题分层：小标题就是正文中以“## ”开头的单独一行，在游戏预览和 Word 中渲染为独立小标题块（较小字号标题样式并保持与后文同页），不会在正文中重复出现。
+- 独立评论请求可返回 `shortComments`。长评论与短评分别校验：长评论必须有分量、有分析、有层次；短评只需观点明确，不合格时单独丢弃，不影响整期。长评论失败仍会明确报错并重试一次。
+- 评论质量按角色区分标准：主编长评论检查篇幅、论证、分段和 2 至 4 个（最多 6 个）长度合理的小标题；短评使用较短的独立标准，不再被当作“论证不足的长评论”误判。重大事件需要评论而评论版没有长评论时会被拒绝，只有短评的版面不能冒充深度分析。
+- 版面规划不再限制“一版只放一类新闻”。同一主题素材多时会连续加版（版名“经济与财政（续）”“（续二）”等），按约 2400 字的编辑容量拆版，新闻版最多十个；只有超过上限时才合并薄版。素材多时给足版面，不再硬塞或删除。
+- 新增 `opinion-mixed` 长评论加短评版式：两栏均衡承载长评论与小标题，窄侧栏放短评。新增小标题内容块、Word 渲染与 UI 样式；原有单篇评论版、其他版式与旧刊行为保持不变。
+- 缓存规则升至 v8，旧缓存不重用；历史报纸仍按原版式阅读和重新导出。
+- 验证：完整离线测试共 **155 项**，包括“长评论含小标题加短评”的端到端生成、按角色的评论质量规则、长评论加短评版式（正文只出现一次、短评标题在侧栏）、同主题连续加版以及含小标题的多版 Word 导出。本环境未验证：浏览器预览（沙箱禁止启动浏览器进程）与原生游戏内显示；仍需重启游戏并由玩家验收。
+
 ## 0.2.0-beta.7
 
 ### English

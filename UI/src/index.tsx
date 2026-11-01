@@ -3,7 +3,7 @@ import {ModRegistrar} from 'cs2/modding';
 import {bindValue, trigger, useValue} from 'cs2/api';
 import styles from './news.module.scss';
 import newspaperIcon from './icons/newspaper.svg';
-import {editionPages,compositionFor,blockText,verticalColumns,PageComposition,LayoutBlock} from './paper-layout';
+import {editionPages,compositionFor,blockText,verticalColumns,isSubhead,subheadText,PageComposition,LayoutBlock} from './paper-layout';
 
 interface Preferences {AutoGenerate:boolean;CustomName:string;Editorial:string;Model:string;ExportDirectory?:string;ApiEndpoint?:string;RequireApiKey?:boolean;JsonMode?:boolean;MaxOutputTokens?:number;TimeoutSeconds?:number;TokenParameter?:string;LayoutMode?:string;LongCommentary?:boolean}
 interface Article {Section:string;Title:string;Body:string;Genre?:string}
@@ -29,7 +29,8 @@ function PageBody({page}:{page:EditionPage}){
   if(item.Kind==='deck')return <p key={key} className={styles.deck}>{text}</p>;
   if(item.Kind==='section')return <div key={key} className={styles.section}>{text}</div>;
   if(item.Kind==='title')return <h3 key={key}>{text}</h3>;
-  return <React.Fragment key={key}>{text.split('\n').filter(Boolean).map((line,n)=><p key={n} data-body="true">{line}</p>)}</React.Fragment>;
+  if(item.Kind==='subhead')return <h4 key={key} className={styles.subhead}>{text}</h4>;
+  return <React.Fragment key={key}>{text.split('\n').filter(Boolean).map((line,n)=>isSubhead(line)?<h4 key={n} className={styles.subhead}>{subheadText(line)}</h4>:<p key={n} data-body="true">{line}</p>)}</React.Fragment>;
  };
  return <div className={`${styles.composition} ${plan.Template==='digest'?styles.digestPlan:''}`} data-layout={plan.Template}>{plan.Top.map((item,i)=>block(item,'top'+i))}<div className={styles.composedColumns}>{plan.Columns.map((column,i)=><div key={i} className={styles.composedColumn} style={{width:(100*column.Width/total)+'%'}}>{column.Blocks.map((item,n)=>block(item,i+'-'+n))}</div>)}</div></div>;
 }

@@ -10,6 +10,19 @@ namespace CityPress.Core {
   static readonly XNamespace w="http://schemas.openxmlformats.org/wordprocessingml/2006/main";
   static XElement P(string text,string style)=>new XElement(w+"p",new XElement(w+"pPr",new XElement(w+"pStyle",new XAttribute(w+"val",style))),new XElement(w+"r",new XElement(w+"t",text??"")));
   static XElement Vertical(string text){var paragraph=P(text,"Heading2");paragraph.Element(w+"r").AddFirst(new XElement(w+"rPr",new XElement(w+"sz",new XAttribute(w+"val",30))));return paragraph;}
+  // Long commentary subheads reuse the article-heading style with a smaller
+  // run so the Word template's Chinese font is preserved.
+  static XElement Subhead(string text){
+   var paragraph=P(text,"Heading2");
+   paragraph.Element(w+"r").AddFirst(new XElement(w+"rPr",new XElement(w+"b"),new XElement(w+"sz",new XAttribute(w+"val",27))));
+   var properties=paragraph.Element(w+"pPr");
+   if(properties!=null){
+    var style=properties.Element(w+"pStyle");
+    var keep=new XElement(w+"keepNext");
+    if(style==null)properties.AddFirst(keep);else{var elements=properties.Elements().ToList();var position=elements.IndexOf(style)+1;if(position>=elements.Count)properties.Add(keep);else elements[position].AddBeforeSelf(keep);}
+   }
+   return paragraph;
+  }
   public static void Save(string path,Newspaper paper) {
    Directory.CreateDirectory(Path.GetDirectoryName(path));var tmp=path+"."+Guid.NewGuid().ToString("N")+".tmp";
    try {
@@ -38,7 +51,9 @@ namespace CityPress.Core {
       foreach(var block in column.Blocks){
        var text=PaperLayout.BlockText(page,block);if(string.IsNullOrWhiteSpace(text))continue;
        if(block.Kind=="vertical-headline"){properties.Add(new XElement(w+"textDirection",new XAttribute(w+"val","tbRl")));cell.Add(Vertical(text));continue;}
+       if(block.Kind=="subhead"){cell.Add(Subhead(text));continue;}
        foreach(var line in text.Split(new[]{'\n'},StringSplitOptions.RemoveEmptyEntries)){
+        if(PaperLayout.IsSubhead(line)){cell.Add(Subhead(PaperLayout.SubheadText(line)));continue;}
         var paragraph=P(line,block.Kind=="section"?"CPSection":block.Kind=="headline"||block.Kind=="title"?"Heading2":block.Kind=="deck"?"CPDeck":"Normal");
         if(block.Kind=="headline")paragraph.Element(w+"r").AddFirst(new XElement(w+"rPr",new XElement(w+"sz",new XAttribute(w+"val",plan.Template=="digest"?30:38))));cell.Add(paragraph);
        }

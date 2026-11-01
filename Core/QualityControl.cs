@@ -111,7 +111,7 @@ namespace CityPress.Core {
    var issue=new QualityIssue{Code=code,Severity=severity,Detail=detail};
    issues.Add(issue);article.Issues.Add(issue);
   }
-  static void CheckArticle(Article article,int index,List<Article> articles,FactBook facts,EditorialBrief brief,bool commentaryRequired,List<QualityIssue> issues,bool commentaryPage) {
+  static void CheckArticle(Article article,int index,List<Article> articles,FactBook facts,EditorialBrief brief,Article commentaryLead,List<QualityIssue> issues,bool commentaryPage) {
    if(article==null)return;
    if(string.IsNullOrWhiteSpace(article.Title))Flag(article,issues,"title-missing",Fatal,"第 "+(index+1)+" 篇稿件缺少标题");
    else if(article.Title.Length>60)Flag(article,issues,"title-too-long",Major,"标题过长："+article.Title);
@@ -141,11 +141,31 @@ namespace CityPress.Core {
    if(GenericOpening.IsMatch((body??"").TrimStart()))Flag(article,issues,"mechanical-opening",Major,"《"+article.Title+"》使用了模板式开头");
    var sentences=Regex.Split(body,@"(?<=[。！？])").Where(sentence=>sentence.Trim().Length>0).ToList();
    if(sentences.Count>0&&sentences.Count(sentence=>sentence.Any(char.IsDigit))*2>sentences.Count)Flag(article,issues,"number-dump",Minor,"《"+article.Title+"》以数字罗列代替叙述");
-   if(commentaryPage||article.Genre=="评论"){
-    if(body.Length<120)Flag(article,issues,"commentary-too-short",Fatal,"评论《"+article.Title+"》不足 120 字，未形成有效论证");
-    else if(body.Length<300)Flag(article,issues,"commentary-short",Major,"评论《"+article.Title+"》仅 "+body.Length+" 字，论证不足");
-    if(AnalysisMarker.Matches(body).Count<2)Flag(article,issues,"commentary-no-analysis",Major,"评论《"+article.Title+"》缺少分析论证，接近新闻复述");
-    if(body.Length>=400&&!body.Contains("\n"))Flag(article,issues,"commentary-no-paragraphs",Major,"评论《"+article.Title+"》没有自然段划分");
+   if(! (article.Genre=="评论") &&body.Contains("## "))Flag(article,issues,"subhead-outside-commentary",Major,"小标题只用于评论版：《"+article.Title+"》");
+   if(article.Genre=="评论"){
+    int commentaryLength=PaperLayout.BodyLength(body);
+    var paragraphs=PaperLayout.Paragraphs(body);
+    var subheads=paragraphs.Where(PaperLayout.IsSubhead).Select(PaperLayout.SubheadText).ToList();
+    bool isLead=commentaryLead!=null&&ReferenceEquals(article,commentaryLead);
+    bool isLong=commentaryLength>=450;
+    if(commentaryLength<40)Flag(article,issues,"commentary-too-short",Fatal,"评论《"+article.Title+"》不足 40 字，未形成有效内容");
+    else if(isLead&&commentaryLength<120)Flag(article,issues,"commentary-too-short",Fatal,"长评论《"+article.Title+"》不足 120 字，未形成有效论证");
+    else if((isLead||isLong)&&commentaryLength<300)Flag(article,issues,"commentary-short",Major,"评论《"+article.Title+"》仅 "+commentaryLength+" 字，论证不足");
+    else if(commentaryLength<120)Flag(article,issues,"short-comment-short",Major,"短评《"+article.Title+"》仅 "+commentaryLength+" 字，信息不足");
+    int markers=AnalysisMarker.Matches(body).Count;
+    if((isLead||isLong)&&markers<2)Flag(article,issues,"commentary-no-analysis",Major,"评论《"+article.Title+"》缺少分析论证，接近新闻复述");
+    else if(!isLead&&!isLong&&markers<1)Flag(article,issues,"short-comment-no-viewpoint",Major,"短评《"+article.Title+"》没有明确观点");
+    if((isLead||isLong)&&commentaryLength>=400&&!body.Contains("\n")&&subheads.Count==0)Flag(article,issues,"commentary-no-paragraphs",Major,"评论《"+article.Title+"》没有自然段划分");
+    if(commentaryLength>=500){
+     if(subheads.Count<2)Flag(article,issues,"commentary-no-subheads",Major,"长评论《"+article.Title+"》缺少小标题层次（正文中用单独一行“## 小标题”分隔段落）");
+     else if(subheads.Count>6)Flag(article,issues,"commentary-subheads-many",Minor,"长评论《"+article.Title+"》小标题过多");
+     if(subheads.Count>0&&paragraphs.Length>0&&PaperLayout.IsSubhead(paragraphs.Last()))Flag(article,issues,"commentary-subhead-tail",Major,"评论《"+article.Title+"》以小标题结尾");
+     foreach(var label in subheads){
+      if(label.Length<2||label.Length>20)Flag(article,issues,"commentary-subhead-length",Major,"评论《"+article.Title+"》小标题长度不合适："+label);
+      else if(new[]{"背景","原因","意义","影响","分析","观点","结论","总结","展望","未来","挑战","建议","评论"}.Contains(label))Flag(article,issues,"commentary-subhead-generic",Major,"评论《"+article.Title+"》小标题空泛："+label);
+     }
+    }
+    if(subheads.Count>0&&commentaryLength<500)Flag(article,issues,"commentary-subheads-short",Minor,"短评论《"+article.Title+"》使用小标题，版面偏碎");
     if(sentences.Count>0&&sentences.Count(sentence=>sentence.Any(char.IsDigit))*10>sentences.Count*7)Flag(article,issues,"commentary-number-dump",Major,"评论《"+article.Title+"》以数字堆砌代替观点论证");
    }
   }
@@ -164,8 +184,10 @@ namespace CityPress.Core {
     while(article.Sources.Count>8)article.Sources.RemoveAt(article.Sources.Count-1);
    }
    var pages=PagePlanner.PagesOf(paper);
+   var comments=paper.Articles.Where(article=>article!=null&&article.Genre=="评论").ToList();
+   var commentaryLead=comments.OrderByDescending(article=>PaperLayout.BodyLength(article.Body)).FirstOrDefault();
    // Content checks.
-   for(int i=0;i<paper.Articles.Count;i++)CheckArticle(paper.Articles[i],i,paper.Articles,facts,brief,false,issues,paper.Articles[i]?.Genre=="评论");
+   for(int i=0;i<paper.Articles.Count;i++)CheckArticle(paper.Articles[i],i,paper.Articles,facts,brief,commentaryLead,issues,paper.Articles[i]?.Genre=="评论");
    // Repeated opening / duplicate editions.
    var openings=paper.Articles.Where(article=>article!=null&&!string.IsNullOrWhiteSpace(article.Body))
     .GroupBy(article=>new string(((article.Body??"").TrimStart().Take(12)).ToArray()).Trim())
@@ -190,13 +212,16 @@ namespace CityPress.Core {
     if(page.Articles.Count==0)Flag(paper.Articles.FirstOrDefault()??new Article(),issues,"page-empty",Major,"版面《"+(page.Theme??"未命名")+"》为空");
     if(page.Articles.Count>6)Flag(page.Articles[0],issues,"page-too-many",Minor,"版面《"+page.Theme+"》文章过多，影响阅读");
     if(page.Theme!="评论"&&page.Theme!="要闻"&&!PagePlanner.IsGenericTheme(page.Theme)){
-     int mismatch=page.Articles.Where(article=>article.Genre!="评论").Count(article=>PagePlanner.ThemeOf(article)!=PagePlanner.FallbackTheme&&PagePlanner.ThemeOf(article)!=page.Theme);
+     var baseTheme=PagePlanner.BaseTheme(page.Theme);
+     int mismatch=page.Articles.Where(article=>article.Genre!="评论").Count(article=>PagePlanner.ThemeOf(article)!=PagePlanner.FallbackTheme&&PagePlanner.ThemeOf(article)!=baseTheme);
      if(mismatch>0&&mismatch*2>page.Articles.Count)Flag(page.Articles[0],issues,"page-mismatch",Minor,"版面《"+page.Theme+"》与多数稿件主题不一致");
     }
    }
    var needCommentary=brief!=null&&brief.CommentaryWarranted;
    bool hasCommentary=pages.Any(page=>page.Articles.Count>0&&page.Articles.All(PagePlanner.IsCommentary));
+   bool hasLongCommentary=comments.Any(article=>PaperLayout.BodyLength(article.Body)>=300);
    if(needCommentary&&!hasCommentary)Flag(paper.Articles.FirstOrDefault()??new Article(),issues,"commentary-missing",Major,"重大事件缺少独立评论版");
+   else if(needCommentary&&!hasLongCommentary)Flag(paper.Articles.FirstOrDefault()??new Article(),issues,"commentary-long-missing",Major,"独立评论版缺少占据主要篇幅的长评论");
    // Milestone coverage: the top event should be visible in the news copy.
    if(brief!=null)foreach(var majorEvent in brief.MajorEvents.Where(item=>item.Importance>=NewsImportance.Milestone)){
     if(!paper.Articles.Any(article=>article!=null&&!string.IsNullOrEmpty(majorEvent.MajorToken)&&PagePlanner.Text(article).Contains(majorEvent.MajorToken)))

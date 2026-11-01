@@ -48,6 +48,8 @@ namespace CityPress.Core {
    public List<string> Sources=new List<string>();
    public List<QualityIssue> Issues=new List<QualityIssue>();
    public double Score=100;public int Revision;public string Status="pending";
+   // "长评"/"短评" on the commentary edition; "" elsewhere.
+   public string CommentaryRole;
   }
  public sealed class LayoutBlock {public string Kind;public int Article=-1,Start,Count=-1;}
  public sealed class LayoutColumn {public int Width;public List<LayoutBlock> Blocks=new List<LayoutBlock>();}

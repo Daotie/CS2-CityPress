@@ -1,27 +1,23 @@
-# CityPress 0.2.0-beta.7
+# CityPress 0.2.0-beta.8
 
 ## English
 
-Editorial-pipeline release: independent commentary as a real generation task, deterministic themed editions and an article quality gate.
+Commentary-edition release: a long analysis with subheadings, short comments on the same page, and page planning that adds editions when the material needs them.
 
-- **First, why the previous report looked broken.** The running game had loaded CityPress 0.2.0-beta.4 at 10:56 and never restarted; the beta.6 files were only copied to `Mods/CityPress` at 12:52. The 13:08 newspaper was produced by the old in-memory beta.4 code, which has no page model and no commentary at all. This release still fixes the real gaps that beta.6 left, and **the game must be restarted before testing it**.
-- The model no longer controls the number of editions. Breakthroughs, transit service changes, management actions and metric deltas are graded into news-value levels; a deterministic planner turns flat output (or a single "综合" edition) into themed editions and keeps the commentary edition separate and last. A single-domain or very thin day stays a single page instead of being padded.
-- Major event with enough material = news + independent commentary. The commentary is a **separate API request** with its own contract; it is validated for length, analysis content, sourcing and overlap with news, retried once with the concrete problem, and then attached as its own article and page. If it still fails, generation reports an explicit error and does not cache or publish a news-only issue.
-- New quality gate before layout: numbers must trace back to observations (including rounding, 万/亿 and percentage forms); fabricated interviews, attributable claims and official-sounding sources are fatal; repeated openings, mechanical evaluations, duplicated stories and commentary that reprints news are detected. Findings are scored, stored as per-article audit metadata, and at most one targeted revision request is made. A fatal fact problem still present after revision removes the unsafe article instead of publishing it.
-- Cache policy is now v7. Earlier cached single-edition issues are not reused; archived issues remain readable and re-exportable in their original layout. Word exports all planned editions with explicit page breaks.
-- Robustness: atomic replacement falls back to a safe delete-and-move when the filesystem denies `File.Replace`; empty editions returned by a model are dropped rather than failing the whole issue.
-- Verified offline: core/cache/finance/transit/API-compatibility/layout/Word/archive tests, plus a new editorial suite (commentary second pass and failure, themed planning, fact and attribution checks, dedupe, one targeted revision, multi-page Word). A simulation over the real save's 2027-01-12 journal (486 actions, 813 metrics, one treasury breakthrough) produced five themed editions plus a commentary page and passed fact checks. **Not verified here:** native in-game display and a real paid model call; browser preview was blocked by the local sandbox (`spawn EPERM`). Treat those as pending player acceptance, not as done.
-- Install: exit the game, extract the full `CityPress-0.2.0-beta.7.zip` into `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\Mods\CityPress`, then **restart the game** so the new assembly is loaded. Existing exports, archives, journals and keys are preserved. Re-generate a day to use the new pipeline; re-exporting an old issue does not rewrite its content.
+- **Commentary edition.** One long commentary occupies the whole or most of the opinion page. It can be accompanied by up to two short comments. The long piece may carry 2–4 subheadings, written as ordinary body lines starting with `## `; the game preview shows them as distinct heading blocks and Word exports them as a smaller heading style that stays with the following paragraph. Headings are never duplicated in the body text.
+- **Separate standards.** The dedicated commentary request may return `shortComments`. The long piece is checked for length, analysis, paragraphing and subheadings; short comments only need a clear viewpoint and are checked separately, so a 150–350 character note is no longer rejected as an "insufficient long commentary". Invalid short comments are dropped individually; a failed long commentary still retries once and otherwise reports a clear error without caching. A commentary edition with no lead long piece is rejected when the event requires commentary.
+- **Pages follow the material.** An edition is no longer limited to one topic. A topic with enough copy continues onto extra editions labelled（续）/（续二）…, pages are split by an editorial capacity (about 2400 characters), the paper can carry up to ten news editions, and thin pages are merged only when the limit is exceeded. Rich days get more space instead of being crammed into one page or losing copy.
+- **New layout.** `opinion-mixed` gives the long commentary two balanced main columns (with its subheadings) and a narrow sidebar for short comments. Existing single-commentary `opinion`, the other four templates and archived issues keep working unchanged. Cache policy is now v8; old cached editions are not reused, while archives stay readable and re-exportable in their original layout.
+- **Verified offline:** 155 checks, including an end-to-end run where the commentary task returns a long piece with three subheadings plus two short comments and the result passes quality, gets the mixed layout, keeps every body paragraph exactly once, and exports to Word with headings and short-comment titles. Also covered: role-based commentary quality rules, same-topic continuation editions, and Word multi-page export. **Not verified here:** browser preview (the local sandbox denies browser launch) and native in-game display. The game must be restarted to load this build; in-game appearance still needs player acceptance.
+- **Install:** exit the game, extract the full `CityPress-0.2.0-beta.8.zip` into `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\Mods\CityPress`, then start the game again. Existing journals, archives, exports and keys are preserved. Re-generate a day to use the new opinion layout; re-exporting an old issue does not rewrite it.
 
 ## 简体中文
 
-编辑流程版本：独立评论成为真正的生成任务，主题版面由确定性规划器决定，并加入文章质量检查。
+评论专版版本：长评论可带小标题、同版可放短评，版面按素材自动加版。
 
-- **先说明此前现象的原因。** 游戏在 10:56 已加载 CityPress 0.2.0-beta.4，之后一直没有重启；beta.6 文件到 12:52 才复制进 `Mods/CityPress`。13:08 生成的报纸由内存中的旧 beta.4 代码产生，而 beta.4 没有分版模型和评论功能。本版仍修复 beta.6 留下的真实缺口，并且**必须先重启游戏**才能验证这些改动。
-- 版面数量不再由模型决定。突破、线路服务变化、管理操作与指标变化先评定新闻价值，再由确定性规划器把扁平输出（或单一“综合”版）拆成主题版，独立评论版始终单独排在最后。素材很少或只涉及一个领域时保持单版，不为凑版注水。
-- 素材足够的重大事件 = 新闻 + 独立评论。评论由**单独的一次 API 请求**生成，拥有自己的写作约定；校验篇幅、分析内容、来源与新闻重复度，针对具体问题重试一次，然后作为独立文章和版面加入。若仍失败，明确报错并且不缓存、不发布只有新闻的残缺报纸。
-- 排版前新增质量检查：数字必须可追溯（含四舍五入、万/亿与百分比写法）；虚构采访、可归属引述和类官方来源判为严重错误；雷同开头、机械评价、重复报道、抄写新闻的评论会被识别。结果计入评分并保存为逐篇审计元数据，最多发起一次针对性局部修订；修订后仍有严重事实错误的稿件会被删除而不是发布。
-- 缓存规则升至 v7。旧的单版缓存不再复用；历史报纸可按原版式继续阅读和重新导出。Word 按全部规划版面显式分页导出。
-- 稳健性：文件系统拒绝 `File.Replace` 时，原子替换回退为安全的删除后移动；模型返回的空版面会被丢弃，不会导致整份报纸失败。
-- 离线已验证：核心/缓存/财政/线路/API 兼容/版式/Word/归档测试，以及新增编辑测试（评论二次生成与失败、主题分版、事实与来源核验、去重、一次局部修订、Word 多版）。用真实存档 2027-01-12 日志（486 条操作、813 项指标、1 项市库突破）模拟，得到五个主题版加评论版并通过事实核验。**本环境未验证**：原生游戏内显示、真实付费模型调用；浏览器预览被本地沙箱阻止（`spawn EPERM`）。这些属于待玩家验收项，不能算已完成。
-- 安装：退出游戏，把完整 `CityPress-0.2.0-beta.7.zip` 解压到 `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\Mods\CityPress`，然后**重启游戏**以加载新程序集。原有导出、档案、日志与密钥保留。需重新生成某一天才会使用新流程；重新导出旧报不会改写其内容。
+- **评论专版。** 一篇长评论占据评论版全部或大部分篇幅，可与至多两篇短评同版。长评论可以有 2 至 4 个小标题：以正文中“## ”开头的单独一行书写，游戏预览中显示为独立小标题，Word 中导出为较小字号的标题样式并保持与后文同页；小标题不会在正文中重复出现。
+- **独立标准。** 独立评论请求可返回 `shortComments`。长评论检查篇幅、论证、分段与小标题；短评只需观点明确，使用单独标准，不再被当作“论证不足的长评论”误判。不合格的短评单独丢弃；长评论失败仍会重试一次，否则明确报错、不缓存。重大事件需要评论而评论版没有长评论时会被拒绝，只有短评的版面不能冒充深度分析。
+- **版面跟着素材走。** 一版不再只放一类新闻。同一主题素材足够时连续加版（版名“（续）”“（续二）”等），按约 2400 字的编辑容量拆版，新闻版最多十个；只有超过上限才合并薄版。素材丰富的日子获得更多版面，而不是硬塞进一版或丢失稿件。
+- **新版式。** `opinion-mixed` 用两栏均衡承载长评论与小标题，窄侧栏放短评。原有单篇评论版、其余四种版式和历史旧刊保持兼容。缓存规则升至 v8，旧缓存不重用；历史报纸仍可按原版式阅读和重新导出。
+- **离线验证：** 共 155 项检查，包括“独立评论任务返回含三个小标题的长评论加两篇短评”的端到端生成：通过质量检查、使用混合版式、每段正文只出现一次、Word 导出保留小标题与短评标题；另外覆盖按角色的评论质量规则、同主题连续加版与多版 Word 导出。**本环境未验证：**浏览器预览（本地沙箱禁止启动浏览器进程）与原生游戏内显示。必须先重启游戏加载本版本，游戏内效果仍需玩家验收。
+- **安装：** 退出游戏，把完整 `CityPress-0.2.0-beta.8.zip` 解压到 `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\Mods\CityPress`，再启动游戏。原有日志、档案、导出和密钥保留。需重新生成某一天才会使用新的评论版式；重新导出旧报不会改写其内容。
