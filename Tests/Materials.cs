@@ -20,7 +20,11 @@ static class MaterialTests {
   Aggregator.Sample(raw,"city/monthlyIncome","月度预算总收入","原生单位",105899335,"10:00");
   raw.Transit.Add(new TransitRecord{Id="old",Name="地铁1号线",Operating=true,Stops=28,Vehicles=17});
   raw.Transit.Add(new TransitRecord{Id="new",Name="APM-3",Operating=true,Stops=8,Vehicles=3,Change="投入运营"});
+  Aggregator.Add(raw,"城市实况 · 建筑施工标记结束（不等于已投入运营）","工业制造01-L1-5x6","11:30");
+  Aggregator.Add(raw,"城市实况 · 建筑火情标记解除","工业制造01-L1-5x6","11:31");
+  Aggregator.Add(raw,"城市实况 · 公共交通线路新增实体（运营状态未核实）","Bus Route","11:32");
   string before=JsonConvert.SerializeObject(raw);var prepared=EditorialMaterial.Prepare(raw);string text=JsonConvert.SerializeObject(prepared);
+  Check(!text.Contains("标记")&&!text.Contains("未核实")&&!text.Contains("Bus Route"),"施工和火情内部标记不进素材，线路消息仅由实际服务变化提供");
   Check(before==JsonConvert.SerializeObject(raw),"素材整理不修改本地原始记录");
   Check(prepared.Actions.Single(a=>a.Detail=="住宅").Count==2&&!text.Contains("L5-6x6")&&!text.Contains("taxable"),"资产规格归并成建筑类别，未知税收分组不送入编辑");
   Check(prepared.Actions.Count(a=>a.Kind=="公共安全事件")==1&&text.Contains("伤亡人数2人")&&!text.Contains("Damages")&&!text.Contains("Entity("),"小事故舍弃，重大事件采用最后累计伤亡值且不泄露资产编号");

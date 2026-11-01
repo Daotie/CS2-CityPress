@@ -47,12 +47,13 @@ namespace CityPress.Core {
      if(!eventLatest.TryGetValue(key,out var old)||string.CompareOrdinal(action.Last,old.Last)>=0)eventLatest[key]=action;
      continue;
     }
-    if(Regex.IsMatch(action.Kind+" "+action.Detail,"设置变化|票价工具|Route Ticket Price|施工结束|工具提交"))continue;
+    if(Regex.IsMatch(action.Kind+" "+action.Detail,"设置变化|票价工具|Route Ticket Price|施工结束|工具提交|施工标记|火情标记|建筑类型变更|公共交通线路"))continue;
     if(action.Kind.Contains("树木"))continue;
     string detail=action.Detail;
     if(action.Kind.Contains("城市实况")||TechnicalCopy.IsMatch(detail))detail=Category(detail);
-    Aggregator.Add(result,action.Kind,detail,"");
-    result.Actions.Last(x=>x.Kind==action.Kind&&x.Detail==detail).Count+=action.Count-1;
+    string kind=action.Kind.Replace("城市实况 · ","").Replace("实体（运营状态未核实）","").Replace("路网区段（非整条道路）","路网调整");
+    Aggregator.Add(result,kind,detail,"");
+    result.Actions.Last(x=>x.Kind==kind&&x.Detail==detail).Count+=action.Count-1;
    }
    foreach(var action in eventLatest.Values){
     var casualties=Regex.Match(action.Detail,@"Casualties=(\d+)");
