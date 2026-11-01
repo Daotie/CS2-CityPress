@@ -6,6 +6,7 @@ The author also maintains another Cities: Skylines II project, [RouteFilter](htt
 
 | Component | Use | License / notice |
 | --- | --- | --- |
+| Ma Shan Zheng | Bundled UI masthead calligraphy font, copyright 2018 The Ma Shan Zheng Project Authors | SIL OFL 1.1, [notice](licenses/MaShanZheng-OFL.txt), [source](https://github.com/google/fonts/tree/main/ofl/mashanzheng) |
 | Harmony 2.2.2 | Bundled `0Harmony.dll`, gameplay hooks | MIT, [Andreas Pardeike](https://github.com/pardeike/Harmony/tree/v2.2.2.0), [notice](licenses/Harmony-MIT.txt) |
 | React 18.3.1 | JSX runtime bundled in the UI; main React provided by the game | MIT, [notice](licenses/React-MIT.txt) |
 | React DOM 18.3.1 | Declared UI dependency; main runtime supplied by the game | MIT, [notice](licenses/React-DOM-MIT.txt) |

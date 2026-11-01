@@ -36,8 +36,10 @@ export function blockText(page:ComposedPage,block:LayoutBlock):string{
  return (block.Count<0?lines:lines.slice(0,block.Count)).join('\n');
 }
 export function compositionFor(page:ComposedPage):PageComposition{
- if(page.Composition?.Columns?.length)return page.Composition;
+ if(page.Composition?.Columns?.length){
+  if(page.Composition.Template!=='vertical-lead'||(page.Headline.length<=20&&!/[0-9A-Za-z，,；;：:。\s]/.test(page.Headline)))return page.Composition;
+ }
  const b=(Kind:string,Article=-1):LayoutBlock=>({Kind,Article,Start:0,Count:-1});let index=0;
  return {Template:'banner',Top:[b('headline'),b('deck')],Columns:groupArticles(page.Articles??[]).map(group=>({Width:1,Blocks:group.reduce<LayoutBlock[]>((all)=>{const n=index++;all.push(b('section',n),b('title',n),b('body',n));return all;},[])}))};
 }
-export function verticalColumns(text:string):string[][]{const chars=Array.from(text??''),count=spec.templates['vertical-lead'].glyphsPerColumn;const result:string[][]=[];for(let i=0;i<chars.length;i+=count)result.push(chars.slice(i,i+count));return result;}
+export function verticalColumns(text:string):string[][]{const chars=Array.from(text??''),maximum=spec.templates['vertical-lead'].glyphsPerColumn,columnCount=Math.max(1,Math.ceil(chars.length/maximum)),count=Math.max(1,Math.ceil(chars.length/columnCount));const result:string[][]=[];for(let i=0;i<chars.length;i+=count)result.push(chars.slice(i,i+count));return result;}

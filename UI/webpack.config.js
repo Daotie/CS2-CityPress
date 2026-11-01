@@ -37,6 +37,7 @@ module.exports = {
   },
   module: {
     rules: [
+      { test: /\.ttf$/i, type: "asset/inline" },
       {
         test: /\.tsx?$/,
         use: "ts-loader",
