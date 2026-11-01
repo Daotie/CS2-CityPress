@@ -76,6 +76,7 @@ namespace CityPress.Systems {
    Rollover(now.ToString("yyyy-MM-dd"));
    var log=state.Days.Last();Aggregator.Sample(log,key,label,unit,value,now.ToString("HH:mm:ss"));Milestones.Observe(state,log,key,value,now.ToString("HH:mm:ss"));Changed();
   }
+  internal void ObserveTransit(TransitRecord value){if(!TryGetGameTime(out var now))return;Rollover(now.ToString("yyyy-MM-dd"));value.Time=now.ToString("HH:mm:ss");TransitFacts.Store(state.Days.Last(),value);Changed();}
   protected override void OnGamePreload(Purpose purpose,GameMode mode){base.OnGamePreload(purpose,mode);loaded=false;Reset();}
   protected override void OnGameLoadingComplete(Purpose purpose,GameMode mode){base.OnGameLoadingComplete(purpose,mode);loaded=mode==GameMode.Game;archiveRefresh=true;}
   void Rollover(string day) {
@@ -165,7 +166,7 @@ namespace CityPress.Systems {
    if(lastCoverage!=CityObserver.Report){lastCoverage=CityObserver.Report;uiDirty=true;}
    if(!uiDirty||DateTime.UtcNow<nextFullUi)return;uiDirty=false;nextFullUi=DateTime.UtcNow.AddSeconds(1);
    binding.Update(JsonConvert.SerializeObject(new {city,day,gameTime=clock,timeReady,preferences=Effective,scope=state.Override==null?"global":"save",busy=pending!=null,status,popup,paper,
-    days=state.Days.Where(x=>GameCalendar.IsValidDay(x.Day)).Select(x=>new{x.Day,count=Aggregator.Count(x),metrics=x.Metrics?.Count??0,breakthroughs=x.Breakthroughs?.Count??0}),issues=issueDays.Where(value=>GameCalendar.IsVisibleIssue(state,value,day)),
+    days=state.Days.Where(x=>GameCalendar.IsValidDay(x.Day)).Select(x=>new{x.Day,count=Aggregator.Count(x),metrics=x.Metrics?.Count??0,breakthroughs=x.Breakthroughs?.Count??0,transit=x.Transit?.Count??0}),issues=issueDays.Where(value=>GameCalendar.IsVisibleIssue(state,value,day)),
     coverage=ActionHooks.Coverage.Concat(new[]{"管理操作入口："+GameplayBindings.Count+" 个；未接入："+GameplayBindings.Failed,CityObserver.Report}),keyConfigured,exportDefault=ExportPaths.DefaultDirectory,exportFolder=ExportFolder}));
   }
   public void Serialize<TWriter>(TWriter writer) where TWriter:IWriter {writer.Write(1);writer.Write(JsonConvert.SerializeObject(state));}

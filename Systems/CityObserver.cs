@@ -13,7 +13,11 @@ namespace CityPress.Systems {
  // never reported as freshly built when a save is opened.
  public partial class CityObserver : GameSystemBase {
   internal static string Report="城市观测：等待存档加载";
-  EntityQuery assets,created,deleted,journals,ownedTiles;
+  EntityQuery assets,created,deleted,journals,ownedTiles,lines;
+  NativeArray<Entity> lineEntities;int lineCursor;bool linesPrimed;DateTime nextTransit;
+  readonly Dictionary<Entity,TransitRecord> lineHistory=new Dictionary<Entity,TransitRecord>();
+  readonly HashSet<Entity> stopSet=new HashSet<Entity>();
+  readonly HashSet<Entity> knownService=new HashSet<Entity>();
   struct Asset {public Entity Prefab;public string Category,Settings;public int State,Slot,SeenPass;}
   Dictionary<Entity,Asset> previous=new Dictionary<Entity,Asset>();
   readonly Dictionary<Entity,string> events=new Dictionary<Entity,string>();
@@ -36,6 +40,7 @@ namespace CityPress.Systems {
    deleted=GetEntityQuery(new EntityQueryDesc{All=new[]{ComponentType.ReadOnly<PrefabRef>(),ComponentType.ReadOnly<Game.Common.Deleted>()},Any=roots,None=new[]{ComponentType.ReadOnly<Game.Tools.Temp>(),ComponentType.ReadOnly<Game.Common.Owner>()}});
    journals=GetEntityQuery(ComponentType.ReadOnly<Game.Events.EventJournalEntry>());
    ownedTiles=GetEntityQuery(new EntityQueryDesc{All=new[]{ComponentType.ReadOnly<Game.Areas.MapTile>()},None=new[]{ComponentType.ReadOnly<Game.Common.Native>(),ComponentType.ReadOnly<Game.Common.Deleted>()}});
+   lines=GetEntityQuery(new EntityQueryDesc{All=new[]{ComponentType.ReadOnly<Game.Routes.TransportLine>(),ComponentType.ReadOnly<Game.Routes.Route>(),ComponentType.ReadOnly<PrefabRef>()},None=new[]{ComponentType.ReadOnly<Game.Tools.Temp>(),ComponentType.ReadOnly<Game.Common.Deleted>()}});
   }
   protected override void OnUpdate() {
    var news=NewsSystem.Active;if(news==null||!news.TryGetGameTime(out var now))return;
@@ -44,7 +49,8 @@ namespace CityPress.Systems {
    long started=Stopwatch.GetTimestamp();
    if(primed)Guard("assets",()=>Changes(news));
    if(dataStage<0&&now>=nextStatistics)dataStage=0;
-   if(dataStage>=0){int stage=dataStage;bool ok=Guard("statistics",()=>{
+   if(lineEntities.IsCreated||now>=nextTransit){if(!Guard("transit",()=>Transit(news))){if(lineEntities.IsCreated)lineEntities.Dispose();nextTransit=now.AddMinutes(1);}}
+   else if(dataStage>=0){int stage=dataStage;bool ok=Guard("statistics",()=>{
      if(stage==0)Statistics(news);
      else if(stage==1){AdditionalStatistics(news);dataStage++;}
      else if(stage==2)Journal(news);
@@ -60,7 +66,7 @@ namespace CityPress.Systems {
     var errors=new[]{assetError,statError,eventError,bindingError}.Where(e=>e!=null).ToArray();if(errors.Length>0)Report+="；部分采集异常："+string.Join("、",errors);maxSliceMs=0;
    }
   }
-  void DisposeWork(){if(scanEntities.IsCreated)scanEntities.Dispose();if(statisticKeys.IsCreated)statisticKeys.Dispose();if(journalEntities.IsCreated)journalEntities.Dispose();pollutionCursor=pollutionLength=0;pollutionSum=pollutionMax=0;pollutionNonzero=0;}
+  void DisposeWork(){if(scanEntities.IsCreated)scanEntities.Dispose();if(statisticKeys.IsCreated)statisticKeys.Dispose();if(journalEntities.IsCreated)journalEntities.Dispose();if(lineEntities.IsCreated)lineEntities.Dispose();lineHistory.Clear();knownService.Clear();linesPrimed=false;nextTransit=default;pollutionCursor=pollutionLength=0;pollutionSum=pollutionMax=0;pollutionNonzero=0;}
   protected override void OnDestroy(){DisposeWork();base.OnDestroy();}
   void Track(Entity entity,Asset value){if(previous.TryGetValue(entity,out var old))value.Slot=old.Slot;else{value.Slot=tracked.Count;tracked.Add(entity);}value.SeenPass=scanPass;previous[entity]=value;}
   void Untrack(Entity entity){if(!previous.TryGetValue(entity,out var value))return;int last=tracked.Count-1;var tail=tracked[last];tracked[value.Slot]=tail;if(tail!=entity){var moved=previous[tail];moved.Slot=value.Slot;previous[tail]=moved;}tracked.RemoveAt(last);previous.Remove(entity);if(value.Slot<sweepCursor)sweepCursor=value.Slot;}
@@ -166,8 +172,8 @@ namespace CityPress.Systems {
    news.Sample(unlimited?"city/displayMoneyUnlimited":"city/money","市库现有资金",unlimited?"无限资金模式显示值，不得作为真实财政突破":"原生货币单位，资金存量",city.moneyAmount);
    if(EntityManager.HasComponent<Game.City.Population>(city.City))news.Sample("city/population","常住人口","人",EntityManager.GetComponentData<Game.City.Population>(city.City).m_Population);
    var budget=World.GetExistingSystemManaged<CityServiceBudgetSystem>();
-   if(budget!=null){var income=budget.GetIncomeArray(out var incomeDeps);var expenses=budget.GetExpenseArray(out var expenseDeps);incomeDeps.Complete();expenseDeps.Complete();long gross=0,signedExpenses=0;foreach(var amount in income)gross+=amount;foreach(var amount in expenses)signedExpenses+=amount;
-    if(gross!=0||signedExpenses!=0){news.Sample("city/monthlyIncome","月度预算总收入","原生货币单位/月，预算面板口径，非本月已结算收入",gross);news.Sample("city/monthlyExpenses","月度预算支出","原生货币单位/月，预算面板口径",Math.Abs(signedExpenses));news.Sample("city/monthlyBalance","月度预算收支结余","原生货币单位/月，预算收入加原生负支出，非市库余额",gross+signedExpenses);}
+   if(budget!=null){var income=budget.GetIncomeArray(out var incomeDeps);var expenses=budget.GetExpenseArray(out var expenseDeps);incomeDeps.Complete();expenseDeps.Complete();long gross=0,cost=0;foreach(var amount in income)gross+=amount;foreach(var amount in expenses)cost+=amount;
+    if(gross!=0||cost!=0){news.Sample("city/monthlyIncome","月度预算总收入","原生货币单位/月，预算面板口径，非本月已结算收入",gross);news.Sample("city/monthlyExpenses","月度预算支出","原生货币单位/月，预算面板口径",cost);news.Sample("city/monthlyNetIncome","月度预算收支结余","原生货币单位/月，预算收入减支出",FinanceFacts.MonthlyNet(gross,cost));}
    }
    var households=World.GetExistingSystemManaged<BudgetSystem>();if(households!=null&&households.HasData)news.Sample("city/households","家庭数量","户",households.GetHouseholdCount());
    if(EntityManager.HasComponent<Game.City.Tourism>(city.City)){var tourism=EntityManager.GetComponentData<Game.City.Tourism>(city.City);news.Sample("city/tourists","当前游客人数","人，当前在城数量，非累计接待量",tourism.m_CurrentTourists);news.Sample("city/lodgingCapacity","住宿接待容量","原生住宿容量单位",tourism.m_Lodging.y);}
@@ -190,6 +196,30 @@ namespace CityPress.Systems {
    }
    var climate=World.GetExistingSystemManaged<ClimateSystem>();if(climate!=null){news.Sample("weather/temperature","气温","摄氏度",climate.temperature.value);news.Sample("weather/rain","降雨状态","1为降雨，0为无雨，不是降雨量",climate.isRaining?1:0);news.Sample("weather/snow","降雪状态","1为降雪，0为无雪，不是降雪量",climate.isSnowing?1:0);}
    var traffic=World.GetExistingSystemManaged<TrafficFlowSystem>();if(traffic!=null){news.Sample("traffic/flow","交通流畅度原始指标","原生比例，非拥堵道路条数",traffic.cityAverageTrafficFlow);news.Sample("traffic/volume","交通流量原始指标","原生单位，非日车辆总数",traffic.cityAverageTrafficVolume);}
+  }
+  void Transit(NewsSystem news) {
+   if(!lineEntities.IsCreated){lineEntities=lines.ToEntityArray(Allocator.Persistent);lineCursor=0;}
+   var slice=new WorkSlice(24);
+   while(lineCursor<lineEntities.Length&&slice.Take()){
+    var entity=lineEntities[lineCursor++];if(!EntityManager.Exists(entity)||!EntityManager.HasComponent<Game.Routes.Route>(entity)||!EntityManager.HasComponent<Game.Routes.TransportLine>(entity)||!EntityManager.HasComponent<PrefabRef>(entity)||EntityManager.HasComponent<Game.Common.Deleted>(entity))continue;
+    var route=EntityManager.GetComponentData<Game.Routes.Route>(entity);var line=EntityManager.GetComponentData<Game.Routes.TransportLine>(entity);var prefab=EntityManager.GetComponentData<PrefabRef>(entity).m_Prefab;
+    if(!EntityManager.HasComponent<TransportLineData>(prefab))continue;var data=EntityManager.GetComponentData<TransportLineData>(prefab);if(!data.m_PassengerTransport)continue;
+    int serving=0;stopSet.Clear();
+    if(EntityManager.HasBuffer<Game.Routes.RouteWaypoint>(entity))foreach(var point in EntityManager.GetBuffer<Game.Routes.RouteWaypoint>(entity,true))if(EntityManager.Exists(point.m_Waypoint)&&EntityManager.HasComponent<Game.Routes.Connected>(point.m_Waypoint)){var stop=EntityManager.GetComponentData<Game.Routes.Connected>(point.m_Waypoint).m_Connected;if(stop!=Entity.Null&&EntityManager.Exists(stop))stopSet.Add(stop);}
+    int stops=stopSet.Count;
+    if(EntityManager.HasBuffer<Game.Routes.RouteVehicle>(entity))foreach(var item in EntityManager.GetBuffer<Game.Routes.RouteVehicle>(entity,true)){
+     var vehicle=item.m_Vehicle;if(!EntityManager.Exists(vehicle)||!EntityManager.HasComponent<Game.Vehicles.PublicTransport>(vehicle)||!EntityManager.HasComponent<Game.Routes.CurrentRoute>(vehicle)||EntityManager.GetComponentData<Game.Routes.CurrentRoute>(vehicle).m_Route!=entity)continue;
+     var flags=EntityManager.GetComponentData<Game.Vehicles.PublicTransport>(vehicle).m_State;
+     var excluded=Game.Vehicles.PublicTransportFlags.Returning|Game.Vehicles.PublicTransportFlags.Testing|Game.Vehicles.PublicTransportFlags.DummyTraffic|Game.Vehicles.PublicTransportFlags.Disabled|Game.Vehicles.PublicTransportFlags.AbandonRoute;
+     var service=Game.Vehicles.PublicTransportFlags.EnRoute|Game.Vehicles.PublicTransportFlags.Boarding|Game.Vehicles.PublicTransportFlags.Arriving;
+     if((flags&excluded)==0&&(flags&service)!=0)serving++;
+    }
+    bool enabled=(route.m_OptionMask&(1u<<(int)Game.Routes.RouteOption.Inactive))==0;
+    string mode=data.m_TransportType==TransportType.Subway?"地铁":data.m_TransportType==TransportType.Tram?"有轨电车":data.m_TransportType==TransportType.Bus?"公交":data.m_TransportType==TransportType.Train?"铁路":data.m_TransportType==TransportType.Ferry?"轮渡":data.m_TransportType==TransportType.Ship?"客船":data.m_TransportType==TransportType.Airplane?"航空":data.m_TransportType.ToString();
+    var value=new TransitRecord{Id=entity.ToString(),Name=EntityContext.Name(entity),Mode=mode,Enabled=enabled,Operating=TransitFacts.IsOperating(enabled,stops,serving),Stops=stops,Vehicles=serving,Fare=line.m_TicketPrice};
+    lineHistory.TryGetValue(entity,out var old);value.Change=TransitFacts.Transition(old,value,!linesPrimed,knownService.Contains(entity));if(!linesPrimed||value.Operating)knownService.Add(entity);lineHistory[entity]=TransitFacts.Copy(value);news.ObserveTransit(value);
+   }
+   if(lineCursor<lineEntities.Length)return;lineEntities.Dispose();linesPrimed=true;nextTransit=lastTime.AddMinutes(1);
   }
   void Journal(NewsSystem news) {
    var system=World.GetOrCreateSystemManaged<Game.Events.EventJournalSystem>();

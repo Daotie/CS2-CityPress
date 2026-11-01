@@ -28,3 +28,5 @@ $text:var(--menuText1Normal);$muted:var(--menuText2Normal);$border:var(--menuBor
 // Cohtml needs game-registered CJK fonts; use the game's font throughout the paper.
 .archiveSummary{display:block;flex:1 1 auto;min-width:0;margin-right:16rem;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.archiveAction{display:block;flex:0 0 auto;white-space:nowrap;}.archive button{flex-wrap:nowrap;}
 .toolbarActions{display:flex;flex:0 0 auto;align-items:center;}.toolbarActions button{flex:0 0 auto;width:auto;min-width:108rem;margin-left:8rem;}.exportPath{font-size:11rem;line-height:18rem;color:var(--menuText2Normal);white-space:pre-wrap;overflow-wrap:break-word;}
+
+.pageNav{display:flex;flex-wrap:wrap;margin:0 0 12rem;padding:6rem;background-color:rgba(0,0,0,.15);border-radius:4rem;}.pageNav button{height:30rem;padding:0 12rem;margin:2rem;font-size:12rem;}.pageTurn{display:flex;align-items:center;justify-content:center;margin:12rem 0;}.pageTurn button{height:30rem;padding:0 16rem;background-color:var(--menuActiveColor);}.pageTurn span{margin:0 16rem;font-size:12rem;color:var(--menuText2Normal);}

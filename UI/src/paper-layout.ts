@@ -13,3 +13,7 @@ export function groupArticles<T extends {Title:string;Body:string}>(articles:T[]
  }
  return groups;
 }
+
+export function editionPages<T extends {Section:string;Title:string;Body:string;Genre?:string}>(paper:{Headline:string;Deck:string;Articles:T[];Pages?:{Theme:string;Headline:string;Deck:string;Articles:T[]}[]}) {
+ return paper.Pages?.length?paper.Pages:[{Theme:'综合',Headline:paper.Headline,Deck:paper.Deck,Articles:paper.Articles??[]}];
+}
