@@ -1,5 +1,23 @@
 # Changelog / 更新日志
 
+## 0.2.0-beta.5
+
+### English
+
+- Added dynamically themed editions with news, briefs, analysis and commentary. Topic count follows the available material instead of mandatory filler pages. In-game page navigation and Word page breaks share page order, themes, headlines and article content; legacy issues remain readable.
+- Rewrote the default editorial policy for publishable real-world newspaper copy. Technical collection caveats stay internal; incomplete conclusions are omitted. Recognizable process/disclaimer phrases are rejected before caching. Existing stock policies upgrade; custom editorial instructions remain intact.
+- Added independent, staged one-game-minute passenger-line checks: actual names, transport modes, distinct stopping points, fares and service evidence. Enabled routes or assigned vehicles alone do not establish operation; testing/returning/dummy/disabled vehicles are excluded. Same-day opening facts survive later fare changes. Baselines and routine vehicle gaps cannot create fake openings.
+- Fixed monthly budget balance: native expenses are positive and must be subtracted from revenue. Earlier incorrect balance samples/highs are excluded from new editorial input by using a corrected metric key; original archives are retained. Cache policy advanced to v5.
+- Validation: core/cache/finance/transit/legacy compatibility, game-assembly callback harness, UI types/build/audit, browser page navigation and three scales, and three rendered Word theme pages. Native game/save acceptance and real DeepSeek editorial output remain untested; test responses are offline fixtures.
+
+### 简体中文
+
+- 新增主题分版，消息、简讯、分析和评论明确标识；版面按素材组织，不强制凑齐栏目。游戏翻版与 Word 主题分页共用版序、版名、头条和文章，兼容旧刊。
+- 重写默认编辑方针，按现实报纸专业语言成稿，采集限制只作内部判断，缺乏依据的结论直接舍弃；技术/免责模板措辞在缓存前拦截。旧默认方针自动升级，自定义保留。
+- 客运线路独立分帧检查，完成后间隔一游戏分钟。记录原名、方式、去重停靠点、票价与实际服务；仅启用/配车不作为运营，排除试车、返场、虚拟及停用车辆。后续调价不覆盖当日开通，既有基线和车辆短暂无服务不冒充新开通。
+- 修正财政结余：原生支出为正数，改为收入减支出。旧错误结余指标及其突破不再进入新稿，原档案保留；正确指标重新建立高位基线，缓存规则升至 v5。
+- 验证：核心/缓存/财政/线路/旧刊、实际程序集回调、UI 类型/构建/审计、翻版/三种缩放和三版 Word 渲染。原生游戏实测与真实 DeepSeek 成稿验收待完成，自动测试使用离线样本。
+
 ## 0.2.0-beta.4
 
 ### English

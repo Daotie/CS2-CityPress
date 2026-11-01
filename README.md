@@ -3,13 +3,13 @@
 <h1 align="center">CityPress</h1>
 <p align="center">Your city's daily newspaper for <strong>Cities: Skylines II</strong>.</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.4-00a8bb" alt="0.2.0-beta.4">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.5-00a8bb" alt="0.2.0-beta.5">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
 <p align="center"><a href="https://github.com/Daotie/CS2-CityPress/releases">Downloads</a> · <a href="https://github.com/Daotie/CS2-CityPress/issues">Issues</a> · <a href="CHANGELOG.md">Changelog</a> · <a href="SECURITY.md">Privacy</a></p>
 
-**0.2.0-beta.4:** Adds custom export folders, persistent numerical breakthroughs and staged background work. See [release notes](RELEASE_NOTES.md). The interface, default editorial policy and Word furniture currently use Simplified Chinese; public documentation is bilingual.
+**0.2.0-beta.5:** Adds themed editions, news/commentary separation, named transit service evidence and a budget-balance correction. See [release notes](RELEASE_NOTES.md). The interface, default editorial policy and Word furniture currently use Simplified Chinese; public documentation is bilingual.
 
 ## What it does
 
@@ -17,7 +17,9 @@
 - Samples available city statistics, finances, transport, utilities, weather and pollution; combines repeated records.
 - Excludes automatic vehicle renaming, individual boarding/alighting, UI navigation and empty previews.
 - Sends eligible summaries to DeepSeek when requested. The editor chooses worthwhile stories, merges repetitions and can leave an issue without articles.
-- Opens a newspaper with a paper background and columns in game, with matching editable `.docx` and JSON archives.
+- Organizes worthwhile material into themed editions (such as news, economy, transport, public services and commentary), with page navigation in game and matching themed page breaks in editable Word. Older single-page issues remain readable.
+- Records named passenger-line service separately from construction and settings. New service requires enabled routes, distinct stops and actual service vehicles; existing routes establish a baseline.
+- Distinguishes reporting, brief news, analysis and opinion, with an editorial gate against technical/process disclaimers in published copy.
 - Uses the city name for the masthead or a custom title, saved per city or as a global default.
 - Keeps generation **manual by default**. Optional automatic publication generates the previous game day's issue and opens it in game.
 - Caches completed issues locally and uses DeepSeek's prefix-cache reporting. Resampling unchanged metrics does not regenerate the same facts.

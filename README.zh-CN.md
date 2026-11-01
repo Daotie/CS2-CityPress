@@ -3,13 +3,13 @@
 <h1 align="center">CityPress 城市日报</h1>
 <p align="center">为 <strong>《都市：天际线 II》</strong> 留下每天的城市新闻。</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.4-00a8bb" alt="0.2.0-beta.4">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.5-00a8bb" alt="0.2.0-beta.5">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta 预发行">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
 <p align="center"><a href="https://github.com/Daotie/CS2-CityPress/releases">下载</a> · <a href="https://github.com/Daotie/CS2-CityPress/issues">反馈问题</a> · <a href="CHANGELOG.md">更新日志</a> · <a href="SECURITY.md">隐私说明</a></p>
 
-**0.2.0-beta.4：** 新增自定义导出目录、重大数值突破报道与后台分帧优化。见[版本说明](RELEASE_NOTES.md)。目前界面、默认编辑方针和 Word 版签使用简体中文，项目公开文档提供中英双语。
+**0.2.0-beta.5：** 新增主题分版、新闻与评论、具名线路运营采集，修正财政结余计算。见[版本说明](RELEASE_NOTES.md)。目前界面、默认编辑方针和 Word 版签使用简体中文，项目公开文档提供中英双语。
 
 ## 主要功能
 
@@ -17,7 +17,9 @@
 - 覆盖人口、经济、交通、水电、天气、污染等可用指标，重复操作合并保存。
 - 排除上下客、车辆自动状态改名、界面导航和空预览。
 - 根据真实可用素材交由 DeepSeek 编辑，自主合并、取舍与安排栏目，不为凑版报道琐事。
-- 在游戏内打开带纸色背景、报头和分栏的报纸，同时保存可编辑 `.docx` 和 JSON；Word 与游戏预览共用排版参数。
+- 按素材组织要闻、经济、交通、民生、评论等主题版，游戏内可翻版，Word 对应主题分页；旧单版报纸继续兼容。
+- 消息、简讯、分析和评论标明体裁，大事件可配评论；正文不刊发技术口径与模板式免责段落。
+- 单独采集具名客运线路的启用、停靠点和实际服务车辆，支持开通、恢复、停运、改名、调价与停站变化；既有线路先建立基线。
 - 报名可随城市名自动变化，也可自定义；设置支持单存档或全局默认。
 - **默认手动生成**。可选开启每日自动发行，跨日后编印前一天的报纸并在游戏内弹出。
 - 相同事实复用本地成稿缓存，展示 DeepSeek 前缀缓存用量；指标没变化的重复快照不触发重新生成。

@@ -16,3 +16,7 @@ The save envelope remains version 1 with additive metric and `OmittedEmptyDays` 
 - `Core/ExportStore.cs`: configurable Documents exports with a per-save location index; internal issue JSON remains stable for the UI.
 - `Core/JournalSnapshot.cs` and `JournalStore.cs`: immutable worker snapshots, per-day journal files and a lightweight version-2 disk index. The game-save envelope remains version 1.
 - Observer reconciliation is staged with row/time targets; native query allocation/job synchronization is still synchronous. Clock and full UI state have separate bindings.
+
+- `Core/TransitFacts.cs`: line-level service evidence, baseline-safe transitions and same-day merged changes. CityObserver stages an independent one-game-minute line cycle, using actual vehicle states rather than assignment counts.
+- `Core/FinanceFacts.cs`: signed monthly balance uses income minus the positive native expense-array sum. Old erroneous monthlyBalance samples/highs are excluded from v5 editorial facts; monthlyNetIncome has a clean baseline.
+- `Core/EditionRules.cs`: normalize themed pages and legacy flat articles, bound response size, distinguish genres and reject process caveats. `Pages` is authoritative when present; `Articles` is flattened for backwards-compatible readers. Theme order is shared by UI and Word.
