@@ -3,34 +3,35 @@
 <h1 align="center">CityPress</h1>
 <p align="center">Your city's daily newspaper for <strong>Cities: Skylines II</strong>.</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.5-00a8bb" alt="0.2.0-beta.5">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.6-00a8bb" alt="0.2.0-beta.6">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
 <p align="center"><a href="https://github.com/Daotie/CS2-CityPress/releases">Downloads</a> · <a href="https://github.com/Daotie/CS2-CityPress/issues">Issues</a> · <a href="CHANGELOG.md">Changelog</a> · <a href="SECURITY.md">Privacy</a></p>
 
-**0.2.0-beta.5:** Adds themed editions, news/commentary separation, named transit service evidence and a budget-balance correction. See [release notes](RELEASE_NOTES.md). The interface, default editorial policy and Word furniture currently use Simplified Chinese; public documentation is bilingual.
+**0.2.0-beta.6:** Adds configurable compatible APIs, independent long commentary and five content-aware layout templates. See [release notes](RELEASE_NOTES.md). The interface, default editorial policy and Word furniture currently use Simplified Chinese; public documentation is bilingual.
 
 ## What it does
 
 - Records meaningful tool and management submissions, observed city changes and important event updates.
 - Samples available city statistics, finances, transport, utilities, weather and pollution; combines repeated records.
 - Excludes automatic vehicle renaming, individual boarding/alighting, UI navigation and empty previews.
-- Sends eligible summaries to DeepSeek when requested. The editor chooses worthwhile stories, merges repetitions and can leave an issue without articles.
+- Sends eligible summaries to your configured Chat Completions-compatible service when requested; DeepSeek remains the initial default. The editor chooses worthwhile stories, merges repetitions and can leave an issue without articles.
 - Organizes worthwhile material into themed editions (such as news, economy, transport, public services and commentary), with page navigation in game and matching themed page breaks in editable Word. Older single-page issues remain readable.
 - Records named passenger-line service separately from construction and settings. New service requires enabled routes, distinct stops and actual service vehicles; existing routes establish a baseline.
 - Distinguishes reporting, brief news, analysis and opinion, with an editorial gate against technical/process disclaimers in published copy.
+- Offers banner headlines, lead/sidebar layouts, vertical headlines, brief-news columns and long-commentary layouts. Choose automatic content matching or suitable-template variation; the composition is saved and shared by UI and Word.
 - Uses the city name for the masthead or a custom title, saved per city or as a global default.
 - Keeps generation **manual by default**. Optional automatic publication generates the previous game day's issue and opens it in game.
-- Caches completed issues locally and uses DeepSeek's prefix-cache reporting. Resampling unchanged metrics does not regenerate the same facts.
+- Caches completed issues locally, isolates providers and reports cache/token usage when the chosen service returns it. Resampling unchanged metrics does not regenerate the same facts.
 
 ## Install and use
 
 1. Download the complete `CityPress-<version>.zip` from [Releases](https://github.com/Daotie/CS2-CityPress/releases), not GitHub's source ZIP.
 2. Exit the game, extract the full package into `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\Mods\CityPress`, and restart using your local-mod setup. Keep `Templates/`, `images/` and UI files beside the DLLs.
-3. Open the newspaper button, then **编辑部设置** (editorial settings). Enter a DeepSeek API key and save. Click **生成本日新闻** to generate; daily automatic generation is optional.
+3. Open the newspaper button, then **编辑部设置** (editorial settings). Set the API address, model and key, or keep the DeepSeek defaults; compatible local services can disable key authentication. Save. Click **生成本日新闻** to generate; daily automatic generation is optional.
 
-Generation sends city facts to DeepSeek and may incur provider charges. The key is encrypted for the local Windows account, excluded from savegames and not displayed back to the UI. Review [privacy](SECURITY.md) before sharing a journal or newspaper.
+Generation sends city facts to the configured service and may incur provider charges. The key is encrypted for the local Windows account, excluded from savegames and not displayed back to the UI. Review [privacy](SECURITY.md) before sharing a journal or newspaper.
 
 Word/JSON exports default to the Windows Documents folder under `CityPress/<newspaper>/存档-<save ID>/`. Choose another absolute folder in editorial settings; **打开导出文件夹** opens the actual location. Re-exporting an existing issue uses no API. Settings, local journals, cache and internal issue JSON remain in `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\ModsData\CityPress`. Read the [detailed player guide](docs/USER_GUIDE.zh-CN.md).
 

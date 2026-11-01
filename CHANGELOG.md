@@ -1,5 +1,23 @@
 # Changelog / 更新日志
 
+## 0.2.0-beta.6
+
+### English
+
+- Added configurable Chat Completions-compatible endpoint/model, optional bearer authentication and JSON response-format mode, output-token parameter/limit and request timeout. DeepSeek is still the initial default; local compatible endpoints can use HTTP without authentication. Native non-compatible protocols are not implemented.
+- Bound encrypted credentials to normalized request endpoints. Legacy DeepSeek key/environment fallback is limited to official HTTPS DeepSeek paths. API addresses/credentials never enter editorial prompts; automatic redirects are disabled. Provider/model/output/format/layout settings isolate caches; unknown usage is not reported as zero cache usage.
+- Added an independent long-commentary option, requesting a developed argument in natural paragraphs, normally 700–1400 Chinese characters when material supports it. Commentary moves to its own edition; major-event issues with this option need both news and a dedicated commentary page.
+- Added five substantive templates: banner, lead/sidebar, vertical headline, digest and long commentary. Content-based or suitable-template variation chooses once at generation. Saved block/column plans drive both UI and Word, with no redraw-time randomness or duplicated long-article bodies. Legacy issues retain their layout.
+- Verified offline custom-API/auth/cache/usage/error/legacy tests, complete body preservation for each template, native callback harness, UI types/build/audit, five-template browser controls/scales and five rendered Word pages. Real provider calls and native game display remain pending.
+
+### 简体中文
+
+- 可配置 Chat Completions 兼容接口地址、模型、Bearer 鉴权、JSON 模式、输出参数/上限与等待时间。初始默认仍为 DeepSeek；本地兼容服务可使用 HTTP 并关闭鉴权，不声称支持其他原生协议。
+- 密钥按归一化后的请求地址加密隔离；旧 DeepSeek 密钥/环境变量仅用于其官方 HTTPS 地址。地址和凭据不写入提示词，禁止自动重定向。服务/模型/输出/格式/版式参数进入缓存隔离，用量缺失时不假报缓存。
+- 独立长评论选项要求有完整论证和自然段，素材足够时通常700至1400汉字，不强行注水。评论单独成版，重大事件须同时有消息与评论版。
+- 增加通栏头条、侧栏主稿、纵向头条、综合短讯、长评论五种模板。按内容或合适模板变换选择，生成时固定保存。游戏与 Word 使用同一栏宽/内容块计划，长文连续分栏不重复，旧刊沿用旧排版。
+- 完成离线 API/鉴权/缓存/用量/错误/旧刊测试、模板正文完整性、原生回调检查、UI 类型/构建/审计、五模板浏览器交互/缩放和五版 Word 渲染。真实服务请求与原生游戏显示仍待验收。
+
 ## 0.2.0-beta.5
 
 ### English

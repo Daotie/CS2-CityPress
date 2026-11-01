@@ -25,4 +25,4 @@ body:
     id: logs
     attributes:
       label: Relevant errors and other mods / 相关错误与其他模组
-      description: Remove API keys and private content. Do not attach key.dpapi. / 请移除密钥和私人内容，不要上传 key.dpapi。
+      description: Remove API keys and private content. Do not attach key.dpapi or credentials/. / 请移除密钥和私人内容，不要上传 key.dpapi 或 credentials/。

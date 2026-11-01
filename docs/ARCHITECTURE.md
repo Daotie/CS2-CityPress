@@ -4,7 +4,7 @@
 - `Systems/ActionHooks.cs` and `GameplayBindings.cs`: tool submissions and stock gameplay management callbacks. Recorder failures must not break the original game action; callback exceptions retain their original type.
 - `Systems/CityObserver.cs`: observed world changes, event journals and five-game-minute metric snapshots. Loading establishes a baseline instead of reporting the existing city as newly built.
 - `Core/EditorialInput.cs`, `CapturePolicy.cs`: exclude known noise by origin, while retaining real construction involving transport boarding areas.
-- `Core/NewsService.cs`: professional editorial contract, configurable policy, factual payload, cache and DeepSeek request. Unchanged resampling does not invalidate a factual cache. No API call for noise-only days.
+- `Core/NewsService.cs`: professional editorial contract, configurable policy, factual payload, cache and configured compatible-service request. Unchanged resampling does not invalidate a factual cache. No API call for noise-only days.
 - `Systems/NewsSystem.cs`: UI state, per-save/global preferences, time rollover, cancellation and archive-before-publication.
 - `Resources/paper-layout.json`, `Core/PaperLayout.cs`, `UI/src/paper-layout.ts`, `Templates/newspaper.docx`: shared newspaper layout and editable Word export.
 
@@ -20,3 +20,7 @@ The save envelope remains version 1 with additive metric and `OmittedEmptyDays` 
 - `Core/TransitFacts.cs`: line-level service evidence, baseline-safe transitions and same-day merged changes. CityObserver stages an independent one-game-minute line cycle, using actual vehicle states rather than assignment counts.
 - `Core/FinanceFacts.cs`: signed monthly balance uses income minus the positive native expense-array sum. Old erroneous monthlyBalance samples/highs are excluded from v5 editorial facts; monthlyNetIncome has a clean baseline.
 - `Core/EditionRules.cs`: normalize themed pages and legacy flat articles, bound response size, distinguish genres and reject process caveats. `Pages` is authoritative when present; `Articles` is flattened for backwards-compatible readers. Theme order is shared by UI and Word.
+
+- `Core/ApiOptions.cs` and `Systems/ApiKeys.cs`: normalized compatible endpoints, bounded request options, endpoint-scoped DPAPI credentials and restricted legacy DeepSeek migration. Keys/endpoint metadata never enter editorial input. Redirects are disabled.
+- The v6 cache key includes endpoint/model/output/JSON/layout settings. A saved PageComposition is authoritative for UI and Word; body blocks refer to article/paragraph ranges to avoid storing another full text copy. Old issues fall back to the banner composition.
+- Five composition templates share Resources/paper-layout.json. Opinion paragraphs are balanced across continuous columns. UI vertical glyph columns avoid relying on Cohtml writing-mode support; Word uses native tbRl text direction.
