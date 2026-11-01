@@ -64,7 +64,7 @@ static class EditorialTests {
   Story("民生与社会","家庭数量随人口增长上升","家庭数量由约19.52万户增至19.91万户，公共服务需求随之增加，设施分布与人员配置需要进一步统筹。"),
   Story("环境与观察","空气与土壤污染强度出现波动","全地图分批观测显示污染强度有所波动，具体影响仍需结合后续观测判断，供水与污水处理能力保持稳定。")
  }};
- static string CommentaryJson()=>JsonConvert.SerializeObject(new{title="城市增长的质量比数字更重要",deck="人口与资金变化之后，公共服务仍需回答长期问题",section="评论",body=CommentaryBody()});
+ static string CommentaryJson()=>JsonConvert.SerializeObject(new{title="城市增长的质量比数字更重要",deck="人口与资金变化之后，公共服务仍需回答长期问题",section="评论",body=CommentaryBody(),shortComments=new[]{new{title="社区服务应与人口布局衔接",body="人口增长意味着公共服务的安排需要回应具体居住需求，学校与医疗设施的布局尤其要重视日常可达性。服务建设的关键在于位置与需求能否匹配，而不是单纯增加设施数量。\n在安排后续投入时，可以优先识别居住区与服务点之间的衔接问题，把步行环境与公共交通接驳纳入同一讨论。长期看，这类选择还需要结合设施运行情况调整，避免以单项建设代替完整服务。"}}});
  static DayLog referenceDayForRevision(){
   var day=new DayLog{Day="2027-01-12"};
   Aggregator.Sample(day,"city/population","常住人口","人",400000,"08:00");Aggregator.Sample(day,"city/population","常住人口","人",410000,"12:00");
@@ -116,11 +116,11 @@ static class EditorialTests {
   using(var service=new NewsService(scripted,root)){
    var before=MajorDay();var result=await service.Generate("save","汐澜",before,prefs,"key",CancellationToken.None).ConfigureAwait(false);
    Check(scripted.Calls==2&&result.Pages.Count>=4,"重大事件先出新闻，再通过独立评论任务补写评论（两次请求）");
-   Check(result.Pages.Last().Theme=="评论"&&result.Pages.Last().Articles.All(article=>article.Genre=="评论"&&article.Title=="城市增长的质量比数字更重要"),"评论是独立文章对象并占据独立评论版");
-   Check(result.Articles.Count(article=>article.Genre=="评论")==1&&result.Articles.Count(article=>article.Genre!="评论")>=3,"评论未被重复并入普通新闻，其他主题稿保留");
+   Check(result.Pages.Last().Theme=="评论"&&result.Pages.Last().Articles.All(article=>article.Genre=="评论")&&result.Pages.Last().Articles[0].Title=="城市增长的质量比数字更重要","评论是独立文章对象并占据独立评论版");
+   Check(result.Articles.Count(article=>article.Genre=="评论")==2&&result.Articles.Count(article=>article.Genre!="评论")>=3,"评论未被重复并入普通新闻，其他主题稿保留");
    Check(result.QualityScore>=70&&result.Articles.All(article=>!article.Issues.Any(issue=>issue.Severity=="fatal")),"生成结果通过事实与质量检查");
    Check(result.Articles.Any(article=>article.Genre!="评论"&&article.Sources.Count>0&&!string.IsNullOrEmpty(article.Id)),"稿件保存事件来源、编号与质量审计元数据");
-   Check(!string.IsNullOrWhiteSpace(result.CommentaryFocus)&&result.LayoutVersion=="7","评论触发依据与版式版本随报纸保存");
+   Check(!string.IsNullOrWhiteSpace(result.CommentaryFocus)&&result.LayoutVersion=="10","评论触发依据与版式版本随报纸保存");
    var reloaded=JsonConvert.DeserializeObject<Newspaper>(JsonConvert.SerializeObject(result));
    Check(reloaded.Pages.Count==result.Pages.Count&&PagePlanner.HasCommentary(reloaded),"重新加载后版面与独立评论不丢失");
    Check(reloaded.Pages.All(page=>page.Composition!=null),"版式计划随报纸一起持久化");

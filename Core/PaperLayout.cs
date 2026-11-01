@@ -40,12 +40,13 @@ namespace CityPress.Core {
    for(int paragraph=0;paragraph<paragraphs.Length;paragraph++)blocks.Add(IsSubhead(paragraphs[paragraph])?B("subhead",articleIndex,paragraph,1):B("body",articleIndex,paragraph,1));
    return blocks;
   }
+  public static bool VerticalEligible(string text)=>!string.IsNullOrWhiteSpace(text)&&text.Length<=20&&!Regex.IsMatch(text,@"[0-9A-Za-z，,；;：:。]|\s");
   public static void Assign(Newspaper paper,string mode){
    var pages=Pages(paper);paper.Pages=pages;
    foreach(var page in pages){
     var articles=page.Articles;int total=articles.Sum(a=>(a.Body??"").Length);bool commentaryTheme=(page.Theme??"").Contains("评论");bool opinion=articles.Count>0&&articles.All(a=>a.Genre=="评论"||(a.Genre=="分析"&&commentaryTheme));
     uint seed=Convert.ToUInt32(Storage.Hash((paper.Name??"")+paper.Day+page.Theme+page.Headline+string.Join("\n",articles.Select(a=>a.Title+"\n"+a.Body))).Substring(0,8),16);
-    string template="banner";bool vertical=(page.Headline??"").Length>0&&(page.Headline??"").Length<=(int)spec["templates"]["vertical-lead"]["maxHeadlineLength"];
+    string template="banner";bool vertical=VerticalEligible(page.Headline);
     if(commentaryTheme&&opinion&&articles.Count>=2&&articles[0].Body!=null&&BodyLength(articles[0].Body)>=350){
      bool hasShorts=articles.Skip(1).Any(article=>BodyLength(article.Body)<450);
      template=hasShorts?"opinion-mixed":"opinion";
@@ -79,6 +80,7 @@ namespace CityPress.Core {
    plan.Columns.AddRange(columns);
   }
   public static PageComposition Compose(NewspaperPage page,string template){
+   if(template=="vertical-lead"&&!VerticalEligible(page.Headline))template="banner";
    if(spec["templates"][template]==null)template="banner";
    var plan=new PageComposition{Template=template};var articles=page.Articles;
    if(template=="opinion"){
@@ -124,8 +126,8 @@ namespace CityPress.Core {
    int index=0;foreach(var group in Group(articles)){var column=new LayoutColumn{Width=1};if(template=="digest"&&index==0)column.Blocks.AddRange(new[]{B("headline"),B("deck")});foreach(var article in group){column.Blocks.AddRange(Story(page,index,template=="digest"&&index==0&&article.Title==page.Headline));index++;}plan.Columns.Add(column);}return plan;
   }
   static double Weight(NewspaperPage page,LayoutBlock block)=>BlockText(page,block).Length*(block.Kind=="headline"?3:block.Kind=="title"||block.Kind=="subhead"?2:1)+(block.Kind=="body"?12:block.Kind=="subhead"?18:25);
-  public static PageComposition Composition(NewspaperPage page)=>page.Composition??Compose(page,"banner");
-  public static List<string[]> VerticalColumns(string text){var glyphs=new List<string>();for(int i=0;i<(text??"").Length;i++){int size=char.IsHighSurrogate(text[i])&&i+1<text.Length&&char.IsLowSurrogate(text[i+1])?2:1;glyphs.Add(text.Substring(i,size));i+=size-1;}int count=(int)spec["templates"]["vertical-lead"]["glyphsPerColumn"];return Enumerable.Range(0,(glyphs.Count+count-1)/count).Select(i=>glyphs.Skip(i*count).Take(count).ToArray()).ToList();}
+  public static PageComposition Composition(NewspaperPage page)=>page.Composition?.Template=="vertical-lead"&&!VerticalEligible(page.Headline)?Compose(page,"banner"):page.Composition??Compose(page,"banner");
+  public static List<string[]> VerticalColumns(string text){var glyphs=new List<string>();for(int i=0;i<(text??"").Length;i++){int size=char.IsHighSurrogate(text[i])&&i+1<text.Length&&char.IsLowSurrogate(text[i+1])?2:1;glyphs.Add(text.Substring(i,size));i+=size-1;}int maximum=(int)spec["templates"]["vertical-lead"]["glyphsPerColumn"];int columnCount=Math.Max(1,(glyphs.Count+maximum-1)/maximum);int count=Math.Max(1,(glyphs.Count+columnCount-1)/columnCount);return Enumerable.Range(0,(glyphs.Count+count-1)/count).Select(i=>glyphs.Skip(i*count).Take(count).ToArray()).ToList();}
   public static List<List<Article>> Group(IReadOnlyList<Article> articles) {
    var count=Columns(articles.Count);var groups=new List<List<Article>>();
    var weights=articles.Select(a=>(a.Body??"").Length+(a.Title??"").Length*(int)spec["titleWeight"]+(int)spec["articleOverhead"]).ToArray();

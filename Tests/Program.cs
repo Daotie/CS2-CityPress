@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 class Fake : HttpMessageHandler {
  public int Calls;public bool Invalid;public string Last;
- protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage req,CancellationToken ct){Calls++;Last=await req.Content.ReadAsStringAsync();return new HttpResponseMessage(HttpStatusCode.OK){Content=new StringContent(JsonConvert.SerializeObject(new { choices=new[]{new{finish_reason="stop",message=new{content=Invalid?"{}":JsonConvert.SerializeObject(new{headline="城区建设持续推进",deck="道路工程与公共服务的新进展。",articles=new[]{new{genre="消息",section="城市建设",title="道路建设纪事",body="城区多项道路工程同步推进，施工安排涉及道路与步行通道。常住人口与市库资金余额等指标出现新的变化，城市公共服务与交通衔接也需要相应安排。"},new{genre="评论",section="城市评论",title="公共投入应回应城市需求",body="道路工程应统筹步行与公共交通衔接，让建设安排有明确的服务目标。\n公共投入的价值取决于服务是否真正回应城市需求：常住人口与市库资金余额的变化说明，城市建设不能只看工程数量，还要看后续维护与公共服务的承受能力。\n从长期看，交通与民生的衔接是衡量工程成效的关键。后续安排应结合站点可达性、步行环境和预算取舍，避免把施工本身当成已经完成的公共服务。\n这类讨论必须区分已确认的事实与有条件的影响：资金余额只是存量数据，不能直接说明服务已经改善；人口变化也需要结合设施分布来判断。城市管理的选择因此更应谨慎，把公共利益的权衡放在工程进度之前，并关注长期维护带来的财政风险。\n只有当实际运营、服务覆盖与预算安排相互匹配时，工程投入才可能转化为市民能够感受到的便利，这一判断仍取决于后续可核实的数据。"}}})}}},usage=new{prompt_cache_hit_tokens=128,prompt_cache_miss_tokens=20}}))};}
+ protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage req,CancellationToken ct){Calls++;Last=await req.Content.ReadAsStringAsync();return new HttpResponseMessage(HttpStatusCode.OK){Content=new StringContent(JsonConvert.SerializeObject(new { choices=new[]{new{finish_reason="stop",message=new{content=Invalid?"{}":JsonConvert.SerializeObject(new{headline="城区建设持续推进",deck="道路工程与公共服务的新进展。",articles=new[]{new{genre="消息",section="城市建设",title="道路建设纪事",body="城区多项道路工程同步推进，施工安排涉及道路与步行通道。常住人口与市库资金余额等指标出现新的变化，城市公共服务与交通衔接也需要相应安排。"},new{genre="评论",section="城市评论",title="公共投入应回应城市需求",body="道路工程应统筹步行与公共交通衔接，让建设安排有明确的服务目标。\n公共投入的价值取决于服务是否真正回应城市需求：常住人口与市库资金余额的变化说明，城市建设不能只看工程数量，还要看后续维护与公共服务的承受能力。\n从长期看，交通与民生的衔接是衡量工程成效的关键。后续安排应结合站点可达性、步行环境和预算取舍，避免把施工本身当成已经完成的公共服务。\n这类讨论必须区分已确认的事实与有条件的影响：资金余额只是存量数据，不能直接说明服务已经改善；人口变化也需要结合设施分布来判断。城市管理的选择因此更应谨慎，把公共利益的权衡放在工程进度之前，并关注长期维护带来的财政风险。\n只有当实际运营、服务覆盖与预算安排相互匹配时，工程投入才可能转化为市民能够感受到的便利，这一判断仍取决于后续可核实的数据。"},new{genre="评论",section="短评",title="社区空间应方便日常步行",body="公共服务的可达性取决于设施与居住区之间的实际联系。建设安排宜把步行通道、过街条件与公共交通接驳放在一起考虑，让市民能够在日常出行中方便使用服务。\n这一选择也涉及长期维护的取舍。新增设施之后，通行环境是否便利、连接是否连续，都需要结合具体地点评估。以公共利益为出发点安排后续改善，比单纯追求设施数量更有利于形成完整的社区服务网络。"}}})}}},usage=new{prompt_cache_hit_tokens=128,prompt_cache_miss_tokens=20}}))};}
 }
 class Program {
  static void Check(bool ok,string message){if(!ok)throw new Exception(message);Console.WriteLine("PASS "+message);}
@@ -42,6 +42,7 @@ class Program {
    await EditionTests.Run(temp,projectRoot);
    await ApiLayoutTests.Run(temp,projectRoot);
    await EditorialTests.Run(temp);
+   MaterialTests.Run();
    LocalizationTests.Run(projectRoot);
    var log=new DayLog{Day="2026-10-31"};Aggregator.Add(log,"道路","公路","10:00");Aggregator.Add(log,"道路","公路","11:00");
    Check(log.Actions.Count==1&&log.Actions[0].Count==2&&log.Actions[0].Last=="11:00","重复操作合并且保留次数和时间");
@@ -53,9 +54,11 @@ class Program {
     var blank=await filterService.Generate("noise","汐澜",noisyDay,prefs,"",CancellationToken.None);
     Check(blank.LocalOnly&&blank.Articles.Count==0&&filterHandler.Calls==0,"纯运行状态与不明政策不凑新闻且不调用 API");
     noisyDay.Actions.Add(new ActionRecord{Kind="工具提交",Detail="Object Tool / CN_Hospital01"});
+    var intent=await filterService.Generate("intent","汐澜",noisyDay,prefs,"",CancellationToken.None);Check(intent.LocalOnly&&filterHandler.Calls==0,"仅有医院放置意图不冒充建设事实");
+    noisyDay.Actions.Add(new ActionRecord{Kind="城市实况 · 建筑进入施工",Detail="CN_Hospital01"});
     await filterService.Generate("noise","汐澜",noisyDay,prefs,"test",CancellationToken.None);
     var request=Newtonsoft.Json.Linq.JObject.Parse(filterHandler.Last);var input=Newtonsoft.Json.Linq.JObject.Parse((string)request["messages"][1]["content"]);
-    Check(filterHandler.Calls==1&&input["actions"].Count()==1&&input["actions"][0]["Detail"].ToString().Contains("Hospital")&&!filterHandler.Last.Contains("结束上客")&&!filterHandler.Last.Contains("2207084"),"高频噪声在发送前剔除，医院建设记录保留");
+    Check(filterHandler.Calls==1&&input["actions"].Count()==1&&input["actions"][0]["Detail"].ToString().Contains("医疗设施")&&!filterHandler.Last.Contains("结束上客")&&!filterHandler.Last.Contains("2207084"),"高频噪声在发送前剔除，医院建设记录保留");
    }
    Check(EditorialInput.IsCandidate("市政建设","公交站上下客区无障碍改造")&&!EditorialInput.IsCandidate("工具提交","Object Tool / 无预制体"),"按记录来源过滤，不误伤涉及上下客区的实际建设");
    Check(!EditorialInput.IsCandidate("PoliciesUISystem.SetPolicy","Entity.Null | Entity(159:1) | True | 7"),"城市级空实体政策编号同样排除");
@@ -75,7 +78,7 @@ class Program {
     var largeDay=new DayLog{Day="2027-01-13"};for(int i=0;i<601;i++)Aggregator.Add(largeDay,"城市实况","设施"+i,"10:00");
     await observationService.Generate("all","汐澜",largeDay,prefs,"test",CancellationToken.None);
     var allInput=Newtonsoft.Json.Linq.JObject.Parse((string)Newtonsoft.Json.Linq.JObject.Parse(observationHandler.Last)["messages"][1]["content"]);
-    Check(allInput["actions"].Count()==601&&(int)allInput["omittedDistinct"]==0,"超过 500 种有效操作也完整发送，不按频次丢掉低频重要操作");
+    Check(allInput["actions"].Count()==1&&(int)allInput["actions"][0]["Count"]==601&&largeDay.Actions.Count==601,"同类建筑素材归并发送，完整原始记录留在本地");
    }
    Check(!GameCalendar.IsReady(DateTime.MinValue)&&!GameCalendar.IsValidDay("0001-01-01")&&!GameCalendar.IsValidDay("2027-99-12")&&GameCalendar.IsReady(new DateTime(2027,1,12,10,30,0)),"加载期默认日期无效，真实游戏时间可用");
    var legacyDays=new SaveState();legacyDays.Days.Add(new DayLog{Day="0001-01-01"});legacyDays.Days.Add(new DayLog{Day="2027-01-12"});

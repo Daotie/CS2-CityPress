@@ -20,7 +20,7 @@
   "subheadSize": 15,
   "pageCapacity": 2400,
   "commentaryCapacity": 3600,
-  "maxNewsPages": 10,
+  "maxNewsPages": 20,
   "minPageChars": 240,
   "templates": {
     "banner": {"label":"通栏头条"},

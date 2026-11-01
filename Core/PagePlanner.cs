@@ -199,6 +199,30 @@ namespace CityPress.Core {
    return pages;
   }
   static List<NewspaperPage> OrderPages(IEnumerable<NewspaperPage> pages)=>pages.Select((page,index)=>new{page,index}).OrderBy(item=>PageOrder(item.page.Theme)).ThenBy(item=>ContinuationIndex(item.page.Theme)).ThenBy(item=>item.index).Select(item=>item.page).ToList();
+  public static void AddFrontPageGuide(Newspaper paper,EditorialBrief brief) {
+   var pages=PagesOf(paper);
+   var front=pages.FirstOrDefault(page=>BaseTheme(page.Theme)=="要闻");
+   bool created=false;
+   if(front==null){
+    if(pages.Count(page=>page.Articles.Any(a=>a.Genre!="评论"))<3)return;
+    front=new NewspaperPage{Theme="要闻",Headline=paper.Headline,Deck=""};pages.Insert(0,front);created=true;
+   }
+   front.Articles.RemoveAll(article=>article.Section=="本期导读");
+   bool english=!I18n.MostlyChinese((paper.Headline??"")+string.Join("",pages.SelectMany(p=>p.Articles).Select(a=>a.Body)));
+   var entries=new List<string>();
+   for(int i=0;i<pages.Count;i++){
+    var page=pages[i];if(page==front||BaseTheme(page.Theme)=="评论"||page.Articles.Count==0)continue;
+    var lead=page.Articles[0];
+    bool important=(brief!=null&&brief.MatchesMajor(Text(lead)))||page.Articles.Sum(a=>(a.Body??"").Length)>=400;
+    if(!important)continue;
+    string summary=Regex.Split(lead.Body??"",@"(?<=[。！？])").FirstOrDefault(line=>!string.IsNullOrWhiteSpace(line))?.Trim();
+    if(string.IsNullOrEmpty(summary)||summary.Length>110)summary=lead.Title;
+    entries.Add(english?summary.TrimEnd('.')+". See page "+(i+1)+" · "+page.Theme+".":summary.TrimEnd('。','！','？')+"。详见第"+(i+1)+"版·"+page.Theme+"。");
+   }
+   if(entries.Count==0&&created)pages.Remove(front);
+   if(entries.Count>0)front.Articles.Add(new Article{Section="本期导读",Genre="简讯",Title=english?"Inside this issue":"本期导读",Body=string.Join("\n",entries),Status="passed"});
+   paper.Pages=pages;paper.Articles=pages.SelectMany(page=>page.Articles).ToList();
+  }
   public static PagePlanResult Plan(Newspaper paper,EditorialBrief brief) {
    var result=new PagePlanResult();if(paper==null)return result;
    paper.Articles=paper.Articles??new List<Article>();
@@ -266,7 +290,7 @@ namespace CityPress.Core {
      commentaryPages.Add(new NewspaperPage{Theme=ThemeWithContinuation("评论",commentaryPages.Count),Headline=commentaryPages.Count==0?(buffer[0].Title??"评论"):(string.IsNullOrWhiteSpace(buffer[0].Title)?"评论":buffer[0].Title),Deck=commentaryPages.Count==0?commentaryDeck:"",Articles=new List<Article>(buffer)});
      buffer.Clear();size=0;
     }
-    foreach(var article in commentaryArticles){int weight=Estimate(article);if(buffer.Count>1&&size+weight>PaperLayout.CommentaryCapacity)Flush();buffer.Add(article);size+=weight;}
+    foreach(var article in commentaryArticles){int weight=Estimate(article);if(buffer.Count>0&&size+weight>PaperLayout.CommentaryCapacity)Flush();buffer.Add(article);size+=weight;}
     Flush();
     foreach(var page in commentaryPages)merged.Add(page);
     result.CommentaryPage=commentaryPages[0];result.HasCommentary=true;

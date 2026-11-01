@@ -7,7 +7,7 @@ namespace CityPress.Core {
   // These are editorial-quality signals, not a reason to discard a whole issue.
   // The pipeline asks the model to rewrite flagged copy once, then removes any
   // remaining cue sentences deterministically before layout.
-  static readonly string[] processPhrases={"施工标记","仍待观察","实际服务情况待观察","不代表完整自然日","观测区间","不等同于","制作过程","原生分组","采集口径","以游戏为准","游戏内","玩家操作","模组","存档","原生单位","实体编号","报道未获知"};
+  static readonly string[] processPhrases={"施工标记","仍待观察","实际服务情况待观察","不代表完整自然日","观测区间","不等同于","制作过程","原生分组","采集口径","以游戏为准","游戏内","玩家操作","模组","存档","原生单位","实体编号","报道未获知","存量不是结余","关口不是余钱","不能相加","不可相加","分别属于","口径混用","流量与差额","原生比例","同日观测","观测范围","原生货币"};
   static readonly string[] genres={"消息","简讯","评论","分析"};
   static string NormalizeGenre(string genre) {
    if(string.IsNullOrWhiteSpace(genre))return "消息";
@@ -80,12 +80,12 @@ namespace CityPress.Core {
      page.Deck=Truncate(page.Deck??"",600);
      pages.Add(page);
     }
-    if(pages.Count>12)throw new InvalidOperationException("返回的分版结构无效，未存入缓存。");
+    if(pages.Count>24)throw new InvalidOperationException("返回的分版结构无效，未存入缓存。");
     paper.Pages=pages;
     paper.Articles=pages.SelectMany(page=>page.Articles).ToList();
    }
    if(paper.Articles==null)paper.Articles=new List<Article>();
-   if(paper.Articles.Count>24||paper.Articles.Any(article=>string.IsNullOrWhiteSpace(article.Title)||string.IsNullOrWhiteSpace(article.Body)||article.Title.Length>300||article.Body.Length>12000)||paper.Articles.Sum(article=>article.Body.Length)>80000)throw new InvalidOperationException("返回的报纸正文无效，未存入缓存。");
+   if(paper.Articles.Count>48||paper.Articles.Any(article=>string.IsNullOrWhiteSpace(article.Title)||string.IsNullOrWhiteSpace(article.Body)||article.Title.Length>300||article.Body.Length>12000)||paper.Articles.Sum(article=>article.Body.Length)>80000)throw new InvalidOperationException("返回的报纸正文无效，未存入缓存。");
    foreach(var article in paper.Articles){article.Title=article.Title.Trim();article.Genre=NormalizeGenre(article.Genre);article.Section=string.IsNullOrWhiteSpace(article.Section)?null:article.Section.Trim();}
    // Process/caveat phrases are handled by QualityControl and a targeted
    // revision. Never reject the whole issue here.

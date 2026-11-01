@@ -119,6 +119,8 @@ namespace CityPress.Core {
    if(GenericTitle.IsMatch(article.Title??""))Flag(article,issues,"title-generic",Major,"标题空泛："+article.Title);
    if(string.IsNullOrWhiteSpace(article.Body)){Flag(article,issues,"body-missing",Fatal,"《"+(article.Title??"无题")+"》缺少正文");return;}
    var body=article.Body;
+   if(EditorialMaterial.TechnicalCopy.IsMatch((article.Title??"")+"\n"+body))Flag(article,issues,"raw-material",Fatal,"《"+article.Title+"》照搬资产编码、内部字段或未知统计分组，必须改写或撤稿");
+   if(Regex.IsMatch(body,@"(?<![\d.])\d{7,}(?![\d.])"))Flag(article,issues,"unformatted-number",Major,"《"+article.Title+"》包含未整理的长整数，请用万、亿及适当精度表达");
    if(body.Length<40)Flag(article,issues,"body-short",Major,"《"+article.Title+"》正文过短，信息不足");
    // Never publish numbers that cannot be traced back to observed facts.
    if(facts.Values.Count>=8&&facts.ReportableMetrics>=2){
@@ -141,7 +143,7 @@ namespace CityPress.Core {
    if(Mechanical.IsMatch(body))Flag(article,issues,"mechanical-evaluation",Major,"《"+article.Title+"》含缺少事实支撑的评价性套话");
    if(GenericOpening.IsMatch((body??"").TrimStart()))Flag(article,issues,"mechanical-opening",Major,"《"+article.Title+"》使用了模板式开头");
    var sentences=Regex.Split(body,@"(?<=[。！？])").Where(sentence=>sentence.Trim().Length>0).ToList();
-   if(sentences.Count>0&&sentences.Count(sentence=>sentence.Any(char.IsDigit))*2>sentences.Count)Flag(article,issues,"number-dump",Minor,"《"+article.Title+"》以数字罗列代替叙述");
+   if(sentences.Count>0&&sentences.Count(sentence=>sentence.Any(char.IsDigit))*2>sentences.Count)Flag(article,issues,"number-dump",NumberToken.Matches(body).Count>8?Major:Minor,"《"+article.Title+"》以数字罗列代替叙述");
    if(! (article.Genre=="评论") &&body.Contains("## "))Flag(article,issues,"subhead-outside-commentary",Major,"小标题只用于评论版：《"+article.Title+"》");
    if(article.Genre=="评论"){
     int commentaryLength=PaperLayout.BodyLength(body);
@@ -263,7 +265,7 @@ namespace CityPress.Core {
    foreach(var article in paper.Articles??new List<Article>()){
     if(article==null)continue;
     var fatal=article.Issues.Any(issue=>issue.Severity==Fatal);
-    var duplicate=article.Issues.Any(issue=>issue.Code=="duplicate-news"||issue.Code=="commentary-duplicate");
+    var duplicate=article.Issues.Any(issue=>issue.Code=="duplicate-news"||issue.Code=="commentary-duplicate"||issue.Code=="unformatted-number");
     if(fatal||duplicate)dropped.Add(article);
    }
    if(dropped.Count>0){
