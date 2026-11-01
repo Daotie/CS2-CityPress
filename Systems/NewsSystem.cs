@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -18,29 +19,43 @@ namespace CityPress.Systems {
   internal static NewsSystem Active;
   SaveState state=new SaveState(); Preferences global;
   NewsService service; CancellationTokenSource lifetime=new CancellationTokenSource();
-  Task<Newspaper> pending; string pendingId,pendingDay; bool pendingPopup; int epoch,pendingEpoch;
-  ValueBinding<string> binding; Newspaper paper; int popup; string status="就绪"; bool dirty; DateTime nextFlush,nextUi;
+  Task<ArchiveResult> pending,reading;Task<string[]> listing;Task journal,opening;
+  string pendingId,pendingDay;bool pendingPopup,pendingExportOnly;int epoch,pendingEpoch,readingEpoch,readingRequest,paperRequest,listingEpoch,journalEpoch,openingEpoch;
+  ValueBinding<string> binding,clockBinding;Newspaper paper;int popup;string status="就绪";bool dirty,uiDirty=true,archiveRefresh=true,keyConfigured,lastReady;DateTime nextFlush,nextUi,nextFullUi;
+  ExportStore archives;JournalStore journals;string[] issueDays=Array.Empty<string>();string paperFolder,lastDay,lastClock,lastCoverage;
   readonly Queue<DayLog> queue=new Queue<DayLog>();
   string key="", city="城市";
   bool loaded;
   internal int SessionEpoch=>epoch;
   Preferences Effective=>state.Override??global;
   string Config=>Path.Combine(Storage.Root,"settings.json");
+  string KeyFile=>Path.Combine(Storage.Root,"key.dpapi");
+  string NewspaperName=>string.IsNullOrWhiteSpace(Effective.CustomName)?city+"日报":Effective.CustomName.Trim();
+  string ExportFolder=>paperFolder??ExportPaths.Folder(Effective.ExportDirectory,NewspaperName,state.Id);
+  void Changed(){dirty=true;uiDirty=true;}
+  void Status(string value){status=value;uiDirty=true;nextFullUi=default;}
   public override GameMode gameMode=>GameMode.Game;
   protected override void OnCreate() {
-   base.OnCreate(); Active=this;service=new NewsService();global=Storage.Read<Preferences>(Config);
+   base.OnCreate();Active=this;service=new NewsService();archives=new ExportStore();journals=new JournalStore();
+   try{global=Storage.Read<Preferences>(Config);}catch{global=new Preferences();}
    if(EditorialPolicy.Upgrade(global))Storage.Write(Config,JsonConvert.SerializeObject(global));
+   try{ExportPaths.Root(global.ExportDirectory);}catch{global.ExportDirectory="";}
+   keyConfigured=File.Exists(KeyFile)||!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DEEPSEEK_API_KEY"));
    binding=new ValueBinding<string>("CityPress","state","{}");AddBinding(binding);
+   clockBinding=new ValueBinding<string>("CityPress","clock","");AddBinding(clockBinding);
    AddBinding(new TriggerBinding("CityPress","generate",()=>Start(Current(),false)));
    AddBinding(new TriggerBinding<string>("CityPress","generateDay",day=>{var log=state.Days.FirstOrDefault(x=>x.Day==day);if(log!=null)Start(log,false);}));
    AddBinding(new TriggerBinding<string>("CityPress","openIssue",OpenIssue));
    AddBinding(new TriggerBinding<string>("CityPress","configure",Configure));
+   AddBinding(new TriggerBinding("CityPress","refreshArchive",()=>archiveRefresh=true));
+   AddBinding(new TriggerBinding("CityPress","openExportFolder",OpenExportFolder));
+   AddBinding(new TriggerBinding("CityPress","exportIssue",ExportCurrent));
   }
   public void Record(string kind,string detail) {
    if(!EditorialInput.IsCandidate(kind,detail))return;
    if(!TryGetGameTime(out var now))return;
    Rollover(now.ToString("yyyy-MM-dd"));
-   Aggregator.Add(state.Days.Last(),kind,detail,now.ToString("HH:mm"));dirty=true;
+   Aggregator.Add(state.Days.Last(),kind,detail,now.ToString("HH:mm"));Changed();
   }
   internal bool TryGetGameTime(out DateTime now) {
    now=default;
@@ -59,19 +74,20 @@ namespace CityPress.Systems {
   internal void Sample(string key,string label,string unit,double value) {
    if(!TryGetGameTime(out var now))return;
    Rollover(now.ToString("yyyy-MM-dd"));
-   Aggregator.Sample(state.Days.Last(),key,label,unit,value,now.ToString("HH:mm:ss"));dirty=true;
+   var log=state.Days.Last();Aggregator.Sample(log,key,label,unit,value,now.ToString("HH:mm:ss"));Milestones.Observe(state,log,key,value,now.ToString("HH:mm:ss"));Changed();
   }
   protected override void OnGamePreload(Purpose purpose,GameMode mode){base.OnGamePreload(purpose,mode);loaded=false;Reset();}
-  protected override void OnGameLoadingComplete(Purpose purpose,GameMode mode){base.OnGameLoadingComplete(purpose,mode);loaded=mode==GameMode.Game;if(loaded)try{GameplayBindings.Scan(this);}catch{Mod.Log.Warn("管理操作入口尚未就绪，将自动重试。");}}
+  protected override void OnGameLoadingComplete(Purpose purpose,GameMode mode){base.OnGameLoadingComplete(purpose,mode);loaded=mode==GameMode.Game;archiveRefresh=true;}
   void Rollover(string day) {
    if(!GameCalendar.IsValidDay(day))return;
-   if(state.OmittedEmptyDays?.Remove(day)==true)dirty=true;
+   if(state.OmittedEmptyDays?.Remove(day)==true)Changed();
    if(state.Days.LastOrDefault()?.Day==day)return;
    var previous=state.Days.LastOrDefault();
-   if(previous!=null && Effective.AutoGenerate && string.CompareOrdinal(day,previous.Day)>0)queue.Enqueue(JsonConvert.DeserializeObject<DayLog>(JsonConvert.SerializeObject(previous)));
+   // Completed day objects are immutable; avoid serializing them just to queue.
+   if(previous!=null && Effective.AutoGenerate && string.CompareOrdinal(day,previous.Day)>0)queue.Enqueue(previous);
    // Time reversal starts a new branch of that day's facts.
    state.Days.RemoveAll(x=>string.CompareOrdinal(x.Day,day)>=0);
-   state.Days.Add(new DayLog{Day=day});dirty=true;
+   state.Days.Add(new DayLog{Day=day});Changed();
   }
   void Configure(string raw) {
    try {
@@ -79,30 +95,44 @@ namespace CityPress.Systems {
     if(scope=="inherit")state.Override=null;
     else {
      var prefs=obj["preferences"].ToObject<Preferences>();
-     if(prefs==null||prefs.CustomName?.Length>60||prefs.Editorial?.Length>6000||string.IsNullOrWhiteSpace(prefs.Model)||prefs.Model.Length>100)throw new Exception();
+     if(prefs==null||prefs.CustomName?.Length>60||prefs.Editorial?.Length>6000||string.IsNullOrWhiteSpace(prefs.Model)||prefs.Model.Length>100)throw new ArgumentException();
+     ExportPaths.Root(prefs.ExportDirectory);
      if(scope=="global"){global=prefs;Storage.Write(Config,JsonConvert.SerializeObject(global));state.Override=null;}else state.Override=prefs;
     }
     var newKey=(string)obj["apiKey"];if(!string.IsNullOrWhiteSpace(newKey)){
      key=newKey.Trim();
      var protectedBytes=System.Security.Cryptography.ProtectedData.Protect(System.Text.Encoding.UTF8.GetBytes(key),null,System.Security.Cryptography.DataProtectionScope.CurrentUser);
-     Directory.CreateDirectory(Storage.Root);File.WriteAllBytes(Path.Combine(Storage.Root,"key.dpapi"),protectedBytes);
+     Directory.CreateDirectory(Storage.Root);File.WriteAllBytes(KeyFile,protectedBytes);keyConfigured=true;
     }
-    dirty=true;status="设置已保存";
-   }catch {status="设置无效，未保存";}
+    Changed();Status("设置已保存；导出目录用于后续导出，旧报纸仍保留在原位置。");
+   }catch(ArgumentException){Status("设置未保存，请检查导出目录；目录应填写完整路径。");}catch{Status("设置无效或写入失败，未保存。");}
   }
   void Start(DayLog day,bool auto) {
-   if(!TryGetGameTime(out _)||day==null||!GameCalendar.IsValidDay(day.Day)){status="城市时间尚未就绪，请等待城市加载完成。";return;}
-   if(pending!=null){status="正在排版，请稍候";return;}
-   if(string.IsNullOrWhiteSpace(key))try {
-    key=System.Text.Encoding.UTF8.GetString(System.Security.Cryptography.ProtectedData.Unprotect(File.ReadAllBytes(Path.Combine(Storage.Root,"key.dpapi")),null,System.Security.Cryptography.DataProtectionScope.CurrentUser));
-   }catch {key=Environment.GetEnvironmentVariable("DEEPSEEK_API_KEY")??"";}
-   pendingId=state.Id;pendingDay=day.Day;pendingPopup=auto;pendingEpoch=epoch;status="编辑部正在整理新闻…";
-   var snapshot=JsonConvert.DeserializeObject<DayLog>(JsonConvert.SerializeObject(day));
+   if(!TryGetGameTime(out _)||day==null||!GameCalendar.IsValidDay(day.Day)){Status("城市时间尚未就绪，请等待城市加载完成。");return;}
+   if(pending!=null){Status("正在处理报纸，请稍候。");return;}
+   pendingId=state.Id;pendingDay=day.Day;pendingPopup=auto;pendingEpoch=epoch;pendingExportOnly=false;paperRequest++;Status("编辑部正在整理新闻…");
+   var snapshot=JournalSnapshot.CopyDay(day);
    var prefs=JsonConvert.DeserializeObject<Preferences>(JsonConvert.SerializeObject(Effective));
-   pending=service.Generate(state.Id,city,snapshot,prefs,key,lifetime.Token);
+   var saveId=state.Id;var currentCity=city;var configuredKey=key;var token=lifetime.Token;
+   pending=Task.Run(async()=>{var result=await service.Generate(saveId,currentCity,snapshot,prefs,ReadKey(configuredKey),token).ConfigureAwait(false);token.ThrowIfCancellationRequested();return archives.Save(saveId,result,prefs.ExportDirectory,token);},token);
   }
+  string ReadKey(string configured){if(!string.IsNullOrWhiteSpace(configured))return configured;try{return System.Text.Encoding.UTF8.GetString(System.Security.Cryptography.ProtectedData.Unprotect(File.ReadAllBytes(KeyFile),null,System.Security.Cryptography.DataProtectionScope.CurrentUser));}catch{return Environment.GetEnvironmentVariable("DEEPSEEK_API_KEY")??"";}}
   string Issues=>Path.Combine(Storage.Root,"cities",state.Id,"issues");
-  void OpenIssue(string day){ if(!GameCalendar.IsValidDay(day))return;if(!GameCalendar.IsVisibleIssue(state,day,TryGetGameTime(out var now)?now.ToString("yyyy-MM-dd"):"")){status="该历史日期没有有效采集记录。";return;}try{paper=Storage.Read<Newspaper>(Path.Combine(Issues,day+".json"));}catch{status="存档读取失败";} }
+  void OpenIssue(string day){
+   if(!GameCalendar.IsValidDay(day)||pending!=null)return;
+   if(!GameCalendar.IsVisibleIssue(state,day,TryGetGameTime(out var now)?now.ToString("yyyy-MM-dd"):"")){Status("该历史日期没有有效采集记录。");return;}
+   var saveId=state.Id;var root=Effective.ExportDirectory;readingEpoch=epoch;readingRequest=++paperRequest;Status("正在读取报纸…");
+   reading=Task.Run(()=>archives.Read(saveId,day,root));reading.ContinueWith(task=>{var ignored=task.Exception;},TaskContinuationOptions.OnlyOnFaulted);
+  }
+  void ExportCurrent(){
+   if(paper==null){Status("请先打开一份报纸。");return;}if(pending!=null){Status("正在处理报纸，请稍候。");return;}
+   var copy=JsonConvert.DeserializeObject<Newspaper>(JsonConvert.SerializeObject(paper));var saveId=state.Id;var root=Effective.ExportDirectory;var token=lifetime.Token;
+   pendingId=saveId;pendingDay=copy.Day;pendingEpoch=epoch;pendingPopup=false;pendingExportOnly=true;paperRequest++;Status("正在导出当前报纸…");pending=Task.Run(()=>archives.Save(saveId,copy,root,token),token);
+  }
+  void OpenExportFolder(){
+   if(opening!=null)return;string folder;try{folder=ExportFolder;}catch{Status("导出目录无效，请在编辑部设置中修改。");return;}
+   openingEpoch=epoch;opening=Task.Run(()=>{Directory.CreateDirectory(folder);Process.Start(new ProcessStartInfo{FileName=folder,UseShellExecute=true});});
+  }
   protected override void OnUpdate() {
    base.OnUpdate();
    if(DateTime.UtcNow<nextUi)return;nextUi=DateTime.UtcNow.AddMilliseconds(250);
@@ -110,38 +140,47 @@ namespace CityPress.Systems {
    // localization key to NameSystem (and localization mods) during loading.
    // Read the authoritative city configuration instead; this is also safe
    // before the city entity and its prefab data have finished loading.
-   city=World.GetOrCreateSystemManaged<Game.City.CityConfigurationSystem>().cityName;
-   if(string.IsNullOrWhiteSpace(city))city="城市";
-   bool timeReady=TryGetGameTime(out var now);
-   if(timeReady){var currentDay=now.ToString("yyyy-MM-dd");if(GameCalendar.PruneEmptyHistory(state,currentDay)>0)dirty=true;Rollover(currentDay);}
-   if(pending?.IsCompleted==true){
-    try {var result=pending.GetAwaiter().GetResult();
-     if(pendingId==state.Id && pendingEpoch==epoch){
-      var dir=Path.Combine(Storage.Root,"cities",pendingId,"issues");
-      // Archive before publishing; a failed archive remains visible as a failure.
-      DocxExporter.Save(Path.Combine(dir,pendingDay+".docx"),result);
-      Storage.Write(Path.Combine(dir,pendingDay+".json"),JsonConvert.SerializeObject(result));paper=result;if(pendingPopup)popup++;status=result.LocalOnly?"本期暂无可刊发事件，已保存简讯；未调用 API。":result.LocalCache?"已复用本地成稿":"新闻已生成并保存";
-     }
-    }catch(OperationCanceledException){}catch(Exception e){status=e is InvalidOperationException?e.Message:"生成或本地保存失败（"+e.GetType().Name+"），请重试；编辑部保留已生成的缓存。";Mod.Log.Warn("新闻生成或保存失败："+e.GetType().Name+"\n"+e.StackTrace);}
-    finally{pending=null;}
+   var currentCity=World.GetOrCreateSystemManaged<Game.City.CityConfigurationSystem>().cityName;if(string.IsNullOrWhiteSpace(currentCity))currentCity="城市";
+   if(currentCity!=city){city=currentCity;uiDirty=true;}
+   bool timeReady=TryGetGameTime(out var now);string day=timeReady?now.ToString("yyyy-MM-dd"):"",clock=timeReady?now.ToString("yyyy-MM-dd HH:mm:ss"):"";
+   if(clock!=lastClock){clockBinding.Update(timeReady?clock:"!");lastClock=clock;}
+   if(timeReady!=lastReady){lastReady=timeReady;uiDirty=true;}
+   if(timeReady&&day!=lastDay){if(GameCalendar.PruneEmptyHistory(state,day)>0)Changed();Rollover(day);lastDay=day;uiDirty=true;}
+   if(pending?.IsCompleted==true){bool current=pendingId==state.Id&&pendingEpoch==epoch;
+    try{var result=pending.GetAwaiter().GetResult();if(current){paper=result.Paper;paperFolder=result.Folder;archiveRefresh=true;if(pendingPopup)popup++;Status(pendingExportOnly?"报纸已导出，未调用 API。":paper.LocalOnly?"本期暂无可刊发事件，已导出简讯；未调用 API。":paper.LocalCache?"已复用本地成稿并导出。":"新闻已生成并导出。");}}
+    catch(OperationCanceledException){}catch(Exception error){if(current){Status(error is InvalidOperationException?error.Message:"生成或导出失败（"+error.GetType().Name+"），请检查目录权限；成稿缓存保留。");Mod.Log.Warn("新闻生成或导出失败："+error.GetType().Name+"\n"+error.StackTrace);}}finally{pending=null;uiDirty=true;}
+   }
+   if(reading?.IsCompleted==true){bool current=readingEpoch==epoch&&readingRequest==paperRequest;
+    try{var result=reading.GetAwaiter().GetResult();if(current){paper=result.Paper;paperFolder=result.Folder;Status("报纸已打开。");}}catch{if(current)Status("报纸读取失败，请检查归档文件。");}finally{reading=null;}
+   }
+   if(listing?.IsCompleted==true){try{var result=listing.GetAwaiter().GetResult();if(listingEpoch==epoch){issueDays=result;uiDirty=true;}}catch{if(listingEpoch==epoch)Status("档案列表读取失败。");}finally{listing=null;}}
+   if(archiveRefresh&&listing==null&&timeReady){archiveRefresh=false;listingEpoch=epoch;var saveId=state.Id;listing=Task.Run(()=>archives.List(saveId));}
+   if(opening?.IsCompleted==true){try{opening.GetAwaiter().GetResult();}catch{if(openingEpoch==epoch)Status("文件夹打开失败，请检查路径和访问权限。");}finally{opening=null;}}
+   if(journal?.IsCompleted==true){try{journal.GetAwaiter().GetResult();}catch(OperationCanceledException){}catch{if(journalEpoch==epoch){dirty=true;Status("日志备份失败，将稍后重试。");}}finally{journal=null;}}
+   if(dirty&&journal==null&&timeReady&&DateTime.UtcNow>=nextFlush){
+    var snapshot=JournalSnapshot.Capture(state);var token=lifetime.Token;journalEpoch=epoch;dirty=false;nextFlush=DateTime.UtcNow.AddSeconds(10);
+    journal=Task.Run(()=>journals.Write(snapshot,token),token);
    }
    if(timeReady&&pending==null&&queue.Count>0)Start(queue.Dequeue(),true);
-   if(dirty && DateTime.UtcNow>=nextFlush){
-    try{Storage.Write(Path.Combine(Storage.Root,"cities",state.Id,"journal.json"),JsonConvert.SerializeObject(state));dirty=false;}catch{status="操作日志保存失败";}
-    nextFlush=DateTime.UtcNow.AddSeconds(5);
-   }
-   binding.Update(JsonConvert.SerializeObject(new {city,day=timeReady?now.ToString("yyyy-MM-dd"):"",gameTime=timeReady?now.ToString("yyyy-MM-dd HH:mm:ss"):"",timeReady,preferences=Effective,scope=state.Override==null?"global":"save",busy=pending!=null,status,popup,paper,days=state.Days.Where(x=>GameCalendar.IsValidDay(x.Day)).Select(x=>new{x.Day,count=x.Actions.Sum(a=>a.Count),metrics=x.Metrics?.Count(m=>m.Samples>0)??0}),issues=Directory.Exists(Issues)?Directory.GetFiles(Issues,"*.json").Select(Path.GetFileNameWithoutExtension).Where(day=>GameCalendar.IsVisibleIssue(state,day,timeReady?now.ToString("yyyy-MM-dd"):"" )).OrderByDescending(x=>x).ToArray():Array.Empty<string>(),coverage=ActionHooks.Coverage.Concat(new[]{"管理操作入口："+GameplayBindings.Count+" 个；未接入："+GameplayBindings.Failed,CityObserver.Report}),keyConfigured=!string.IsNullOrWhiteSpace(key)||File.Exists(Path.Combine(Storage.Root,"key.dpapi"))}));
+   if(lastCoverage!=CityObserver.Report){lastCoverage=CityObserver.Report;uiDirty=true;}
+   if(!uiDirty||DateTime.UtcNow<nextFullUi)return;uiDirty=false;nextFullUi=DateTime.UtcNow.AddSeconds(1);
+   binding.Update(JsonConvert.SerializeObject(new {city,day,gameTime=clock,timeReady,preferences=Effective,scope=state.Override==null?"global":"save",busy=pending!=null,status,popup,paper,
+    days=state.Days.Where(x=>GameCalendar.IsValidDay(x.Day)).Select(x=>new{x.Day,count=Aggregator.Count(x),metrics=x.Metrics?.Count??0,breakthroughs=x.Breakthroughs?.Count??0}),issues=issueDays.Where(value=>GameCalendar.IsVisibleIssue(state,value,day)),
+    coverage=ActionHooks.Coverage.Concat(new[]{"管理操作入口："+GameplayBindings.Count+" 个；未接入："+GameplayBindings.Failed,CityObserver.Report}),keyConfigured,exportDefault=ExportPaths.DefaultDirectory,exportFolder=ExportFolder}));
   }
   public void Serialize<TWriter>(TWriter writer) where TWriter:IWriter {writer.Write(1);writer.Write(JsonConvert.SerializeObject(state));}
   public void Deserialize<TReader>(TReader reader) where TReader:IReader {
    Reset();reader.Read(out int version);reader.Read(out string json);
    if(version!=1)throw new InvalidDataException("不支持的 CityPress 存档版本");
    state=JsonConvert.DeserializeObject<SaveState>(json)??new SaveState();
+   if(string.IsNullOrWhiteSpace(state.Id))state.Id=Guid.NewGuid().ToString("N");
    if(GameCalendar.RemoveInvalidDays(state)>0)dirty=true;
    if(EditorialPolicy.Upgrade(state.Override))dirty=true;
+   if(state.Override!=null)try{ExportPaths.Root(state.Override.ExportDirectory);}catch{state.Override.ExportDirectory="";}
+   Changed();
   }
-  public void SetDefaults(Context context){Reset();state=new SaveState();}
-  void Reset(){epoch++;lifetime.Cancel();lifetime.Dispose();lifetime=new CancellationTokenSource();queue.Clear();paper=null;popup=0;dirty=false;}
+  public void SetDefaults(Context context){Reset();state=new SaveState();Changed();}
+  void Reset(){epoch++;lifetime.Cancel();lifetime.Dispose();lifetime=new CancellationTokenSource();queue.Clear();paper=null;paperFolder=null;popup=0;dirty=false;uiDirty=true;archiveRefresh=true;issueDays=Array.Empty<string>();lastDay=null;lastCoverage=null;paperRequest++;nextFullUi=default;}
   protected override void OnDestroy(){lifetime.Cancel();service.Dispose();lifetime.Dispose();if(Active==this)Active=null;base.OnDestroy();}
  }
 }
