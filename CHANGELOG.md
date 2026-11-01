@@ -1,5 +1,9 @@
 # Changelog / 更新日志
 
+## 0.2.0-beta.11
+
+- Audit actual local journal input and close remaining raw-material paths: completion/fire markers, automatic building type changes and unverified line entities. Normalize observation labels before provider requests.
+
 ## 0.2.0-beta.10
 
 - Compile editorial material locally before any model request: group construction categories, suppress routine line inventories and low-impact incidents, and exclude unverified statistics groups and units. Keep original journals intact.
