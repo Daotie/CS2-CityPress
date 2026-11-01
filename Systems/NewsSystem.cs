@@ -36,6 +36,7 @@ namespace CityPress.Systems {
   public override GameMode gameMode=>GameMode.Game;
   protected override void OnCreate() {
    base.OnCreate();Active=this;service=new NewsService();archives=new ExportStore();journals=new JournalStore();
+   service.Warn=message=>{try{Mod.Log.Warn("CityPress 编辑部："+message);}catch{}};
    try{global=Storage.Read<Preferences>(Config);}catch{global=new Preferences();}
    if(EditorialPolicy.Upgrade(global))Storage.Write(Config,JsonConvert.SerializeObject(global));
    try{ExportPaths.Root(global.ExportDirectory);}catch{global.ExportDirectory="";}
@@ -147,7 +148,7 @@ namespace CityPress.Systems {
    if(timeReady!=lastReady){lastReady=timeReady;uiDirty=true;}
    if(timeReady&&day!=lastDay){if(GameCalendar.PruneEmptyHistory(state,day)>0)Changed();Rollover(day);lastDay=day;uiDirty=true;}
    if(pending?.IsCompleted==true){bool current=pendingId==state.Id&&pendingEpoch==epoch;
-    try{var result=pending.GetAwaiter().GetResult();if(current){paper=result.Paper;paperFolder=result.Folder;archiveRefresh=true;if(pendingPopup)popup++;Status(pendingExportOnly?"报纸已导出，未调用 API。":paper.LocalOnly?"本期暂无可刊发事件，已导出简讯；未调用 API。":paper.LocalCache?"已复用本地成稿并导出。":"新闻已生成并导出。");}}
+    try{var result=pending.GetAwaiter().GetResult();if(current){paper=result.Paper;paperFolder=result.Folder;archiveRefresh=true;if(pendingPopup)popup++;Status(pendingExportOnly?"报纸已导出，未调用 API。":paper.LocalOnly?"本期暂无可刊发事件，已导出简讯；未调用 API。":paper.LocalCache?"已复用本地成稿并导出。":"新闻已生成并导出。"+(paper.DroppedUnsafeArticles>0?"有 "+paper.DroppedUnsafeArticles+" 篇稿件未通过事实核验，未刊发。":"")+(paper.QualityScore<100?"质量评分 "+paper.QualityScore+"。":""));}}
     catch(OperationCanceledException){}catch(Exception error){if(current){Status(error is InvalidOperationException?error.Message:"生成或导出失败（"+error.GetType().Name+"），请检查目录权限；成稿缓存保留。");Mod.Log.Warn("新闻生成或导出失败："+error.GetType().Name+"\n"+error.StackTrace);}}finally{pending=null;uiDirty=true;}
    }
    if(reading?.IsCompleted==true){bool current=readingEpoch==epoch&&readingRequest==paperRequest;

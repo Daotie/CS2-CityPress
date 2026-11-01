@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 class Fake : HttpMessageHandler {
  public int Calls;public bool Invalid;public string Last;
- protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage req,CancellationToken ct){Calls++;Last=await req.Content.ReadAsStringAsync();return new HttpResponseMessage(HttpStatusCode.OK){Content=new StringContent(JsonConvert.SerializeObject(new { choices=new[]{new{finish_reason="stop",message=new{content=Invalid?"{}":JsonConvert.SerializeObject(new{headline="城区建设持续推进",deck="道路工程与公共服务的新进展。",articles=new[]{new{genre="消息",section="城市建设",title="道路建设纪事",body="城区多项道路工程同步推进，施工安排涉及道路与步行通道。"},new{genre="评论",section="城市短评",title="公共投入应回应城市需求",body="道路工程应统筹步行与公共交通衔接，让建设安排有明确的服务目标。"}}})}}},usage=new{prompt_cache_hit_tokens=128,prompt_cache_miss_tokens=20}}))};}
+ protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage req,CancellationToken ct){Calls++;Last=await req.Content.ReadAsStringAsync();return new HttpResponseMessage(HttpStatusCode.OK){Content=new StringContent(JsonConvert.SerializeObject(new { choices=new[]{new{finish_reason="stop",message=new{content=Invalid?"{}":JsonConvert.SerializeObject(new{headline="城区建设持续推进",deck="道路工程与公共服务的新进展。",articles=new[]{new{genre="消息",section="城市建设",title="道路建设纪事",body="城区多项道路工程同步推进，施工安排涉及道路与步行通道。常住人口与市库资金余额等指标出现新的变化，城市公共服务与交通衔接也需要相应安排。"},new{genre="评论",section="城市评论",title="公共投入应回应城市需求",body="道路工程应统筹步行与公共交通衔接，让建设安排有明确的服务目标。\n公共投入的价值取决于服务是否真正回应城市需求：常住人口与市库资金余额的变化说明，城市建设不能只看工程数量，还要看后续维护与公共服务的承受能力。\n从长期看，交通与民生的衔接是衡量工程成效的关键。后续安排应结合站点可达性、步行环境和预算取舍，避免把施工本身当成已经完成的公共服务。\n这类讨论必须区分已确认的事实与有条件的影响：资金余额只是存量数据，不能直接说明服务已经改善；人口变化也需要结合设施分布来判断。城市管理的选择因此更应谨慎，把公共利益的权衡放在工程进度之前，并关注长期维护带来的财政风险。\n只有当实际运营、服务覆盖与预算安排相互匹配时，工程投入才可能转化为市民能够感受到的便利，这一判断仍取决于后续可核实的数据。"}}})}}},usage=new{prompt_cache_hit_tokens=128,prompt_cache_miss_tokens=20}}))};}
 }
 class Program {
  static void Check(bool ok,string message){if(!ok)throw new Exception(message);Console.WriteLine("PASS "+message);}
@@ -40,6 +40,7 @@ class Program {
    await FeatureTests.Run(Path.Combine(temp,"features"));
    await EditionTests.Run(temp,Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../")));
    await ApiLayoutTests.Run(temp,Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../")));
+   await EditorialTests.Run(temp);
    var log=new DayLog{Day="2026-10-31"};Aggregator.Add(log,"道路","公路","10:00");Aggregator.Add(log,"道路","公路","11:00");
    Check(log.Actions.Count==1&&log.Actions[0].Count==2&&log.Actions[0].Last=="11:00","重复操作合并且保留次数和时间");
    var prefs=new Preferences();Check(!prefs.AutoGenerate,"默认手动生成");

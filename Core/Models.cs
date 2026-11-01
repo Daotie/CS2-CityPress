@@ -18,6 +18,9 @@ namespace CityPress.Core {
   public bool RequireApiKey=true,JsonMode=true,LongCommentary=true;
   public int MaxOutputTokens=8192,TimeoutSeconds=180;
   public string TokenParameter="max_tokens",LayoutMode="auto";
+  // Editing controls added in beta.7. Defaults stay on for existing settings,
+  // because a missing JSON field keeps the field initializer.
+  public bool QualityCheck=true,AutoRevision=true,DedicatedCommentary=true;
  }
  public sealed class ActionRecord { public string Kind, Detail; public int Count = 1; public string First, Last; }
  public sealed class MetricRecord {
@@ -36,19 +39,39 @@ namespace CityPress.Core {
   public List<string> OmittedEmptyDays = new List<string>();
   public Dictionary<string,MilestoneProgress> MilestoneProgress = new Dictionary<string,MilestoneProgress>();
  }
- public sealed class Article { public string Section, Title, Body,Genre; }
+  // Severity is "fatal" (must not publish), "major" (targeted revision) or "minor".
+  public sealed class QualityIssue { public string Code,Detail,Severity="minor";public bool Fatal=>Severity=="fatal"; }
+  public sealed class Article {
+   public string Section, Title, Body, Genre;
+   // Debug/audit metadata: never rendered into the newspaper body.
+   public string Id;
+   public List<string> Sources=new List<string>();
+   public List<QualityIssue> Issues=new List<QualityIssue>();
+   public double Score=100;public int Revision;public string Status="pending";
+  }
  public sealed class LayoutBlock {public string Kind;public int Article=-1,Start,Count=-1;}
  public sealed class LayoutColumn {public int Width;public List<LayoutBlock> Blocks=new List<LayoutBlock>();}
  public sealed class PageComposition {public string Template;public List<LayoutBlock> Top=new List<LayoutBlock>();public List<LayoutColumn> Columns=new List<LayoutColumn>();}
  public sealed class NewspaperPage {public string Theme,Headline,Deck;public List<Article> Articles=new List<Article>();public PageComposition Composition;}
- public sealed class Newspaper { public string Name, Day, Headline, Deck,Provider,Model; public List<Article> Articles; public List<NewspaperPage> Pages; public int CacheHitTokens, CacheMissTokens,InputTokens,OutputTokens;public bool CacheUsageReported,UsageReported; public bool LocalCache, LocalOnly; }
+ public sealed class Newspaper { public string Name, Day, Headline, Deck,Provider,Model; public List<Article> Articles; public List<NewspaperPage> Pages; public int CacheHitTokens, CacheMissTokens,InputTokens,OutputTokens;public bool CacheUsageReported,UsageReported; public bool LocalCache, LocalOnly;
+  // Beta.7 editorial pipeline metadata (persisted for auditing, not shown in the paper).
+  public int QualityScore=100;public string QualityNote;public List<QualityIssue> Issues=new List<QualityIssue>();
+  public int RevisionCount;public string LayoutVersion;public string CommentaryFocus;public int DroppedUnsafeArticles;
+ }
  public static class Storage {
   public static readonly string Root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "Colossal Order", "Cities Skylines II", "ModsData", "CityPress");
   public static string Hash(string s) { using(var h=SHA256.Create()) return BitConverter.ToString(h.ComputeHash(Encoding.UTF8.GetBytes(s))).Replace("-", "").ToLowerInvariant(); }
   public static void Write(string path, string text) {
    Directory.CreateDirectory(Path.GetDirectoryName(path)); var tmp=path+"."+Guid.NewGuid().ToString("N")+".tmp";
    File.WriteAllText(tmp,text,new UTF8Encoding(false));
-   if(File.Exists(path)) File.Replace(tmp,path,null); else File.Move(tmp,path);
+   Commit(tmp,path);
+  }
+  // File.Replace is atomic but is denied by some sandboxed, network or
+  // anti-virus mediated file systems. Never lose the new content for that.
+  public static void Commit(string tmp,string path) {
+   if(!File.Exists(path)){File.Move(tmp,path);return;}
+   try{File.Replace(tmp,path,null);return;}catch(IOException){}catch(UnauthorizedAccessException){}
+   File.Delete(path);File.Move(tmp,path);
   }
   public static T Read<T>(string path) where T:new() { return File.Exists(path) ? JsonConvert.DeserializeObject<T>(File.ReadAllText(path)) ?? new T() : new T(); }
  }

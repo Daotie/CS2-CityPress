@@ -1,5 +1,29 @@
 # Changelog / 更新日志
 
+## 0.2.0-beta.7
+
+### English
+
+- Reworked the editorial pipeline so the model no longer decides how many editions exist. News value is graded from breakthroughs, transit service changes, actions and metric deltas; a deterministic page planner splits flat or single-"综合" output into themed editions (front news, economy and finance, construction and transport, livelihoods and society, environment and observation) and keeps an independent commentary edition last.
+- Fixed the missing-commentary defect at its source: when a major event has enough material, a separate commentary API task now writes an independent article, validates length, analysis, sourcing and overlap with news, retries once with the specific problem, and only then attaches it to its own edition. A failed commentary is reported as a failure and never published as a complete issue; nothing is cached.
+- Added an article quality gate that runs before layout: numbers must trace back to collected facts (rounding, 万/亿 and percentage forms included), invented interviews/sources are fatal, mechanical openings/evaluations and duplicated openings are flagged, near-duplicate news is merged out, commentary that reprints news is rejected, and titles/genre/commentary structure are checked. Issues yield a weighted score, per-article audit metadata and at most one targeted revision request; if a fatal fact problem remains, that unsafe article is removed rather than published.
+- Added an explicit editorial brief and value grading (routine, notable, major, milestone, critical) covering population/treasury/household/tourism/land breakthroughs, transit openings, public-service and incident records. A bare threshold without other evidence no longer forces a commentary.
+- Cache policy advanced to v7, so earlier single-page editions cannot be reused; old archives stay readable and re-exportable with their original layout. Word exports every planned edition with explicit page breaks.
+- Fixed a write-path failure: when the sandboxed/network filesystem denies `File.Replace`, JSON and Word writes now fall back to a safe delete-and-move instead of throwing. Empty editions returned by a model are dropped instead of rejecting the whole issue.
+- Root cause note for the reported P0 symptoms: the game had been running the already-loaded beta.4 assembly since 10:56 while beta.6 files were only placed on disk at 12:52. The 13:08 issue was therefore produced by beta.4's single-page code, not by beta.6. This release still fixes the real pipeline gaps that beta.6 left: flat-list fallback, no dedicated commentary task, no quality gate, and over-strict rejection without safe degradation. A game restart is required before judging these changes.
+- Validation: full offline suite (journal, cache, finance, transit, API compatibility, five layouts, Word, archive reload) plus a new editorial suite covering commentary second pass/failure, themed page planning, fact and attribution checks, deduplication, revision and Word multi-page export. A simulation over the real save's 2027-01-12 journal (486 actions, 813 metrics, one treasury breakthrough) produced five themed editions with a commentary page and a passing fact check. Native in-game display and a real paid model call remain unverified here; browser preview was blocked by the local sandbox (`spawn EPERM`).
+
+### 简体中文
+
+- 重构编辑流程，版面数量不再由模型决定。先从突破、线路服务变化、操作记录和指标变化评定新闻价值，再由确定性版面规划器把模型返回的扁平文章或单一“综合”版拆分为要闻、经济与财政、城市建设与交通、民生与社会、环境与观察等主题版，并始终把独立评论版放在最后。
+- 从根源修复“重大事件没有评论版”：当重大事件素材足够时，由**独立的评论生成任务**另发一次 API 请求撰写评论，校验篇幅、分析性、来源与新闻重复度，针对具体问题重试一次后才放入独立评论版。评论失败会明确报错、不缓存，不会把残缺报纸当作完成品发布。
+- 新增排版前文章质量检查：数字必须可追溯到采集事实（含四舍五入、万/亿和百分比写法）；虚构采访与消息来源判为严重错误；机械开头、套话、雷同开头被标记；近似重复的新闻被合并删除；抄写新闻的评论被拒绝；同时检查标题、体裁和评论结构。检查给出加权评分、逐篇审计元数据，最多进行一次针对性局部修订；若严重事实错误仍存在，删除该稿件而不是发布。
+- 新增编辑简报与事件分级（一般、重要、重大、里程碑、特别重大），覆盖人口/财政/家庭/游客/用地突破、线路开通、公共服务与事故记录。仅有单个阈值、缺少其他事实支撑时不再强行配评论。
+- 缓存规则升至 v7，旧的单版成稿不会被复用；历史报纸仍按原版式阅读和导出。Word 按规划后的全部主题版显式分页导出。
+- 修复写入路径：沙箱、网络盘或杀软拒绝 `File.Replace` 时，JSON 与 Word 写入回退为安全的删除后移动，不再直接失败。模型返回的空版面会被丢弃，而不是拒绝整份报纸。
+- 关于用户报告的两个 P0 现象的真实原因：游戏自 10:56 起一直在运行内存中的 beta.4 程序集，beta.6 文件到 12:52 才写入磁盘，13:08 生成的报纸实际由 beta.4 的单版代码产生，并非 beta.6。本版仍修复了 beta.6 留下的真实缺口：扁平文章回退、没有独立评论任务、没有质量检查、失败即整份拒绝且无安全降级。判断这些改动前必须重启游戏。
+- 验证：完整离线测试（日志、缓存、财政、线路、API 兼容、五种版式、Word、归档重载）加新增编辑测试（评论二次生成/失败、主题分版、事实与来源核验、去重、局部修订、Word 多版导出）。用真实存档 2027-01-12 日志（486 条操作、813 项指标、1 项市库突破）模拟，得到五个主题版加评论版并通过事实核验。原生游戏内显示与真实付费模型调用本环境仍未验收；浏览器预览被本地沙箱阻止（`spawn EPERM`），已在交付说明中标注。
+
 ## 0.2.0-beta.6
 
 ### English

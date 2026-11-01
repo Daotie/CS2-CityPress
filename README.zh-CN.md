@@ -3,13 +3,13 @@
 <h1 align="center">CityPress 城市日报</h1>
 <p align="center">为 <strong>《都市：天际线 II》</strong> 留下每天的城市新闻。</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.6-00a8bb" alt="0.2.0-beta.6">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.6-00a8bb" alt="0.2.0-beta.7">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta 预发行">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
 <p align="center"><a href="https://github.com/Daotie/CS2-CityPress/releases">下载</a> · <a href="https://github.com/Daotie/CS2-CityPress/issues">反馈问题</a> · <a href="CHANGELOG.md">更新日志</a> · <a href="SECURITY.md">隐私说明</a></p>
 
-**0.2.0-beta.6：** 新增自定义兼容 API、独立长评论和五种按内容选择的报纸版式。见[版本说明](RELEASE_NOTES.md)。目前界面、默认编辑方针和 Word 版签使用简体中文，项目公开文档提供中英双语。
+**0.2.0-beta.7：** 编辑流程版本——独立评论由单独任务生成，主题版面由确定性规划器决定，并在排版前加入文章质量检查。见[版本说明](RELEASE_NOTES.md)与[更新日志](CHANGELOG.md)。目前界面、默认编辑方针和 Word 版签使用简体中文，项目公开文档提供中英双语。
 
 ## 主要功能
 
@@ -18,6 +18,9 @@
 - 排除上下客、车辆自动状态改名、界面导航和空预览。
 - 根据真实可用素材交由自选 Chat Completions 兼容服务编辑（初始默认 DeepSeek），自主合并、取舍与安排栏目，不为凑版报道琐事。
 - 按素材组织要闻、经济、交通、民生、评论等主题版，游戏内可翻版，Word 对应主题分页；旧单版报纸继续兼容。
+- 先评定新闻价值（一般、重要、重大、里程碑、特别重大），再由确定性规划器排版：模型返回的扁平文章或单一“综合”版会被拆成主题版；只涉及一个领域或素材很少时保持单版，不为凑版注水。
+- 重大事件且素材足够时，由独立评论任务另发请求撰写评论并校验篇幅、分析性与重复度，失败会明确报错而不是发布只有新闻的残缺报纸；仅有单个阈值、缺少其他事实时不强行配评论。
+- 排版前执行质量检查：数字必须可追溯到采集事实，虚构消息来源与采访被拒绝，雷同开头、机械套话、重复报道被标记或合并，抄写新闻的评论被拒绝；不确定稿件被删除而不是发布，最多进行一次针对性局部修订。
 - 消息、简讯、分析和评论标明体裁，大事件可配评论；正文不刊发技术口径与模板式免责段落。
 - 单独采集具名客运线路的启用、停靠点和实际服务车辆，支持开通、恢复、停运、改名、调价与停站变化；既有线路先建立基线。
 - 提供通栏、侧栏主稿、纵向头条、综合短讯、长评论专版五种布局；按内容选择或从合适模板中适度随机。版式保存于成稿，游戏预览与 Word 对应。

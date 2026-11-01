@@ -60,7 +60,7 @@ namespace CityPress.Core {
      if(templateBody.Element(w+"sectPr")!=null)body.Add(new XElement(templateBody.Element(w+"sectPr")));
      entry.Delete();using(var stream=zip.CreateEntry("word/document.xml").Open())doc.Save(stream);
     }
-    if(File.Exists(path))File.Replace(tmp,path,null);else File.Move(tmp,path);
+    Storage.Commit(tmp,path);
    }finally {if(File.Exists(tmp))File.Delete(tmp);}
   }
  }

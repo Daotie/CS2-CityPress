@@ -26,10 +26,10 @@ namespace CityPress.Core {
   public static void Assign(Newspaper paper,string mode){
    var pages=Pages(paper);paper.Pages=pages;
    foreach(var page in pages){
-    var articles=page.Articles;int total=articles.Sum(a=>(a.Body??"").Length);bool opinion=articles.Count>0&&articles.All(a=>a.Genre=="评论"||(a.Genre=="分析"&&(page.Theme??"").Contains("评论")));
+    var articles=page.Articles;int total=articles.Sum(a=>(a.Body??"").Length);bool commentaryTheme=(page.Theme??"").Contains("评论");bool opinion=articles.Count>0&&articles.All(a=>a.Genre=="评论"||(a.Genre=="分析"&&(page.Theme??"").Contains("评论")));
     uint seed=Convert.ToUInt32(Storage.Hash((paper.Name??"")+paper.Day+page.Theme+page.Headline+string.Join("\n",articles.Select(a=>a.Title+"\n"+a.Body))).Substring(0,8),16);
     string template="banner";bool vertical=(page.Headline??"").Length>0&&(page.Headline??"").Length<=(int)spec["templates"]["vertical-lead"]["maxHeadlineLength"];
-    if(opinion&&total>=350)template="opinion";
+    if(opinion&&(total>=350||commentaryTheme))template="opinion";
     else if(mode=="varied") {var candidates=new List<string>{"banner"};if(articles.Count>=2)candidates.Add("lead-left");if(vertical&&articles.Count>0)candidates.Add("vertical-lead");if(articles.Count>=4)candidates.Add("digest");template=candidates[(int)(seed%candidates.Count)];}
     else if(articles.Count>=5&&articles.All(a=>(a.Body??"").Length<650))template="digest";
     else if(articles.Count>=2&&(articles[0].Body??"").Length>=total*.4)template="lead-left";

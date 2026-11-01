@@ -26,7 +26,7 @@ static class ApiLayoutTests {
   foreach(var value in new[]{"","file:///C:/data","https://user:password@example.test/v1","https://example.test/v1?key=example","https://example.test/v1#secret"}){bool rejected=false;try{ApiOptions.Endpoint(value);}catch(ArgumentException){rejected=true;}Check(rejected,"拒绝无效或混入凭据的 API 地址");}
   var invalid=new Preferences{ApiEndpoint="invalid",MaxOutputTokens=0};ApiOptions.Repair(invalid);Check(invalid.ApiEndpoint=="invalid"&&invalid.MaxOutputTokens==8192,"修复数值配置不悄悄更换玩家选择的服务地址");
   var day=new DayLog{Day="2027-01-12"};Aggregator.Add(day,"城市实况 · 建筑进入施工","社区医疗中心","10:00");
-  var example=new Newspaper{Headline="公共服务的新进展",Deck="城市建设与服务安排",Articles=new(){Story("社区医疗中心建设推进","社区医疗中心建设正在推进。"),Story("服务安排应回应需求","公共服务安排应结合设施分布，统筹建设与维护。","评论")}};
+  var example=new Newspaper{Headline="公共服务的新进展",Deck="城市建设与服务安排",Articles=new(){Story("社区医疗中心建设推进","社区医疗中心建设正在推进，周边道路与步行通道同步调整，服务设施的布局需要与人口分布相匹配。"),Story("服务安排应回应需求","公共服务安排应结合设施分布，统筹建设与维护。\n设施建成只是服务供给的起点，能否真正满足需求还取决于人员、交通衔接和后续运营安排。\n从长期看，医疗、教育与交通服务之间存在联动关系，任何单项投入都需要放在城市整体运行中衡量。\n因此，讨论公共投入时应区分已完成的工程事实与仍有条件的影响，把资金取舍、服务覆盖和运营成本放在一起考虑，避免用工程数量代替服务效果，并关注长期维护带来的财政压力。\n对城市管理者而言，真正的考验不是单个项目能否落地，而是公共服务能否形成稳定、可负担的长期供给。设施选址、人员配置和预算安排共同决定服务效果，任何一项短板都可能削弱投入的实际价值。只有在运营数据可核实、服务调整有依据的前提下，公共投入才可能转化为市民能够感受到的便利。","评论")}};
   using(var handler=new Response{Paper=example,Fence=true})using(var service=new NewsService(handler,Path.Combine(temp,"custom-api"))){
    var prefs=new Preferences{ApiEndpoint="http://localhost:11434/v1",Model="local-model",RequireApiKey=false,JsonMode=false,TokenParameter="max_completion_tokens",MaxOutputTokens=12000};
    var result=await service.Generate("local","汐澜",day,prefs,"must-not-send",CancellationToken.None);var body=JObject.Parse(handler.Body);
