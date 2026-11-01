@@ -1,5 +1,12 @@
 # Changelog / 更新日志
 
+## 0.2.0-beta.12
+
+- Require a complete long commentary in the initial generation prompt. Review receives the complete numbered manuscript and can add, expand, merge and remove articles before publication checks; repaired copy is rechecked and replanned.
+- Raise the accepted long-commentary minimum to 500 characters (requested target 700–1400). Missing opinions go to the repair editor before the bounded specialist fallback. Preserve compliant copy and invalidate older editorial caches.
+- Fix Cohtml font loading by emitting the bundled calligraphy TTF as a mounted resource instead of a rejected data URI. Mastheads remain editable text and support custom newspaper names.
+- Offline regression tests cover additions, expansion, merge/delete index stability, full-manuscript review, persistence and Word content. Native game rendering and live provider output require in-game acceptance.
+
 ## 0.2.0-beta.11
 
 - Audit actual local journal input and close remaining raw-material paths: completion/fire markers, automatic building type changes and unverified line entities. Normalize observation labels before provider requests.
