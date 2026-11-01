@@ -19,6 +19,7 @@ class Fake : HttpMessageHandler {
 class Program {
  static void Check(bool ok,string message){if(!ok)throw new Exception(message);Console.WriteLine("PASS "+message);}
  static async Task Main(string[] args){
+  var projectRoot=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../"));
   if(args.Length==2&&args[0]=="--audit-input") {
    var saved=Storage.Read<SaveState>(args[1]);
    foreach(var day in saved.Days.Where(d=>GameCalendar.IsValidDay(d.Day)))Console.WriteLine(day.Day+": recorded="+day.Actions.Count+", eligible="+EditorialInput.Select(day).Count);
@@ -38,9 +39,10 @@ class Program {
   var handler=new Fake();using var service=new NewsService(handler,temp);
   try {
    await FeatureTests.Run(Path.Combine(temp,"features"));
-   await EditionTests.Run(temp,Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../")));
-   await ApiLayoutTests.Run(temp,Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../")));
+   await EditionTests.Run(temp,projectRoot);
+   await ApiLayoutTests.Run(temp,projectRoot);
    await EditorialTests.Run(temp);
+   LocalizationTests.Run(projectRoot);
    var log=new DayLog{Day="2026-10-31"};Aggregator.Add(log,"道路","公路","10:00");Aggregator.Add(log,"道路","公路","11:00");
    Check(log.Actions.Count==1&&log.Actions[0].Count==2&&log.Actions[0].Last=="11:00","重复操作合并且保留次数和时间");
    var prefs=new Preferences();Check(!prefs.AutoGenerate,"默认手动生成");

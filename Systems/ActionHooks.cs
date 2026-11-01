@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Game.Tools;
 using HarmonyLib;
+using CityPress.Core;
 
 namespace CityPress.Systems {
  internal static class ActionHooks {
@@ -23,7 +24,7 @@ namespace CityPress.Systems {
   static void Patch(Type type,string name,string hook,bool prefix) {
    var methods=type?.GetMethods(BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.DeclaredOnly).Where(m=>m.Name==name).ToArray()??Array.Empty<MethodInfo>();
    foreach(var method in methods) try { var hm=new HarmonyMethod(typeof(ActionHooks),hook); harmony.Patch(method,prefix:prefix?hm:null,postfix:prefix?null:hm);Coverage.Add(type.Name+"."+name); } catch {Mod.Log.Warn("操作采集挂钩不可用："+type.Name+"."+name);}
-   if(methods.Length==0) Coverage.Add("未支持："+type?.Name+"."+name);
+   if(methods.Length==0) Coverage.Add(I18n.Say("未支持：","Unsupported: ")+type?.Name+"."+name);
   }
   static void ToolCommit(ToolOutputSystem __instance) {
    try {

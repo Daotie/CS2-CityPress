@@ -23,6 +23,45 @@ namespace CityPress.Core {
    }
    return paragraph;
   }
+  static readonly System.Collections.Generic.Dictionary<string,string> ThemeEnglish=new System.Collections.Generic.Dictionary<string,string>{
+   {"综合","General"},{"要闻","Front Page"},{"经济与财政","Economy & Finance"},{"城市建设与交通","Construction & Transport"},
+   {"民生与社会","Livelihood & Society"},{"环境与观察","Environment & Observation"},{"评论","Opinion"},{"城市要闻","City News"}
+  };
+  static readonly System.Text.RegularExpressions.Regex Continuation=new System.Text.RegularExpressions.Regex(@"（续(?:[一二三四五六七八九])?）$");
+  static string ThemeLabel(string theme,bool english){
+   if(!english||string.IsNullOrWhiteSpace(theme))return theme??"综合";
+   var value=theme.Trim();int count=0;
+   while(Continuation.IsMatch(value)){count++;value=Continuation.Replace(value,"").Trim();}
+   var label=ThemeEnglish.TryGetValue(value,out var translated)?translated:value;
+   for(int i=0;i<count;i++)label+=" (cont.)";
+   return label;
+  }
+  static bool IsEnglish(Newspaper paper){
+   var articles=paper.Articles??PaperLayout.Pages(paper).SelectMany(page=>page.Articles).ToList();
+   var sample=string.Join("\n",new[]{paper.Headline??"",paper.Deck??""}.Concat(articles.Select(article=>(article?.Title??"")+"\n"+(article?.Body??""))));
+   return !I18n.MostlyChinese(sample);
+  }
+  static string WordDate(string day,bool english){
+   if(!DateTime.TryParseExact(day,"yyyy-MM-dd",CultureInfo.InvariantCulture,DateTimeStyles.None,out var issueDate))return day;
+   if(english){
+    var months=new[]{"January","February","March","April","May","June","July","August","September","October","November","December"};
+    var weekdays=new[]{"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"};
+    return months[issueDate.Month-1]+" "+issueDate.Day+", "+issueDate.Year+" · "+weekdays[(int)issueDate.DayOfWeek];
+   }
+   return issueDate.ToString("yyyy年MM月dd日",CultureInfo.InvariantCulture)+" 星期"+"日一二三四五六"[(int)issueDate.DayOfWeek];
+  }
+  static string TemplateText(string value,string theme,bool english,int pageIndex){
+   if(value=="综合")return theme;
+   if(value=="综合版 · 01")return english?theme+" · PAGE "+(pageIndex+1).ToString("D2"):theme+"版 · "+(pageIndex+1).ToString("D2");
+   if(value=="综合 · 城市新闻")return english?theme+" · CITY NEWS":theme+" · "+(pageIndex+1).ToString("D2");
+   if(english){
+    if(value=="城市新闻")return "CITY NEWS";
+    if(value=="城市纪事")return "CITY CHRONICLE";
+    if(value=="日报")return "DAILY";
+    if(value=="电子刊")return "E-PAPER";
+   }
+   return value;
+  }
   public static void Save(string path,Newspaper paper) {
    Directory.CreateDirectory(Path.GetDirectoryName(path));var tmp=path+"."+Guid.NewGuid().ToString("N")+".tmp";
    try {
@@ -61,12 +100,9 @@ namespace CityPress.Core {
       if(cell.Elements().LastOrDefault()?.Name!=w+"p")cell.Add(P("","Normal"));row.Add(cell);
      }
      table.Element(w+"tblGrid").ReplaceWith(grid);table.Element(w+"tr").ReplaceWith(row);
-     string date=paper.Day;
-     if(DateTime.TryParseExact(paper.Day,"yyyy-MM-dd",CultureInfo.InvariantCulture,DateTimeStyles.None,out var issueDate))date=issueDate.ToString("yyyy年MM月dd日",CultureInfo.InvariantCulture)+" 星期"+"日一二三四五六"[(int)issueDate.DayOfWeek];
+     bool english=IsEnglish(paper);string date=WordDate(paper.Day,english);
      foreach(var text in pageBody.Descendants(w+"t")){
-      if(text.Value=="综合")text.Value=page.Theme??"综合";
-      else if(text.Value=="综合版 · 01")text.Value=(page.Theme??"综合")+"版 · "+(pageIndex+1).ToString("D2");
-      else if(text.Value=="综合 · 城市新闻")text.Value=(page.Theme??"综合")+" · "+(pageIndex+1).ToString("D2");
+      text.Value=TemplateText(text.Value,ThemeLabel(page.Theme??"综合",english),english,pageIndex);
       text.Value=text.Value.Replace("{{报纸名称}}",paper.Name??"").Replace("{{刊发日期}}",date).Replace("{{本期头条}}",page.Headline??paper.Headline??"").Replace("{{导语}}",page.Deck??paper.Deck??"");
      }
      if(pageIndex>0)body.Add(new XElement(w+"p",new XElement(w+"r",new XElement(w+"br",new XAttribute(w+"type","page")))));

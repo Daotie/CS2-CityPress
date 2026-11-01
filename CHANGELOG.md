@@ -1,5 +1,29 @@
 # Changelog / 更新日志
 
+## 0.2.0-beta.9
+
+### English
+
+- Added English and Simplified Chinese localization for the in-game interface, status and error messages, edition/theme labels, page dates and Word furniture. The interface follows the game language; other game languages fall back to English. A built-in fallback table is bundled, so a missing or not-yet-loaded language file never renders raw translation keys.
+- Added `lang/en-US.json` and `lang/zh-HANS.json` with a shared key set. Translation keys cover UI labels, placeholders, archive text, settings, operation status, API/quality errors, theme names and collection summaries.
+- Backend user-facing failures now carry stable `CityPress.Error.*` keys and arguments; operation status uses `CityPress.Status.*`. The UI translates them and keeps the existing Chinese fallbacks for logs, tests and older callers.
+- Word export now detects whether the issue is Chinese or English and selects matching furniture, page labels and date format, including English month/weekday names. Existing Chinese issues keep their original furniture.
+- Added standard mod metadata (`mod.json`) and packaged `lang/` with the release, so the game and translators can discover the strings. The generated newspaper prose itself still follows the editorial policy; interface language does not auto-translate articles.
+- Process/caveat wording no longer rejects an entire issue. It is flagged by the quality gate, sent to the model for one targeted revision, and any phrase that survives is removed sentence-by-sentence before layout. This avoids gambling on a full regeneration and prevents a single boilerplate sentence from costing the whole issue.
+- Fixed settings-panel scrolling and input overlap: the settings form now forwards wheel scrolling to the panel, gives inputs an opaque clipped surface and explicit stacking, and uses a scrollable textarea. Long English labels no longer overlap neighbouring fields.
+- Validation: full offline suite with **214 checks**, including language-file key parity, no hard-coded Chinese left in the UI entry file, every UI/backend key present, English Word furniture/date, Chinese fallbacks, one-model-revision process-wording repair, and deterministic phrase cleanup fallback. Not verified here: native in-game language switching, Cohtml layout with English strings, and real CI/browser rendering remain pending; the game must be restarted after installing.
+
+### 简体中文
+
+- 为游戏内界面、状态与错误消息、版面/主题标签、报纸日期和 Word 版签增加英文与简体中文。界面跟随游戏显示语言，其他游戏语言回退为英文；界面内置回退词条表，语言文件缺失或尚未加载时不会显示原始键名。
+- 新增 `lang/en-US.json` 与 `lang/zh-HANS.json`，两者键集合一致。词条覆盖界面标签、输入占位、档案文案、设置项、操作状态、API/质量错误、主题名称和采集摘要。
+- 后端用户可见错误改为携带稳定的 `CityPress.Error.*` 词条与参数，操作状态使用 `CityPress.Status.*`；界面负责翻译，同时保留中文回退文案供日志、测试和旧调用使用。
+- Word 导出现在会检测报纸是中文还是英文，并选择对应的版签、版号和日期格式（含英文月份与星期）；已有中文报纸保持原版签。
+- 新增标准模组元数据 `mod.json`，发行包附带 `lang/`，便于游戏与译者发现词条。生成的报纸正文仍由编辑方针决定，界面语言不会自动翻译文章内容。
+- 制作口径/模板免责措辞不再导致整期拒绝：质量检查先要求模型进行一次针对性改写，仍有残留时在排版前按句清理。这样既避免“整期丢弃、重新生成靠运气”，也避免一句套话浪费整期 Token。
+- 修复设置面板滚动与输入框重叠：设置表单会把鼠标滚轮转发给面板滚动，输入框使用不透明裁剪背景与明确层级，长文本域可独立滚动；选择文本时不再叠显其他输入框内容。
+- 验证：完整离线测试共 **214 项**，包括中英文词条键一致、界面入口不再硬编码中文、所有界面/后端词条存在、英文 Word 版签与日期、中文回退、制作口径一次模型修订与确定性清理回退等。本环境未验证：原生游戏内语言切换、英文文案在 Cohtml 中的布局、真实 CI/浏览器渲染；安装后需重启游戏。
+
 ## 0.2.0-beta.8
 
 ### English

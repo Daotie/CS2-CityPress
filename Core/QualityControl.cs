@@ -136,6 +136,7 @@ namespace CityPress.Core {
      break;
     }
    }
+   if(EditionRules.ContainsProcessPhrase((article.Title??"")+"\n"+body))Flag(article,issues,"process-phrase",Major,"《"+article.Title+"》含制作口径或模板式免责措辞，需重写");
    if(Attribution.IsMatch(body))Flag(article,issues,"fabricated-source",Fatal,"《"+article.Title+"》出现无法核实的采访、引述或消息来源");
    if(Mechanical.IsMatch(body))Flag(article,issues,"mechanical-evaluation",Major,"《"+article.Title+"》含缺少事实支撑的评价性套话");
    if(GenericOpening.IsMatch((body??"").TrimStart()))Flag(article,issues,"mechanical-opening",Major,"《"+article.Title+"》使用了模板式开头");

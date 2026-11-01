@@ -33,6 +33,8 @@ try {
  Copy-Item bin/Release/net48/CityPress.dll $out
  Copy-Item bin/Release/net48/0Harmony.dll $out
  Copy-Item UI/build/* $out -Recurse
+ Copy-Item UI/mod.json $out
+ Copy-Item lang $out -Recurse
  Copy-Item Templates/newspaper.docx "$out/Templates"
  foreach($file in @('README.md','README.zh-CN.md','CHANGELOG.md','RELEASE_NOTES.md','LICENSE','THIRD_PARTY_NOTICES.md','SECURITY.md')){Copy-Item -LiteralPath $file -Destination $out}
  foreach($directory in @('licenses','docs','assets')){Copy-Item -LiteralPath $directory -Destination $out -Recurse}

@@ -12,7 +12,7 @@ namespace CityPress.Systems {
  // Observation is deliberately separate from UI intent. Existing cities are baselined,
  // never reported as freshly built when a save is opened.
  public partial class CityObserver : GameSystemBase {
-  internal static string Report="城市观测：等待存档加载";
+  internal static string Report=I18n.Say("城市观测：等待存档加载","City observation: waiting for the save to load");
   EntityQuery assets,created,deleted,journals,ownedTiles,lines;
   NativeArray<Entity> lineEntities;int lineCursor;bool linesPrimed;DateTime nextTransit;
   readonly Dictionary<Entity,TransitRecord> lineHistory=new Dictionary<Entity,TransitRecord>();
@@ -62,8 +62,8 @@ namespace CityPress.Systems {
    }else if(scanEntities.IsCreated||now>=nextSnapshot){if(!Guard("assets",()=>Snapshot(news))){if(scanEntities.IsCreated)scanEntities.Dispose();nextSnapshot=now.AddMinutes(5);}}
    maxSliceMs=Math.Max(maxSliceMs,(Stopwatch.GetTimestamp()-started)*1000.0/Stopwatch.Frequency);
    if(DateTime.UtcNow>=nextReport){nextReport=DateTime.UtcNow.AddSeconds(2);
-    Report="城市观测："+previous.Count+" 个对象，"+metricCount+" 项统计；分帧校对，采集切片峰值 "+maxSliceMs.ToString("F1")+" ms";
-    var errors=new[]{assetError,statError,eventError,bindingError}.Where(e=>e!=null).ToArray();if(errors.Length>0)Report+="；部分采集异常："+string.Join("、",errors);maxSliceMs=0;
+    Report=I18n.Say("城市观测："+previous.Count+" 个对象，"+metricCount+" 项统计；分帧校对，采集切片峰值 "+maxSliceMs.ToString("F1")+" ms","City observation: "+previous.Count+" objects, "+metricCount+" statistics; staged reconciliation, peak collection slice "+maxSliceMs.ToString("F1")+" ms");
+    var errors=new[]{assetError,statError,eventError,bindingError}.Where(e=>e!=null).ToArray();if(errors.Length>0)Report+=I18n.Say("；部分采集异常：","; some collection channels reported errors: ")+string.Join(I18n.Say("、",", "),errors);maxSliceMs=0;
    }
   }
   void DisposeWork(){if(scanEntities.IsCreated)scanEntities.Dispose();if(statisticKeys.IsCreated)statisticKeys.Dispose();if(journalEntities.IsCreated)journalEntities.Dispose();if(lineEntities.IsCreated)lineEntities.Dispose();lineHistory.Clear();knownService.Clear();linesPrimed=false;nextTransit=default;pollutionCursor=pollutionLength=0;pollutionSum=pollutionMax=0;pollutionNonzero=0;}

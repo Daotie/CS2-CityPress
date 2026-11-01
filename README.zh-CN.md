@@ -3,7 +3,7 @@
 <h1 align="center">CityPress 城市日报</h1>
 <p align="center">把《都市：天际线 II》的城市运行编辑成一份每日报纸。</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.8-00a8bb" alt="0.2.0-beta.8">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.8-00a8bb" alt="0.2.0-beta.9">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta 预发行">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
@@ -13,7 +13,7 @@ CityPress 是一个《都市：天际线 II》模组。它观察城市中实际�
 
 原版游戏通过统计面板和事件提示展示城市信息，但没有报纸、选题、往期档案或可导出的刊物。CityPress 补上这层编辑与出版能力，不改变城市管理的核心规则。
 
-**当前状态：** 当前源码版本为 `0.2.0-beta.8`（预发行），已发布构建见[下载页](https://github.com/Daotie/CS2-CityPress/releases)。项目仍在持续开发，存档数据采用向后兼容的追加字段，但接口、提示词和生成版面可能在 Beta 之间调整。实际验证范围见[版本说明](RELEASE_NOTES.md)。
+**当前状态：** 当前源码版本为 `0.2.0-beta.9`（预发行），已发布构建见[下载页](https://github.com/Daotie/CS2-CityPress/releases)。项目仍在持续开发，存档数据采用向后兼容的追加字段，但接口、提示词和生成版面可能在 Beta 之间调整。实际验证范围见[版本说明](RELEASE_NOTES.md)。
 
 ## 功能
 
@@ -41,6 +41,7 @@ CityPress 是一个《都市：天际线 II》模组。它观察城市中实际�
 - 版式计划随报纸保存，游戏预览与 Word 导出使用同一套栏宽和内容块；重新打开、命中缓存和重新导出不会重新排版。
 - 每期报纸同时保存 JSON 与 Word 文件；Word 按全部版面显式分页，文字可编辑。
 - 支持自定义报纸名称、自定义导出目录、单存档或全局设置，并可在游戏内打开实际导出文件夹。
+- 界面与状态/错误消息跟随游戏语言，内置英文与简体中文并提供回退，其他游戏语言使用英文。报纸正文语言由编辑方针决定，Word 版签跟随报纸内容检测到的语言。
 - **默认手动生成**。可选开启每日自动发行，在跨日后编印前一天的报纸并在游戏内打开。
 - 已完成报纸复用本地缓存，按服务实际返回值显示缓存或 token 用量；指标没有变化的重复快照不会触发生成。
 
@@ -86,7 +87,7 @@ CityPress 以本地模组形式安装，不通过 Steam 创意工坊或 Paradox 
 5. 在往期档案中阅读已出版报纸，或补编有记录的历史日期。
 6. 使用“导出当前报纸”重新导出当前报纸（不调用 API），使用“打开导出文件夹”打开实际目录。
 
-界面、默认编辑方针和 Word 版签目前使用简体中文。版面切换、档案列表和设置项的具体说明见[完整使用指南](docs/USER_GUIDE.zh-CN.md)。
+界面与系统消息跟随游戏语言，内置英文与简体中文，其他语言回退为英文。生成的报纸正文语言由编辑方针决定，不随界面语言自动切换；Word 版签跟随报纸内容检测到的语言。版面切换、档案列表和设置项的具体说明见[完整使用指南](docs/USER_GUIDE.zh-CN.md)。
 
 ## 配置
 

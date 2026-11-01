@@ -238,6 +238,21 @@ static class EditorialTests {
     Check(text.Split(new[]{"资金存量不是服务成效"},StringSplitOptions.None).Length-1==1,"小标题在 Word 中只出现一次，未与正文重复");
    }
   }
+  // 11. Process/caveat wording is sent back for one model review instead of rejecting the issue.
+  var processDay=new DayLog{Day="2027-01-12"};Aggregator.Add(processDay,"建设","社区医院","10:00");
+  var processPaper=new Newspaper{Headline="城市服务需要持续调整",Deck="人口变化带来的公共服务需求。",Articles=new List<Article>{Story("民生","人口增长带来服务需求","观测区间内，全市人口由40.04万增至40.99万，学校与医院需求同步增加，城市公共服务安排需要持续调整。公共服务需要持续投入，并关注学校与医院的承载能力。")}};
+  var processHandler=new Scripted{Respond=system=>system.Contains("质量编辑")
+   ? "{\"rewrites\":[{\"index\":0,\"title\":\"人口增长带来服务需求\",\"body\":\"全市人口由40.04万增至40.99万，学校与医院需求同步增加，城市公共服务安排需要持续调整。\"}]}"
+   : JsonConvert.SerializeObject(processPaper)};
+  using(var service=new NewsService(processHandler,Path.Combine(temp,"process-review"))){
+    var result=await service.Generate("process","汐澜",processDay,new Preferences(),"key",CancellationToken.None).ConfigureAwait(false);
+    Check(processHandler.Calls==2&&result.RevisionCount==1&&result.Articles.All(article=>!EditionRules.ContainsProcessPhrase(article.Title+"\n"+article.Body)),"制作口径先交给模型局部审校，修订成功后正常发刊");
+   }
+   var fallbackHandler=new Scripted{Respond=system=>JsonConvert.SerializeObject(processPaper)};
+   using(var service=new NewsService(fallbackHandler,Path.Combine(temp,"process-fallback"))){
+    var result=await service.Generate("fallback","汐澜",processDay,new Preferences(),"key",CancellationToken.None).ConfigureAwait(false);
+   Check(result.Articles.Count>0&&result.Articles.All(article=>!EditionRules.ContainsProcessPhrase(article.Title+"\n"+article.Body)),"模型未修好时确定性清理残留措辞，不整期丢弃");
+  }
   Console.WriteLine("Editorial pipeline checks passed");
  }
 }

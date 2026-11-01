@@ -3,7 +3,7 @@
 <h1 align="center">CityPress</h1>
 <p align="center">A daily newspaper generated from a living <strong>Cities: Skylines II</strong> city.</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.8-00a8bb" alt="0.2.0-beta.8">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.8-00a8bb" alt="0.2.0-beta.9">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta prerelease">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
@@ -13,7 +13,7 @@ CityPress is a Cities: Skylines II mod that turns a city's recorded activity and
 
 The base game exposes city information through statistics panels and event notifications, but it has no newspaper, editorial selection, issue archive or exportable record. CityPress adds that layer without changing city-management rules.
 
-**Status:** the current source version is `0.2.0-beta.8` (prerelease). Published builds are listed on the [Releases](https://github.com/Daotie/CS2-CityPress/releases) page. The mod is under active development; save data is versioned additively, but APIs, prompts and generated layouts may change between betas. See [release notes](RELEASE_NOTES.md) for the current validation scope.
+**Status:** the current source version is `0.2.0-beta.9` (prerelease). Published builds are listed on the [Releases](https://github.com/Daotie/CS2-CityPress/releases) page. The mod is under active development; save data is versioned additively, but APIs, prompts and generated layouts may change between betas. See [release notes](RELEASE_NOTES.md) for the current validation scope.
 
 ## Features
 
@@ -41,6 +41,7 @@ The base game exposes city information through statistics panels and event notif
 - Saves the composition plan with the issue, so the in-game preview and Word export use the same columns and content blocks. Reopening, cache hits and re-exporting do not redraw the layout.
 - Keeps every issue as JSON and Word files. Word exports all planned editions with explicit page breaks and editable text.
 - Supports a custom newspaper name, a custom export directory, a per-save or global settings scope, and opening the actual export folder from the game.
+- Localizes the interface and status/error messages with the game language. English and Simplified Chinese are included with built-in fallbacks; other game languages use English. Newspaper prose follows the editorial policy, and Word furniture follows the language detected in the issue.
 - Keeps generation **manual by default**. Optional automatic publication generates the previous game day's issue and opens it in game.
 - Caches completed issues locally, isolates caches by provider/model/settings, and shows cache or token usage when the service returns it. Unchanged metric snapshots do not trigger regeneration.
 
@@ -86,7 +87,7 @@ To confirm which build loaded, check `%USERPROFILE%\AppData\LocalLow\Colossal Or
 5. Open the archive tab to read past issues or generate an issue for a recorded day.
 6. Use **导出当前报纸** to re-export the open issue without calling the API, and **打开导出文件夹** to open the actual export directory.
 
-The interface, default editorial policy and Word furniture currently use Simplified Chinese. The in-game page navigation, archive rows and settings are documented in the [player guide](docs/USER_GUIDE.zh-CN.md) (Simplified Chinese).
+The interface and system messages follow the game language. English and Simplified Chinese are included; other languages fall back to English. Generated newspaper text follows the editorial policy, not the interface language; Word furniture follows the language detected in the newspaper itself. The in-game page navigation, archive rows and settings are documented in the [player guide](docs/USER_GUIDE.zh-CN.md) (Simplified Chinese).
 
 ## Configuration
 
