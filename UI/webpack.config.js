@@ -37,7 +37,11 @@ module.exports = {
   },
   module: {
     rules: [
-      { test: /\.ttf$/i, type: "asset/inline" },
+      // Cohtml rejects data: font resources. Use the same mounted, flat asset
+      // directory as images so arbitrary masthead text can use the real font.
+      { test: /\.ttf$/i, type: "asset/resource", generator: {
+        filename: "images/cp-[name].[contenthash:8][ext]",
+      } },
       {
         test: /\.tsx?$/,
         use: "ts-loader",
