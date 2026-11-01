@@ -10,6 +10,6 @@ namespace CityPress.Core {
    if(result.Days.Count>0)result.Days[result.Days.Count-1]=CopyDay(result.Days[result.Days.Count-1]);
    return result;
   }
-  public static DayLog CopyDay(DayLog old)=>new DayLog{Day=old.Day,Actions=old.Actions.Select(x=>new ActionRecord{Kind=x.Kind,Detail=x.Detail,Count=x.Count,First=x.First,Last=x.Last}).ToList(),Metrics=old.Metrics.Select(x=>new MetricRecord{Key=x.Key,Label=x.Label,Unit=x.Unit,First=x.First,Last=x.Last,Min=x.Min,Max=x.Max,Samples=x.Samples,FirstTime=x.FirstTime,LastTime=x.LastTime}).ToList(),Breakthroughs=(old.Breakthroughs??new List<BreakthroughRecord>()).Select(x=>new BreakthroughRecord{Key=x.Key,Label=x.Label,Unit=x.Unit,Kind=x.Kind,Time=x.Time,PreviousHigh=x.PreviousHigh,Threshold=x.Threshold,Value=x.Value}).ToList()};
+  public static DayLog CopyDay(DayLog old)=>new DayLog{Day=old.Day,Actions=old.Actions.Select(x=>new ActionRecord{Kind=x.Kind,Detail=x.Detail,Count=x.Count,First=x.First,Last=x.Last}).ToList(),Metrics=old.Metrics.Select(x=>new MetricRecord{Key=x.Key,Label=x.Label,Unit=x.Unit,First=x.First,Last=x.Last,Min=x.Min,Max=x.Max,Samples=x.Samples,FirstTime=x.FirstTime,LastTime=x.LastTime}).ToList(),Breakthroughs=(old.Breakthroughs??new List<BreakthroughRecord>()).Select(x=>new BreakthroughRecord{Key=x.Key,Label=x.Label,Unit=x.Unit,Kind=x.Kind,Time=x.Time,PreviousHigh=x.PreviousHigh,Threshold=x.Threshold,Value=x.Value}).ToList(),Transit=(old.Transit??new List<TransitRecord>()).Select(TransitFacts.Copy).ToList()};
  }
 }

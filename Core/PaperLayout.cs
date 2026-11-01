@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace CityPress.Core {
  public static class PaperLayout {
+  public static List<NewspaperPage> Pages(Newspaper paper)=>paper.Pages!=null&&paper.Pages.Count>0?paper.Pages:new List<NewspaperPage>{new NewspaperPage{Theme="综合",Headline=paper.Headline,Deck=paper.Deck,Articles=paper.Articles??new List<Article>()}};
   static readonly JObject spec=Load();
   static JObject Load(){using(var stream=typeof(PaperLayout).Assembly.GetManifestResourceStream("CityPress.paper-layout.json"))using(var reader=new StreamReader(stream))return JObject.Parse(reader.ReadToEnd());}
   public static int Columns(int count)=>Math.Max(1,Math.Min(count,count<3?(int)spec["sparseColumns"]:(int)spec["maxColumns"]));

@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 
 class Fake : HttpMessageHandler {
  public int Calls;public bool Invalid;public string Last;
- protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage req,CancellationToken ct){Calls++;Last=await req.Content.ReadAsStringAsync();return new HttpResponseMessage(HttpStatusCode.OK){Content=new StringContent(JsonConvert.SerializeObject(new { choices=new[]{new{finish_reason="stop",message=new{content=Invalid?"{}":JsonConvert.SerializeObject(new{headline="城区建设持续推进",deck="本日施工操作已记录。",articles=new[]{new{section="城市建设",title="道路建设纪事",body="市政施工记录显示，多项道路建设操作在本日提交。重复操作已合并统计，实际建设效果以游戏为准。"}}})}}},usage=new{prompt_cache_hit_tokens=128,prompt_cache_miss_tokens=20}}))};}
+ protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage req,CancellationToken ct){Calls++;Last=await req.Content.ReadAsStringAsync();return new HttpResponseMessage(HttpStatusCode.OK){Content=new StringContent(JsonConvert.SerializeObject(new { choices=new[]{new{finish_reason="stop",message=new{content=Invalid?"{}":JsonConvert.SerializeObject(new{headline="城区建设持续推进",deck="道路工程与公共服务的新进展。",articles=new[]{new{genre="消息",section="城市建设",title="道路建设纪事",body="城区多项道路工程同步推进，施工安排涉及道路与步行通道。"},new{genre="评论",section="城市短评",title="公共投入应回应城市需求",body="道路工程应统筹步行与公共交通衔接，让建设安排有明确的服务目标。"}}})}}},usage=new{prompt_cache_hit_tokens=128,prompt_cache_miss_tokens=20}}))};}
 }
 class Program {
  static void Check(bool ok,string message){if(!ok)throw new Exception(message);Console.WriteLine("PASS "+message);}
@@ -38,6 +38,7 @@ class Program {
   var handler=new Fake();using var service=new NewsService(handler,temp);
   try {
    await FeatureTests.Run(Path.Combine(temp,"features"));
+   await EditionTests.Run(temp,Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../")));
    var log=new DayLog{Day="2026-10-31"};Aggregator.Add(log,"道路","公路","10:00");Aggregator.Add(log,"道路","公路","11:00");
    Check(log.Actions.Count==1&&log.Actions[0].Count==2&&log.Actions[0].Last=="11:00","重复操作合并且保留次数和时间");
    var prefs=new Preferences();Check(!prefs.AutoGenerate,"默认手动生成");

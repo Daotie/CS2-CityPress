@@ -8,7 +8,7 @@ namespace CityPress.Core {
    {"city/population",new Rule{Label="常住人口",Unit="人",Population=true,Minimum=1000}},
    {"city/money",new Rule{Label="市库资金余额",Unit="原生货币单位，资金存量",Minimum=100000}},
    {"city/monthlyIncome",new Rule{Label="月度预算总收入",Unit="原生货币单位/月，预算面板口径，非本月已结算收入",Minimum=100000}},
-   {"city/monthlyBalance",new Rule{Label="月度预算收支结余",Unit="原生货币单位/月，预算口径，非市库余额",Minimum=100000}},
+   {"city/monthlyNetIncome",new Rule{Label="月度预算收支结余",Unit="原生货币单位/月，预算口径，非市库余额",Minimum=100000}},
    {"city/households",new Rule{Label="家庭数量",Unit="户",Minimum=1000}},
    {"city/tourists",new Rule{Label="当前游客人数",Unit="人，当前在城数量，非累计接待量",Minimum=1000}},
    {"city/ownedTiles",new Rule{Label="已解锁用地",Unit="用地单元，不等于平方公里",Minimum=10}}
@@ -27,7 +27,7 @@ namespace CityPress.Core {
    }
    double before=progress.High;if(value<=before)return false;progress.High=value;
    string kind="数量级突破";double threshold;
-   if(key=="city/monthlyBalance"&&before<=0&&value>0){threshold=0;kind="预算由亏转盈";}
+   if(key=="city/monthlyNetIncome"&&before<=0&&value>0){threshold=0;kind="预算由亏转盈";}
    else {double step=Step(rule,Math.Max(0,before));double next=(Math.Floor(Math.Max(0,before)/step)+1)*step;if(value<next)return false;threshold=Math.Floor(value/Step(rule,value))*Step(rule,value);}
    if(day.Breakthroughs==null)day.Breakthroughs=new List<BreakthroughRecord>();
    var record=day.Breakthroughs.FirstOrDefault(x=>x.Key==key&&x.Kind==kind);

@@ -22,7 +22,8 @@ namespace CityPress.Core {
  }
  public sealed class BreakthroughRecord { public string Key,Label,Unit,Kind,Time;public double PreviousHigh,Threshold,Value; }
  public sealed class MilestoneProgress { public double High; }
- public sealed class DayLog { public string Day; public List<ActionRecord> Actions = new List<ActionRecord>(); public List<MetricRecord> Metrics=new List<MetricRecord>(); public List<BreakthroughRecord> Breakthroughs=new List<BreakthroughRecord>(); }
+ public sealed class TransitRecord {public string Id,Name,Mode,Time,Change;public bool Enabled,Operating;public int Stops,Vehicles,Fare;}
+ public sealed class DayLog { public string Day; public List<ActionRecord> Actions = new List<ActionRecord>(); public List<MetricRecord> Metrics=new List<MetricRecord>(); public List<BreakthroughRecord> Breakthroughs=new List<BreakthroughRecord>(); public List<TransitRecord> Transit=new List<TransitRecord>(); }
  public sealed class SaveState {
   public int Version = 1;
   public string Id = Guid.NewGuid().ToString("N");
@@ -31,8 +32,9 @@ namespace CityPress.Core {
   public List<string> OmittedEmptyDays = new List<string>();
   public Dictionary<string,MilestoneProgress> MilestoneProgress = new Dictionary<string,MilestoneProgress>();
  }
- public sealed class Article { public string Section, Title, Body; }
- public sealed class Newspaper { public string Name, Day, Headline, Deck; public List<Article> Articles; public int CacheHitTokens, CacheMissTokens; public bool LocalCache, LocalOnly; }
+ public sealed class Article { public string Section, Title, Body,Genre; }
+ public sealed class NewspaperPage {public string Theme,Headline,Deck;public List<Article> Articles=new List<Article>();}
+ public sealed class Newspaper { public string Name, Day, Headline, Deck; public List<Article> Articles; public List<NewspaperPage> Pages; public int CacheHitTokens, CacheMissTokens; public bool LocalCache, LocalOnly; }
  public static class Storage {
   public static readonly string Root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "Colossal Order", "Cities Skylines II", "ModsData", "CityPress");
   public static string Hash(string s) { using(var h=SHA256.Create()) return BitConverter.ToString(h.ComputeHash(Encoding.UTF8.GetBytes(s))).Replace("-", "").ToLowerInvariant(); }

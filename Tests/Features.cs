@@ -34,7 +34,7 @@ static class FeatureTests {
   Milestones.Observe(state,day,"city/monthlyIncome",0,"08:00");Check(!Milestones.Observe(state,day,"city/monthlyIncome",5000000,"09:00"),"财政面板初始化的零值不冒充有效月收入基线");
   Milestones.Observe(state,day,"city/monthlyIncome",6100000,"10:00");Milestones.Observe(state,day,"city/money",1400000000,"10:00");Milestones.Observe(state,day,"city/money",1510000000,"11:00");
   Check(day.Breakthroughs.Any(x=>x.Key=="city/monthlyIncome"&&x.Unit.Contains("/月"))&&day.Breakthroughs.Any(x=>x.Key=="city/money"&&x.Threshold==1500000000),"月收入和市库存量独立检测，支持十亿级资金");
-  Milestones.Observe(state,day,"city/monthlyBalance",-300000,"11:00");Check(Milestones.Observe(state,day,"city/monthlyBalance",10000,"12:00")&&day.Breakthroughs.Any(x=>x.Kind=="预算由亏转盈"),"月度预算由亏转盈有独立事实类型");
+  Milestones.Observe(state,day,"city/monthlyNetIncome",-300000,"11:00");Check(Milestones.Observe(state,day,"city/monthlyNetIncome",10000,"12:00")&&day.Breakthroughs.Any(x=>x.Kind=="预算由亏转盈"),"月度预算由亏转盈有独立事实类型");
   var handler=new Fake();using(var service=new NewsService(handler,Path.Combine(root,"news"))){
    var prefs=new Preferences{ExportDirectory=export};await service.Generate("test","汐澜",day,prefs,"test",CancellationToken.None);
    var payload=JObject.Parse(handler.Last);var input=JObject.Parse((string)payload["messages"][1]["content"]);
