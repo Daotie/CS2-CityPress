@@ -24,12 +24,14 @@ namespace CityPress.Core {
    // Full native samples stay in the journal. For reporting, avoid duplicating
    // sample and rolled-up values; carry changes plus useful baseline context.
    var metrics=(day.Metrics??new System.Collections.Generic.List<MetricRecord>()).Where(m=>!m.Key.StartsWith("native-sample/",StringComparison.Ordinal)&&(m.Min!=m.Max||m.Key.StartsWith("city/",StringComparison.Ordinal)||m.Key=="native/Population/0")).OrderBy(m=>m.Key,StringComparer.Ordinal).ToArray();
-   var input=JsonConvert.SerializeObject(new { city, name, day=day.Day, totalDistinct=ordered.Count, omittedDistinct=0, actions=ordered, metrics });
+   var breakthroughs=(day.Breakthroughs??new System.Collections.Generic.List<BreakthroughRecord>()).OrderBy(x=>x.Key,StringComparer.Ordinal).ThenBy(x=>x.Kind,StringComparer.Ordinal).ToArray();
+   system+="\n重大突破：breakthroughs 是已观测的数值越线事件。非空时必须在正文报道这些重大变化，可合并相关事项，不强制专栏或篇数。同一指标当日多次越线只突出最高级，突破时观测值与当前值要区分。人口是常住人口；月度预算收入是收入流量，预算结余是收入减支出，市库余额是资金存量，绝不能混写、相加或将预算口径说成已结算收入。只证明采集范围内的越线，不据此称史上首次或全历史纪录；不得虚构突破的原因、成效和官方消息来源。";
+   var input=JsonConvert.SerializeObject(new { city, name, day=day.Day, totalDistinct=ordered.Count, omittedDistinct=0, actions=ordered, metrics,breakthroughs });
    // Version the filtering policy so earlier noisy editions cannot be reused.
-   var cacheFacts=JsonConvert.SerializeObject(new {city,name,day=day.Day,actions=ordered,metrics=metrics.Select(m=>new{m.Key,m.Label,m.Unit,m.First,m.Last,m.Min,m.Max,HasTrend=m.Samples>1&&m.Min!=m.Max})});
-   var cache=Path.Combine(cacheRoot,"cities",saveId,"cache",Storage.Hash("editorial-input-v3\n"+prefs.Model+system+cacheFacts)+".json");
+   var cacheFacts=JsonConvert.SerializeObject(new {city,name,day=day.Day,actions=ordered,metrics=metrics.Select(m=>new{m.Key,m.Label,m.Unit,m.First,m.Last,m.Min,m.Max,HasTrend=m.Samples>1&&m.Min!=m.Max}),breakthroughs});
+   var cache=Path.Combine(cacheRoot,"cities",saveId,"cache",Storage.Hash("editorial-input-v4\n"+prefs.Model+system+cacheFacts)+".json");
    if(File.Exists(cache)) {var hit=Storage.Read<Newspaper>(cache); hit.LocalCache=true; return hit;}
-   if(ordered.Count==0&&!metrics.Any(m=>m.Samples>1&&m.Min!=m.Max)) {
+   if(ordered.Count==0&&breakthroughs.Length==0&&!metrics.Any(m=>m.Samples>1&&m.Min!=m.Max)) {
     var empty=new Newspaper{Name=name,Day=day.Day,Headline="本期简讯",Deck="本期暂无专题报道。",Articles=new System.Collections.Generic.List<Article>(),LocalOnly=true};
     Storage.Write(cache,JsonConvert.SerializeObject(empty));return empty;
    }
@@ -45,6 +47,7 @@ namespace CityPress.Core {
      if((string)root["choices"]?[0]?["finish_reason"]!="stop") throw new InvalidOperationException("新闻未完整生成，请重试或缩短编辑方针。");
      var paper=JsonConvert.DeserializeObject<Newspaper>((string)root["choices"]?[0]?["message"]?["content"] ?? "");
      if(paper==null || string.IsNullOrWhiteSpace(paper.Headline)||paper.Headline.Length>300||paper.Articles==null||paper.Articles.Count>20||paper.Articles.Any(x=>x==null||string.IsNullOrWhiteSpace(x.Title)||string.IsNullOrWhiteSpace(x.Body)||x.Body.Length>16000)) throw new InvalidOperationException("返回的报纸格式无效，未存入缓存。");
+     if(breakthroughs.Length>0&&paper.Articles.Count==0)throw new InvalidOperationException("返回稿件遗漏重大突破报道，请重试。");
      paper.Name=name;paper.Day=day.Day;paper.CacheHitTokens=(int?)root["usage"]?["prompt_cache_hit_tokens"]??0;paper.CacheMissTokens=(int?)root["usage"]?["prompt_cache_miss_tokens"]??0;
      Storage.Write(cache,JsonConvert.SerializeObject(paper));return paper;
     }
