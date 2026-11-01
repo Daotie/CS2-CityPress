@@ -1,23 +1,25 @@
-# CityPress 0.2.0-beta.3
+# CityPress 0.2.0-beta.4
 
 ## English
 
-- Fixed Chinese newspaper text displaying as boxes: use the game's registered font throughout the newspaper instead of Windows-only font families.
-- Fixed fragmented archive row text and the wrapped brand subtitle; made the panel background opaque.
-- Removed empty historical initialization dates while keeping real early-year activity, metric-only history and the current day. Issues mistakenly generated for these empty dates are hidden without deleting local archives; the suppression survives save/reload.
-- Added source/UI/release version consistency checks.
+Custom export folders, persistent numerical breakthroughs and staged background work. Word/JSON exports default to Windows Documents/CityPress, grouped by newspaper and save. Use the folder button to open an issue's actual location; re-exporting existing text uses no API. Earlier exports remain intact.
 
-Verified locally: Release compilation, core/cache/export and callback checks, UI type/build checks, runtime dependency audit, and browser regression checks for game-font inheritance, archive grouping and three UI scales. The updated native in-game display still needs confirmation after restart; automated/harness checks do not constitute a full in-game acceptance pass.
+Population, treasury, monthly budget income/balance, households, current visitors and land crossings are merged by day. Initial readings establish a baseline; persisted highs prevent rebound/reload duplicates. Monthly budget rates are distinct from settled income and cash balances. Generation remains manual by default.
 
-Download the complete `CityPress-0.2.0-beta.3.zip` and `.sha256`. Close the game, extract all files to local `Mods/CityPress`, retaining `images/` and `Templates/`, and restart. Journals, settings, keys and existing Word/JSON newspapers remain in `ModsData/CityPress`. The save envelope remains version 1 with additive fields. Generation is still manual by default.
+Export and incremental journals run on workers. World/statistics/pollution reconciliation is staged across frames, aggregation is indexed and clock updates are isolated. Native job waits and query copies can still spike; live-game frame-rate improvement is not yet measured.
+
+Verified locally: Release compilation, core/export/migration/cancellation, milestone/cache/snapshot/journal checks, game-assembly callback harness, UI types/build/runtime audit and browser controls at three scales. These do not replace native Cohtml and real-save acceptance.
+
+Download CityPress-0.2.0-beta.4.zip and its .sha256. Exit the game, extract the complete package into local Mods/CityPress, and restart. Keep images/ and Templates/. Existing data and legacy journal.json remain intact; the game-save envelope stays version 1 with additive fields.
 
 ## 简体中文
 
-- 修复报纸中文变方框：整张报纸使用游戏已注册的字体，避免依赖 Windows 字体名。
-- 修复档案行文字被拆散排布、标题副行换行，并使面板底板不透明。
-- 清理无操作、无指标的过去初始化日期，保留真实早期操作、仅指标历史和当前日期。空日期误生成的报纸只隐藏入口，不删除本地归档，标记随存档保留。
-- 新增源码、UI 和发行说明的版本一致性检查。
+新增自定义导出目录、重大数值突破报道与分帧后台优化。Word/JSON 默认导出至系统文档的 CityPress 文件夹，再按报纸名称与存档分类。游戏内可打开报纸实际所在目录，已有成稿重新导出不调用 API，旧报纸保留。
 
-已完成本地 Release 编译、核心/缓存/导出和回调检查、UI 类型/构建、运行依赖审计，以及字体继承、档案分组和三种缩放的浏览器回归检查。更新后的原生游戏显示仍需重启确认；自动检查不等于完整游戏内验收。
+人口、市库、月度预算收入/结余、家庭数、当前游客和解锁用地跨越整级时形成新闻素材，同日多次突破合并。首次采样只建立基线，历史高位随存档保留，回落反弹或读档不重复报。预算收入、结余与资金存量分别解释。默认仍为手动生成。
 
-下载完整 `CityPress-0.2.0-beta.3.zip` 与 `.sha256`。退出游戏后完整解压至本地 `Mods/CityPress`，保留 `images/`、`Templates/`，重启生效。`ModsData/CityPress` 下的日志、设置、密钥和已有 Word/JSON 报纸保留，存档外层版本仍为 1。默认仍为手动生成。
+导出、档案读取和分日增量日志移到后台；城市/统计/污染分帧校对，汇总使用索引，时钟独立更新。原生任务等待与实体列表复制仍可能出现尖峰，尚未测量真实游戏帧率改善。
+
+已验证 Release 编译、核心/导出/旧档/取消、突破/缓存/快照/日志、实际程序集回调、UI 类型/构建/运行依赖审计和三种缩放交互；不替代真实存档与原生 Cohtml 验收。
+
+退出游戏后，将完整 CityPress-0.2.0-beta.4.zip 解压至本地 Mods/CityPress，保留 images/ 和 Templates/，重启生效。原有数据与旧 journal.json 保留，游戏存档外层仍为版本 1，新增字段向后兼容。

@@ -1,5 +1,23 @@
 # Changelog / 更新日志
 
+## 0.2.0-beta.4
+
+### English
+
+- Added configurable Word/JSON exports under Documents/CityPress, grouped by masthead and save. Open the actual folder from the game or re-export an existing issue without an API request; old files remain readable.
+- Added persistent high-water marks for population, treasury, monthly budget income/balance, households, visitors and land. Initial readings establish a baseline; rebounds do not repeat breakthroughs and daily crossings are merged.
+- Included breakthroughs in editorial facts and cache keys, with explicit units and budget/stock distinctions. Unlimited-money display values and unexplained native metrics cannot become fiscal milestones.
+- Moved export, archive reads and incremental per-day journal writes to workers; indexed aggregation, staged world/statistics/pollution scans and isolated clock updates reduce repeated work.
+- Validation: export/migration/cancellation, milestone baseline/rebound/cache, aggregation/snapshot/journal checks, game-assembly callback checks, UI types/build/audit and browser controls at three scales. Native in-game frame-rate and display acceptance remain pending.
+
+### 简体中文
+
+- 可自定义 Word/JSON 导出目录，默认系统文档中的 CityPress，按报头与存档分类。游戏内可打开实际文件夹，已有报纸重新导出不调用 API，旧文件保留可读。
+- 人口、市库、月度预算收入/结余、家庭数、游客和用地支持持久化突破检测。首次采样建立基线，回落反弹不重复报道，同日多次越线合并。
+- 突破纳入编辑素材与缓存，明确预算/存量及单位；无限资金显示值和未解释的原生指标不冒充财政里程碑。
+- 导出、档案读取、分日增量日志改为后台；索引合并、城市/统计/污染分帧扫描和独立时钟减少重复工作。旧 journal.json 保留，游戏存档外层仍为版本 1。
+- 验证涵盖导出/旧档/取消、突破/去重/缓存、汇总/快照/日志、实际程序集回调与 UI 类型/构建/审计和三种缩放。原生游戏帧率及显示仍需实测。
+
 ## 0.2.0-beta.3
 
 ### English

@@ -3,13 +3,13 @@
 <h1 align="center">CityPress</h1>
 <p align="center">Your city's daily newspaper for <strong>Cities: Skylines II</strong>.</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.3-00a8bb" alt="0.2.0-beta.3">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.4-00a8bb" alt="0.2.0-beta.4">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
 <p align="center"><a href="https://github.com/Daotie/CS2-CityPress/releases">Downloads</a> · <a href="https://github.com/Daotie/CS2-CityPress/issues">Issues</a> · <a href="CHANGELOG.md">Changelog</a> · <a href="SECURITY.md">Privacy</a></p>
 
-**0.2.0-beta.3:** Fixes Chinese newspaper glyphs, fragmented archive rows and empty initialization dates. See [release notes](RELEASE_NOTES.md). The interface, default editorial policy and Word furniture currently use Simplified Chinese; public documentation is bilingual.
+**0.2.0-beta.4:** Adds custom export folders, persistent numerical breakthroughs and staged background work. See [release notes](RELEASE_NOTES.md). The interface, default editorial policy and Word furniture currently use Simplified Chinese; public documentation is bilingual.
 
 ## What it does
 
@@ -30,11 +30,11 @@
 
 Generation sends city facts to DeepSeek and may incur provider charges. The key is encrypted for the local Windows account, excluded from savegames and not displayed back to the UI. Review [privacy](SECURITY.md) before sharing a journal or newspaper.
 
-Storage: `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\ModsData\CityPress`. The settings, local journal, cache and `issues/<date>.json` / `.docx` are separate from the installation folder. Read the [detailed player guide](docs/USER_GUIDE.zh-CN.md).
+Word/JSON exports default to the Windows Documents folder under `CityPress/<newspaper>/存档-<save ID>/`. Choose another absolute folder in editorial settings; **打开导出文件夹** opens the actual location. Re-exporting an existing issue uses no API. Settings, local journals, cache and internal issue JSON remain in `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\ModsData\CityPress`. Read the [detailed player guide](docs/USER_GUIDE.zh-CN.md).
 
 ## Coverage and beta status
 
-Observed changes are separate from submitted intentions. Tool submissions are not completed-building counts; network edges are not whole roads. Existing city assets are baselined on load. Statistics and reconciliation snapshots run every five game minutes, using the game's underlying update cadence.
+Observed changes are separate from submitted intentions. Tool submissions are not completed-building counts; network edges are not whole roads. Existing city assets are baselined on load. Statistics and reconciliation cycles are spread across frames; the next cycle starts five game minutes after completion, using the game's underlying update cadence. Persistent high-water marks detect population, treasury, monthly budget income/balance, households, visitors and land breakthroughs; initial samples establish a baseline. Monthly budget figures are rates, not settled receipts. Export and journal writes run on workers; native query copies and job waits can still cause spikes.
 
 Independent third-party mod actions, transient intermediate states and unavailable internal data can be missed. The compatibility panel reports active management bindings and collection errors. Earlier unobserved history cannot be reconstructed. Generated articles are editable output based on available evidence, not verified reporting.
 

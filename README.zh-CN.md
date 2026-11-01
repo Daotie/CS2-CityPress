@@ -3,13 +3,13 @@
 <h1 align="center">CityPress 城市日报</h1>
 <p align="center">为 <strong>《都市：天际线 II》</strong> 留下每天的城市新闻。</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.3-00a8bb" alt="0.2.0-beta.3">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.4-00a8bb" alt="0.2.0-beta.4">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta 预发行">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
 <p align="center"><a href="https://github.com/Daotie/CS2-CityPress/releases">下载</a> · <a href="https://github.com/Daotie/CS2-CityPress/issues">反馈问题</a> · <a href="CHANGELOG.md">更新日志</a> · <a href="SECURITY.md">隐私说明</a></p>
 
-**0.2.0-beta.3：** 修复报纸中文方框、档案行分散排版和初始化空日期残留。见[版本说明](RELEASE_NOTES.md)。目前界面、默认编辑方针和 Word 版签使用简体中文，项目公开文档提供中英双语。
+**0.2.0-beta.4：** 新增自定义导出目录、重大数值突破报道与后台分帧优化。见[版本说明](RELEASE_NOTES.md)。目前界面、默认编辑方针和 Word 版签使用简体中文，项目公开文档提供中英双语。
 
 ## 主要功能
 
@@ -30,7 +30,7 @@
 
 生成会将城市事实摘要交给 DeepSeek，并可能产生服务商费用。密钥使用当前 Windows 账户加密保存，不写入城市存档，不回显。分享日志或报纸前请阅读[隐私说明](SECURITY.md)。
 
-数据保存在 `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\ModsData\CityPress`；报纸位于对应城市目录的 `issues/<日期>.json` 与 `.docx`。更多设置、采集范围与存档说明见[完整使用指南](docs/USER_GUIDE.zh-CN.md)。
+Word/JSON 默认导出到系统文档中的 `CityPress/<报纸名称>/存档-<存档标识>/`。可在编辑部设置自定义完整路径，点击“打开导出文件夹”打开实际位置；重新导出已有报纸不调用 API。设置、日志、缓存和内部报纸 JSON 仍保存在 `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\ModsData\CityPress`。更多设置、采集范围与存档说明见[完整使用指南](docs/USER_GUIDE.zh-CN.md)。
 
 ## 采集范围与测试状态
 
