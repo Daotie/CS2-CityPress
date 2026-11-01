@@ -24,12 +24,11 @@ namespace CityPress.Systems {
   ValueBinding<string> binding,clockBinding;Newspaper paper;int popup;string status="就绪";bool dirty,uiDirty=true,archiveRefresh=true,keyConfigured,lastReady;DateTime nextFlush,nextUi,nextFullUi;
   ExportStore archives;JournalStore journals;string[] issueDays=Array.Empty<string>();string paperFolder,lastDay,lastClock,lastCoverage;
   readonly Queue<DayLog> queue=new Queue<DayLog>();
-  string key="", city="城市";
+  string city="城市";
   bool loaded;
   internal int SessionEpoch=>epoch;
   Preferences Effective=>state.Override??global;
   string Config=>Path.Combine(Storage.Root,"settings.json");
-  string KeyFile=>Path.Combine(Storage.Root,"key.dpapi");
   string NewspaperName=>string.IsNullOrWhiteSpace(Effective.CustomName)?city+"日报":Effective.CustomName.Trim();
   string ExportFolder=>paperFolder??ExportPaths.Folder(Effective.ExportDirectory,NewspaperName,state.Id);
   void Changed(){dirty=true;uiDirty=true;}
@@ -40,7 +39,7 @@ namespace CityPress.Systems {
    try{global=Storage.Read<Preferences>(Config);}catch{global=new Preferences();}
    if(EditorialPolicy.Upgrade(global))Storage.Write(Config,JsonConvert.SerializeObject(global));
    try{ExportPaths.Root(global.ExportDirectory);}catch{global.ExportDirectory="";}
-   keyConfigured=File.Exists(KeyFile)||!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("DEEPSEEK_API_KEY"));
+   ApiOptions.Repair(global);keyConfigured=ApiKeys.Exists(global.ApiEndpoint);
    binding=new ValueBinding<string>("CityPress","state","{}");AddBinding(binding);
    clockBinding=new ValueBinding<string>("CityPress","clock","");AddBinding(clockBinding);
    AddBinding(new TriggerBinding("CityPress","generate",()=>Start(Current(),false)));
@@ -78,7 +77,7 @@ namespace CityPress.Systems {
   }
   internal void ObserveTransit(TransitRecord value){if(!TryGetGameTime(out var now))return;Rollover(now.ToString("yyyy-MM-dd"));value.Time=now.ToString("HH:mm:ss");TransitFacts.Store(state.Days.Last(),value);Changed();}
   protected override void OnGamePreload(Purpose purpose,GameMode mode){base.OnGamePreload(purpose,mode);loaded=false;Reset();}
-  protected override void OnGameLoadingComplete(Purpose purpose,GameMode mode){base.OnGameLoadingComplete(purpose,mode);loaded=mode==GameMode.Game;archiveRefresh=true;}
+  protected override void OnGameLoadingComplete(Purpose purpose,GameMode mode){base.OnGameLoadingComplete(purpose,mode);loaded=mode==GameMode.Game;archiveRefresh=true;keyConfigured=ApiKeys.Exists(Effective.ApiEndpoint);}
   void Rollover(string day) {
    if(!GameCalendar.IsValidDay(day))return;
    if(state.OmittedEmptyDays?.Remove(day)==true)Changed();
@@ -93,31 +92,31 @@ namespace CityPress.Systems {
   void Configure(string raw) {
    try {
     var obj=JObject.Parse(raw);string scope=(string)obj["scope"];
-    if(scope=="inherit")state.Override=null;
-    else {
-     var prefs=obj["preferences"].ToObject<Preferences>();
+    if(scope!="inherit"&&scope!="global"&&scope!="save")throw new ArgumentException();
+    var prefs=scope=="inherit"?global:obj["preferences"].ToObject<Preferences>();
+    if(scope!="inherit"){
      if(prefs==null||prefs.CustomName?.Length>60||prefs.Editorial?.Length>6000||string.IsNullOrWhiteSpace(prefs.Model)||prefs.Model.Length>100)throw new ArgumentException();
-     ExportPaths.Root(prefs.ExportDirectory);
-     if(scope=="global"){global=prefs;Storage.Write(Config,JsonConvert.SerializeObject(global));state.Override=null;}else state.Override=prefs;
+     ExportPaths.Root(prefs.ExportDirectory);ApiOptions.Validate(prefs);
     }
     var newKey=(string)obj["apiKey"];if(!string.IsNullOrWhiteSpace(newKey)){
-     key=newKey.Trim();
-     var protectedBytes=System.Security.Cryptography.ProtectedData.Protect(System.Text.Encoding.UTF8.GetBytes(key),null,System.Security.Cryptography.DataProtectionScope.CurrentUser);
-     Directory.CreateDirectory(Storage.Root);File.WriteAllBytes(KeyFile,protectedBytes);keyConfigured=true;
+     if(scope=="inherit")throw new ArgumentException("恢复继承时不更改服务密钥。");
+     if(newKey.Length>4096||newKey.Any(char.IsControl))throw new ArgumentException("密钥格式无效");ApiKeys.Save(prefs.ApiEndpoint,newKey);
     }
+    if(scope=="inherit")state.Override=null;else if(scope=="global"){Storage.Write(Config,JsonConvert.SerializeObject(prefs));global=prefs;state.Override=null;}else state.Override=prefs;
+    keyConfigured=ApiKeys.Exists(Effective.ApiEndpoint);
     Changed();Status("设置已保存；导出目录用于后续导出，旧报纸仍保留在原位置。");
-   }catch(ArgumentException){Status("设置未保存，请检查导出目录；目录应填写完整路径。");}catch{Status("设置无效或写入失败，未保存。");}
+   }catch(ArgumentException){Status("设置未保存，请检查 API 地址、参数与导出目录。");}catch{Status("设置无效或写入失败，未保存。");}
   }
   void Start(DayLog day,bool auto) {
+   try{ApiOptions.Validate(Effective);}catch(ArgumentException){Status("API 配置无效，请在编辑部设置中检查服务地址和参数。");return;}
    if(!TryGetGameTime(out _)||day==null||!GameCalendar.IsValidDay(day.Day)){Status("城市时间尚未就绪，请等待城市加载完成。");return;}
    if(pending!=null){Status("正在处理报纸，请稍候。");return;}
    pendingId=state.Id;pendingDay=day.Day;pendingPopup=auto;pendingEpoch=epoch;pendingExportOnly=false;paperRequest++;Status("编辑部正在整理新闻…");
    var snapshot=JournalSnapshot.CopyDay(day);
    var prefs=JsonConvert.DeserializeObject<Preferences>(JsonConvert.SerializeObject(Effective));
-   var saveId=state.Id;var currentCity=city;var configuredKey=key;var token=lifetime.Token;
-   pending=Task.Run(async()=>{var result=await service.Generate(saveId,currentCity,snapshot,prefs,ReadKey(configuredKey),token).ConfigureAwait(false);token.ThrowIfCancellationRequested();return archives.Save(saveId,result,prefs.ExportDirectory,token);},token);
+   var saveId=state.Id;var currentCity=city;var token=lifetime.Token;
+   pending=Task.Run(async()=>{var result=await service.Generate(saveId,currentCity,snapshot,prefs,prefs.RequireApiKey?ApiKeys.Read(prefs.ApiEndpoint):"",token).ConfigureAwait(false);token.ThrowIfCancellationRequested();return archives.Save(saveId,result,prefs.ExportDirectory,token);},token);
   }
-  string ReadKey(string configured){if(!string.IsNullOrWhiteSpace(configured))return configured;try{return System.Text.Encoding.UTF8.GetString(System.Security.Cryptography.ProtectedData.Unprotect(File.ReadAllBytes(KeyFile),null,System.Security.Cryptography.DataProtectionScope.CurrentUser));}catch{return Environment.GetEnvironmentVariable("DEEPSEEK_API_KEY")??"";}}
   string Issues=>Path.Combine(Storage.Root,"cities",state.Id,"issues");
   void OpenIssue(string day){
    if(!GameCalendar.IsValidDay(day)||pending!=null)return;
@@ -177,6 +176,7 @@ namespace CityPress.Systems {
    if(string.IsNullOrWhiteSpace(state.Id))state.Id=Guid.NewGuid().ToString("N");
    if(GameCalendar.RemoveInvalidDays(state)>0)dirty=true;
    if(EditorialPolicy.Upgrade(state.Override))dirty=true;
+   if(state.Override!=null)ApiOptions.Repair(state.Override);
    if(state.Override!=null)try{ExportPaths.Root(state.Override.ExportDirectory);}catch{state.Override.ExportDirectory="";}
    Changed();
   }
