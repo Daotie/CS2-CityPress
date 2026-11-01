@@ -4,9 +4,11 @@ $version=([IO.File]::ReadAllText((Join-Path $root 'VERSION'))).Trim()
 if($version -notmatch '^\d+\.\d+\.\d+(?:-beta\.\d+)?$'){throw 'Invalid VERSION'}
 $project=[xml][IO.File]::ReadAllText((Join-Path $root 'CityPress.csproj'))
 $package=Get-Content -LiteralPath (Join-Path $root 'UI/package.json') -Raw | ConvertFrom-Json
-$lock=Get-Content -LiteralPath (Join-Path $root 'UI/package-lock.json') -Raw | ConvertFrom-Json -AsHashtable
+$lockText=Get-Content -LiteralPath (Join-Path $root 'UI/package-lock.json') -Raw
+$lockVersion=[regex]::Match($lockText,'"version"\s*:\s*"([^"]+)"').Groups[1].Value
+$lockRootVersion=[regex]::Match($lockText,'"packages"\s*:\s*\{\s*"":\s*\{[^}]*?"version"\s*:\s*"([^"]+)"').Groups[1].Value
 $mod=Get-Content -LiteralPath (Join-Path $root 'UI/mod.json') -Raw | ConvertFrom-Json
-$versions=@($project.SelectSingleNode('/Project/PropertyGroup/Version').InnerText,$package.version,$lock.version,$lock['packages']['']['version'],$mod.version)
+$versions=@($project.SelectSingleNode('/Project/PropertyGroup/Version').InnerText,$package.version,$lockVersion,$lockRootVersion,$mod.version)
 if($versions | Where-Object {$_ -ne $version}){throw 'Backend/UI version metadata does not match VERSION'}
 foreach($file in @('Mod.cs','README.md','README.zh-CN.md','CHANGELOG.md','RELEASE_NOTES.md','docs/USER_GUIDE.zh-CN.md')){
  if(![IO.File]::ReadAllText((Join-Path $root $file)).Contains($version)){throw "Missing current version in $file"}
