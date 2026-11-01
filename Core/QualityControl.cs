@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -17,6 +17,7 @@ namespace CityPress.Core {
  // Checks run on the finished copy; a single targeted revision may follow, then
  // unsafe copy is removed rather than published with invented facts.
  public static class QualityControl {
+  public const int LongCommentaryMinimum=500;
   const string Fatal="fatal",Major="major",Minor="minor";
   static readonly Regex Attribution=new Regex(@"记者|通讯员|采访|受访|新闻发言人|发布会|有关部门|相关部门|据[^，。；\n]{0,6}(介绍|表示|透露|通报)|官方(表示|通报|消息)|市政府(表示|通报)|统计局|调查(显示|结果)|民调|市民(表示|认为|反映)|居民(表示|认为)|专家(表示|指出|认为)|学者(表示|指出)|业内人士|知情人士",RegexOptions.CultureInvariant);
   static readonly Regex Mechanical=new Regex(@"意义重大|成效显著|稳步推进|值得关注|再上新台阶|迈上新台阶|谱写|新篇章|持续向好|成效初显|有力推动|极大提升|开创新局面|注入新动力",RegexOptions.CultureInvariant);
@@ -222,7 +223,7 @@ namespace CityPress.Core {
    }
    var needCommentary=brief!=null&&brief.CommentaryWarranted;
    bool hasCommentary=pages.Any(page=>page.Articles.Count>0&&page.Articles.All(PagePlanner.IsCommentary));
-   bool hasLongCommentary=comments.Any(article=>PaperLayout.BodyLength(article.Body)>=300);
+   bool hasLongCommentary=comments.Any(article=>PaperLayout.BodyLength(article.Body)>=LongCommentaryMinimum);
    if(needCommentary&&!hasCommentary)Flag(paper.Articles.FirstOrDefault()??new Article(),issues,"commentary-missing",Major,"重大事件缺少独立评论版");
    else if(needCommentary&&!hasLongCommentary)Flag(paper.Articles.FirstOrDefault()??new Article(),issues,"commentary-long-missing",Major,"独立评论版缺少占据主要篇幅的长评论");
    // Milestone coverage: the top event should be visible in the news copy.
