@@ -26,6 +26,6 @@ Core tests use a NuGet JSON dependency and embedded layout/template resources; n
 
 ## 简体中文
 
-完整构建需要本机游戏程序集，路径可通过 `CSII_MANAGED_PATH`、`build.ps1 -ManagedPath` 或 MSBuild 参数指定。构建脚本会执行完整核心/导出检查与实际绑定类型的回调检查，再构建 UI、审计运行依赖、生成安装包。已有发行压缩包不覆盖。
+完整构建需要本地游戏程序集，路径可通过 `CSII_MANAGED_PATH`、`build.ps1 -ManagedPath` 或 MSBuild 参数指定。构建脚本会执行完整核心/导出检查与实际绑定类型的回调检查，再构建 UI、审计运行依赖、生成安装包。已有发行压缩包不覆盖。
 
 `--core-only` 可在没有游戏文件和 API 密钥的环境验证汇总、降噪、缓存及 Word 导出，并明确跳过游戏程序集集成。公开 CI 执行此范围及前端检查，不代表运行过游戏。回调检查绕过 Unity 构造过程，不等于原生 Cohtml 或真实存档验收。

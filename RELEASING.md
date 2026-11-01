@@ -7,4 +7,4 @@
 5. Attach the full install archive and SHA-256 checksum to a GitHub **prerelease**. Never overwrite an existing public version; publish a new beta for corrections.
 6. Check remote tag/commit alignment, download assets and automated checks. Do not label a beta stable or claim unperformed in-game tests.
 
-遵循 RouteFilter 的发布约定：版本一致、中英双语更新说明、签名提交与标签、完整安装包和 SHA-256；每批修改独立提交。每个已公开 Beta 保持不变，修正使用新版本号。源码与安装包不包含个人数据、游戏文件或内部验收报告。GitHub 发布不等于已上架 Paradox Mods。
+发布流程遵循以下约定：版本一致、中英双语更新说明、签名提交与标签、完整安装包和 SHA-256；每批修改独立提交。每个已公开 Beta 保持不变，修正使用新版本号。源码与安装包不包含个人数据、游戏文件或内部验收报告。GitHub 发布不等于已上架 Paradox Mods。

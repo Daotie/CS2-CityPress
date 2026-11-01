@@ -20,3 +20,10 @@ settings.json
 journal.json
 # Local browser harness and session evidence, not public development dependencies.
 /tools/preview.cjs
+# Local editor/OS metadata and ad-hoc backups.
+.DS_Store
+Thumbs.db
+*.log
+*.bak
+*.orig
+/.vscode/
