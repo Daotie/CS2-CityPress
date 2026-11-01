@@ -1,5 +1,14 @@
 # Changelog / 更新日志
 
+## 0.2.0-beta.10
+
+- Compile editorial material locally before any model request: group construction categories, suppress routine line inventories and low-impact incidents, and exclude unverified statistics groups and units. Keep original journals intact.
+- Format population and finance figures, block prefab codes and raw internal fields in finished copy, and apply the same selection instructions to news, commentary and revision tasks.
+- Request several distinct opinions when warranted; multiple major domains require at least two accepted opinion pieces. Support extra long opinions and capacity-based continuation editions.
+- Add a compact front-page guide with final page references; omit thin minor stories from the guide. Increase room for themed continuation pages.
+- Bundle the OFL Ma Shan Zheng font for the UI masthead. Restrict vertical headlines to short Chinese titles and render old unsuitable vertical headlines horizontally in both UI and Word.
+
+
 ## 0.2.0-beta.9
 
 ### English

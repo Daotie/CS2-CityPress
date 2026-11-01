@@ -1,29 +1,17 @@
-# CityPress 0.2.0-beta.9
-
-## English
-
-Localization release: the mod now follows the game language for its interface, messages and exported newspaper furniture.
-
-- **Interface and messages.** All in-game labels, placeholders, archive text, settings, operation status, API/quality errors, theme names and collection summaries are available in English and Simplified Chinese. The interface follows the game language; other game languages fall back to English.
-- **Built-in fallbacks.** `lang/en-US.json` and `lang/zh-HANS.json` share the same key set and are packaged with the mod. The UI also carries a fallback table, so a missing or not-yet-loaded language file never shows raw keys or blank controls. The game's own localization dictionary is used when available.
-- **Backend status/error keys.** User-facing failures use stable `CityPress.Error.*` keys with arguments, and status uses `CityPress.Status.*`. The UI renders the translated text while preserving the previous Chinese fallback for logs and tests.
-- **Word furniture.** The exporter detects the language of the issue and applies matching furniture: English kicker, masthead labels, page numbering, month names and weekdays for English issues; existing Chinese issues keep their current layout.
-- **Generated newspaper prose.** The interface language does not auto-translate article content. Newspaper text follows the editorial policy and the configured model; Word furniture follows the language detected in the issue. The player guide explains this behavior.
-- **Packaging.** The release includes `mod.json` and `lang/`; restart the game after installing so the new metadata and language files are loaded.
-- **Process wording is repaired, not fatal.** Sentences that expose the production process or use template disclaimers are flagged, sent back to the model once as a targeted revision, and any phrase that survives is removed deterministically before layout. One boilerplate sentence no longer discards an otherwise usable issue or forces a full regeneration.
-- **Settings panel fixes.** Scrolling now works while the pointer is over the settings form, and inputs use opaque clipped surfaces with explicit stacking so selecting text no longer shows overlapping field contents.
-- **Verified offline:** 214 checks including language-file key parity, no hard-coded Chinese in the UI entry file, all UI/backend keys present, English Word furniture/date, Chinese fallbacks, one-model-revision process-wording repair and deterministic cleanup fallback. **Not verified here:** native in-game language switching, Cohtml layout with longer English strings, real browser/CI rendering, and native game acceptance; treat those as pending player validation rather than completed.
+# CityPress 0.2.0-beta.10
 
 ## 简体中文
 
-本地化版本：模组界面、提示消息和导出报纸版签现在会跟随游戏语言。
+- **素材先整理。** 新增本地素材整理工具，按建筑类别归并，保留实际建设变化，放置意图不作建设结果。常规运营线路清单、零伤亡且无明确影响的小事故、未核实含义的税收分组和电水内部数值不进入模型。生态保留有含义的监测检出占比，不把内部强度冒充现实污染等级。本地完整记录保留。
+- **正文更接近报纸。** 金额、人口统一整理万/亿与小数精度，质量检查拦截资产规格、内部字段和长整数罗列；核实口径仅供内部使用。新闻、评论、局部修订采用同一素材取舍要求。
+- **多议题评论和连续加版。** 评论任务按事实组织主评论及多篇不同角度短评，可补充其他长评；存在多个独立重大领域时至少保留两篇有效评论。所有主题按容量加版，评论第二篇长稿不再被强塞到第一版。
+- **要闻导读。** 用已接受专题稿的核心事实形成一句导读，最终排版后写入“详见第几版”；薄小消息只留在专题，不重复凑要闻。
+- **书法报头与竖排修复。** UI 内置马善政毛笔字体，自定义报纸名也适用，字体按 OFL 1.1 随包授权。带数字、复合长标题使用横排，短中文标题可竖排；旧报纸的不适合竖排标题在 UI 与 Word 中自动回退。版名区域加宽。
 
-- **界面与消息。** 游戏内标签、占位文字、档案文案、设置项、操作状态、API/质量错误、主题名称和采集摘要均提供英文与简体中文。界面跟随游戏显示语言，其他游戏语言回退为英文。
-- **内置回退。** `lang/en-US.json` 与 `lang/zh-HANS.json` 使用同一套键并随包发布；界面还内置回退表，语言文件缺失或尚未加载时不会出现原始键名或空白控件。游戏本地化字典可用时优先使用。
-- **后端状态与错误词条。** 用户可见错误使用稳定的 `CityPress.Error.*` 与参数，状态使用 `CityPress.Status.*`。界面负责翻译，同时保留原有中文回退供日志和测试使用。
-- **Word 版签。** 导出时检测报纸语言并使用对应版签：英文报纸使用英文栏目、报头标签、版号、月份和星期；已有中文报纸保持现有版式。
-- **生成的报纸正文。** 界面语言不会自动翻译文章内容。正文语言由编辑方针和所配置的模型决定，Word 版签跟随报纸检测到的语言；使用指南中已说明这一点。
-- **制作口径可修复，不再整期作废。** 暴露制作过程或使用模板免责措辞的句子会被质量检查标出，先交给模型做一次针对性改写；仍有残留时在排版前按句清理。一句套话不再导致整期丢弃或强制重新生成。
-- **设置面板修复。** 鼠标位于设置表单时也能正常滚动；输入框使用不透明裁剪层与明确层级，选择文本时不再叠显其他输入框内容。
-- **打包。** 发行包包含 `mod.json` 与 `lang/`；安装后请重启游戏，以加载新的元数据和语言文件。
-- **离线已验证：** 共 214 项检查，包括中英文语言文件键一致、界面入口不再硬编码中文、所有界面/后端词条存在、英文 Word 版签与日期、中文回退、制作口径的一次模型修订与确定性清理回退。**本环境未验证：** 原生游戏内语言切换、较长英文文案在 Cohtml 中的布局、真实浏览器/CI 渲染和原生游戏验收；这些属于待玩家验收项。
+安装后需重启游戏；新内容需重新生成报纸，仅导出不会重新编辑旧正文。缓存版本已升级，不复用旧版嘈杂成稿。未调用玩家付费 API；离线模拟服务验证不能替代实际模型与游戏内验收。
+
+## English
+
+Local editorial tools now select, normalize and group source material before generation. Routine fleet inventories, prefab specifications, low-impact incidents and unverified units are excluded from provider input while complete local journals remain intact. Finished-copy checks reject leaked raw fields. Multiple major domains require distinct accepted opinions; rich themes and opinions can continue across editions. Front-page guides reference final edition numbers. The UI masthead bundles the OFL Ma Shan Zheng font; unsuitable numeric or long vertical headlines fall back to horizontal layout, including older papers and Word exports.
+
+Restart the game and regenerate the issue for the new editorial policy. Export alone does not rewrite an archived issue. No paid player API was used in validation; native game and actual provider acceptance remain pending.
