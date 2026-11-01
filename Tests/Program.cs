@@ -39,6 +39,7 @@ class Program {
   try {
    await FeatureTests.Run(Path.Combine(temp,"features"));
    await EditionTests.Run(temp,Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../")));
+   await ApiLayoutTests.Run(temp,Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../")));
    var log=new DayLog{Day="2026-10-31"};Aggregator.Add(log,"道路","公路","10:00");Aggregator.Add(log,"道路","公路","11:00");
    Check(log.Actions.Count==1&&log.Actions[0].Count==2&&log.Actions[0].Last=="11:00","重复操作合并且保留次数和时间");
    var prefs=new Preferences();Check(!prefs.AutoGenerate,"默认手动生成");

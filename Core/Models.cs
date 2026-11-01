@@ -14,6 +14,10 @@ namespace CityPress.Core {
   public string Editorial = EditorialPolicy.Default;
   public string Model = "deepseek-chat";
   public string ExportDirectory = "";
+  public string ApiEndpoint=ApiOptions.DefaultEndpoint;
+  public bool RequireApiKey=true,JsonMode=true,LongCommentary=true;
+  public int MaxOutputTokens=8192,TimeoutSeconds=180;
+  public string TokenParameter="max_tokens",LayoutMode="auto";
  }
  public sealed class ActionRecord { public string Kind, Detail; public int Count = 1; public string First, Last; }
  public sealed class MetricRecord {
@@ -33,8 +37,11 @@ namespace CityPress.Core {
   public Dictionary<string,MilestoneProgress> MilestoneProgress = new Dictionary<string,MilestoneProgress>();
  }
  public sealed class Article { public string Section, Title, Body,Genre; }
- public sealed class NewspaperPage {public string Theme,Headline,Deck;public List<Article> Articles=new List<Article>();}
- public sealed class Newspaper { public string Name, Day, Headline, Deck; public List<Article> Articles; public List<NewspaperPage> Pages; public int CacheHitTokens, CacheMissTokens; public bool LocalCache, LocalOnly; }
+ public sealed class LayoutBlock {public string Kind;public int Article=-1,Start,Count=-1;}
+ public sealed class LayoutColumn {public int Width;public List<LayoutBlock> Blocks=new List<LayoutBlock>();}
+ public sealed class PageComposition {public string Template;public List<LayoutBlock> Top=new List<LayoutBlock>();public List<LayoutColumn> Columns=new List<LayoutColumn>();}
+ public sealed class NewspaperPage {public string Theme,Headline,Deck;public List<Article> Articles=new List<Article>();public PageComposition Composition;}
+ public sealed class Newspaper { public string Name, Day, Headline, Deck,Provider,Model; public List<Article> Articles; public List<NewspaperPage> Pages; public int CacheHitTokens, CacheMissTokens,InputTokens,OutputTokens;public bool CacheUsageReported,UsageReported; public bool LocalCache, LocalOnly; }
  public static class Storage {
   public static readonly string Root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "Colossal Order", "Cities Skylines II", "ModsData", "CityPress");
   public static string Hash(string s) { using(var h=SHA256.Create()) return BitConverter.ToString(h.ComputeHash(Encoding.UTF8.GetBytes(s))).Replace("-", "").ToLowerInvariant(); }

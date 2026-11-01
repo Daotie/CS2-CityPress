@@ -3,6 +3,13 @@ using System.Linq;
 namespace CityPress.Core {
  public static class EditionRules {
   static readonly string[] processPhrases={"施工标记","仍待观察","实际服务情况待观察","不代表完整自然日","观测区间","不等同于","制作过程","原生分组","采集口径","以游戏为准","游戏内","玩家操作","模组","存档","原生单位","实体编号","报道未获知"};
+  public static void SeparateCommentary(Newspaper paper){
+   if(paper.Articles.Count==0)return;
+   var pages=PaperLayout.Pages(paper);var moved=new System.Collections.Generic.List<Article>();
+   foreach(var page in pages)if(page.Articles.Any(a=>a.Genre!="评论")){moved.AddRange(page.Articles.Where(a=>a.Genre=="评论"));page.Articles=page.Articles.Where(a=>a.Genre!="评论").ToList();}
+   if(moved.Count>0){var opinion=pages.FirstOrDefault(p=>p.Articles.Count>0&&p.Articles.All(a=>a.Genre=="评论"));if(opinion!=null)opinion.Articles.AddRange(moved);else pages.Add(new NewspaperPage{Theme="评论",Headline=moved[0].Title,Deck="",Articles=moved});}
+   paper.Pages=pages;Normalize(paper);
+  }
   public static void Normalize(Newspaper paper) {
    if(paper==null||string.IsNullOrWhiteSpace(paper.Headline)||paper.Headline.Length>300)throw new InvalidOperationException("返回的报纸标题无效，未存入缓存。");
    if(paper.Pages!=null&&paper.Pages.Count>0){

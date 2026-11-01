@@ -16,5 +16,12 @@
   "bodySize": 12.5,
   "bodyLineHeight": 1.8,
   "deckSize": 13,
-  "labelSize": 9
+  "labelSize": 9,
+  "templates": {
+    "banner": {"label":"通栏头条"},
+    "lead-left": {"label":"左侧主稿", "leadWidth":60},
+    "vertical-lead": {"label":"纵向头条", "leadWidth":18, "glyphsPerColumn":12, "maxHeadlineLength":36},
+    "digest": {"label":"综合短讯", "columns":3},
+    "opinion": {"label":"长评论专版", "threeColumnsAt":950}
+  }
 }
