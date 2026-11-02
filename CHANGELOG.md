@@ -1,5 +1,12 @@
 # Changelog / 更新日志
 
+## 0.2.0-beta.14
+
+- Archive generated JSON before Word export. If an existing Word file cannot be replaced, save a uniquely named copy; redirect an unavailable export location to the local issue archive.
+- Always return the generated paper for in-game reading when filesystem writes fail, with explicit localized save notices and an export retry action. Cache write failures no longer discard completed papers.
+- Fix Unity World.Systems scanning by using its concrete enumerator instead of the unsupported generic IEnumerable/LINQ path.
+- Verify locked Word replacement, preservation of the old document, blocked custom folders and complete filesystem failure using offline regression scenarios.
+
 ## 0.2.0-beta.13
 
 - Replace missing-content publication vetoes with automatic repair. Review still edits first; verified transit openings and milestones omitted afterward are supplied by local factual briefs.

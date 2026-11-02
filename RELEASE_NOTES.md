@@ -1,13 +1,15 @@
-# CityPress 0.2.0-beta.13
+# CityPress 0.2.0-beta.14
 
-漏稿先补稿，合格内容照常发行。
+修复生成成功却因覆盖 Word 文件失败而不显示报纸的问题。
 
-- 审校先按缺项补写；若模型仍漏报已确认的新线运营或数值突破，本地事实工具自动补成简讯，再分版和核实，不再因漏项拒刊。
-- 长评补写经过有限重试仍失败时，发行合格新闻，保留缺项审校记录，不伪造观点或用无关段落凑字。缺长评的稿件不锁入完整成稿缓存，可继续补齐。
-- 无效、截断的模型正文自动转入事实补稿；无用或无法核实的稿件清理后，用已确认的本地材料完成发行。关闭可选审校也不会关闭已确认事实的补漏。
+- 日志确认 IOException 位于替换旧 Word 文件时。现在先保存本地 JSON 归档，再导出 Word；原文件无法覆盖时自动另存带时间与标识的新副本，保留旧文件。
+- 自定义目录不可用时自动保存到本地归档目录。所有保存位置都失败时，成稿仍在游戏内显示，可重新点击导出；界面明确提示保存状态。缓存写入失败也不再丢弃成稿。
+- 修复统计采集使用 Unity 不支持的通用枚举接口而产生的 NotSupportedException，改用原生枚举方式。
 
-离线回归覆盖漏报新线、长评补写失败、全部原稿不合格、关闭可选审校及模型结构错误/截断。安装后重启游戏；新规则需重新生成报纸。未调用玩家付费API。
+离线测试已覆盖文件占用、目录不可用、全部保存失败及旧文件完整性。完整打包另验证游戏程序集和回调兼容性。未调用玩家付费API。
+
+安装后重启游戏加载；新生成/重新导出使用新逻辑。
 
 ## English
 
-Missing content now triggers repair instead of vetoing publication. After model review, verified transit openings and milestones are supplemented using local factual briefs. Accepted news is published even when opinion retries are exhausted, with quality records retained and incomplete editions excluded from the complete-draft cache. Invalid/truncated model manuscripts and unsafe drafts recover using confirmed material. No facts or long opinions are fabricated. Restart and regenerate; no paid player API was used.
+Completed papers are archived before Word export and remain available in-game even if persistence fails. Locked Word targets receive a uniquely named new copy; unavailable export locations fall back to the local issue archive. Localized notices report recovery or deferred saves. Cache write failures are nonfatal. World.Systems scanning uses Unity's concrete enumerator rather than unsupported generic LINQ enumeration. Offline tests cover locks, blocked folders, total save failure and preservation of the existing document. Restart to load the update; no paid player API was used.

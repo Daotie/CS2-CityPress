@@ -3,7 +3,7 @@
 <h1 align="center">CityPress 城市日报</h1>
 <p align="center">把《都市：天际线 II》的城市运行编辑成一份每日报纸。</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.13-00a8bb" alt="0.2.0-beta.13">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.14-00a8bb" alt="0.2.0-beta.14">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta 预发行">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
@@ -13,7 +13,7 @@ CityPress 是一个《都市：天际线 II》模组。它观察城市中实际�
 
 原版游戏通过统计面板和事件提示展示城市信息，但没有报纸、选题、往期档案或可导出的刊物。CityPress 补上这层编辑与出版能力，不改变城市管理的核心规则。
 
-**当前状态：** 当前源码版本为 `0.2.0-beta.13`（预发行），已发布构建见[下载页](https://github.com/Daotie/CS2-CityPress/releases)。项目仍在持续开发，存档数据采用向后兼容的追加字段，但接口、提示词和生成版面可能在 Beta 之间调整。实际验证范围见[版本说明](RELEASE_NOTES.md)。
+**当前状态：** 当前源码版本为 `0.2.0-beta.14`（预发行），已发布构建见[下载页](https://github.com/Daotie/CS2-CityPress/releases)。项目仍在持续开发，存档数据采用向后兼容的追加字段，但接口、提示词和生成版面可能在 Beta 之间调整。实际验证范围见[版本说明](RELEASE_NOTES.md)。
 
 ## 功能
 
