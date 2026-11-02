@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -38,7 +38,7 @@ static class ApiLayoutTests {
    var other=await service.Generate("local","汐澜",day,prefs,"fake-new-provider-key",CancellationToken.None);body=JObject.Parse(handler.Body);Check(handler.Calls==2&&handler.Auth=="Bearer fake-new-provider-key"&&body["response_format"]["type"].ToString()=="json_object"&&other.InputTokens==500&&other.OutputTokens==800&&other.CacheHitTokens==120&&other.CacheUsageReported,"切换服务使缓存隔离，兼容 JSON 模式与通用用量字段");
    prefs.LayoutMode="varied";await service.Generate("local","汐澜",day,prefs,"fake",CancellationToken.None);Check(handler.Calls==3,"版式模式变化使生成缓存失效");
    handler.Code=HttpStatusCode.Redirect;bool redirect=false;try{await service.Generate("redirect","汐澜",day,prefs,"fake",CancellationToken.None);}catch(InvalidOperationException error){redirect=error.Message.Contains("302");}Check(redirect,"接口重定向被拒绝，不自动向其他地址重试");
-   handler.Code=HttpStatusCode.OK;handler.Truncate=true;bool truncated=false;try{await service.Generate("truncated","汐澜",day,prefs,"fake",CancellationToken.None);}catch(InvalidOperationException){truncated=true;}Check(truncated&&!Directory.Exists(Path.Combine(temp,"custom-api","cities","truncated","cache")),"截断的长评论稿不缓存，不静默发布半份报纸");
+   handler.Code=HttpStatusCode.OK;handler.Truncate=true;var recovered=await service.Generate("truncated","汐澜",day,prefs,"fake",CancellationToken.None);Check(recovered!=null&&!Directory.Exists(Path.Combine(temp,"custom-api","cities","truncated","cache")),"截断模型稿自动转为已确认事实简讯，不采用半篇正文且不缓存为完整成稿");
   }
   string paragraph="城市公共服务的安排，需要把设施建设与长期服务放在一起考虑。道路、轨道交通与社区服务相互联系，单项工程的推进应兼顾接驳组织、步行可达性和后续维护。讨论这些选择，应当以明确事实为基础，把建议作为建议提出，不能用期待代替已经实现的效果。";
   var longBody=string.Join("\n",Enumerable.Range(0,9).Select(i=>paragraph));var longStory=Story("从线路建设走向服务协同",longBody,"评论");

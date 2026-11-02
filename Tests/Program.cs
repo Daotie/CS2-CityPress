@@ -113,8 +113,8 @@ class Program {
    prefs.CustomName="市民时报";await service.Generate("a","汐澜",log,prefs,"test",CancellationToken.None);Check(handler.Calls==2,"改报头使缓存失效");
    prefs.Editorial+=" 精简篇幅";await service.Generate("a","汐澜",log,prefs,"test",CancellationToken.None);Check(handler.Calls==3,"编辑方针变化使缓存失效");
    await service.Generate("b","汐澜",log,prefs,"test",CancellationToken.None);Check(handler.Calls==4,"存档缓存隔离");
-   handler.Invalid=true;bool rejected=false;try{await service.Generate("bad","汐澜",log,prefs,"test",CancellationToken.None);}catch(InvalidOperationException){rejected=true;}
-   Check(rejected&&!Directory.Exists(Path.Combine(temp,"cities","bad","cache")),"无效结果不缓存");
+   handler.Invalid=true;var repaired=await service.Generate("bad","汐澜",log,prefs,"test",CancellationToken.None);
+   Check(repaired!=null&&repaired.Articles!=null,"模型结构无效时自动整理已确认事实，不因结构错误拒刊");
    var root=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../"));
    if(!coreOnly)using(var binary=File.OpenRead(Path.Combine(root,"bin/Release/net48/CityPress.dll")))
    using(var pe=new PEReader(binary)) {

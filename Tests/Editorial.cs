@@ -152,11 +152,9 @@ static class EditorialTests {
   // 5. A failed commentary is reported as a failure, never published as news-only.
   var failureHandler=new Scripted{Respond=system=>system.Contains("评论编辑")?JsonConvert.SerializeObject(FirstPaper()):JsonConvert.SerializeObject(FirstPaper())};
   using(var service=new NewsService(failureHandler,Path.Combine(temp,"failed"))) {
-   bool failed=false;string message="";
-   try{await service.Generate("fail","汐澜",MajorDay(),new Preferences(),"key",CancellationToken.None).ConfigureAwait(false);}
-   catch(InvalidOperationException error){failed=true;message=error.Message;}
-   Check(failed&&message.Contains("评论或分析")&&failureHandler.Calls>=2,"独立评论生成失败时明确报错并重试，不假装完成");
-   Check(!Directory.Exists(Path.Combine(temp,"failed","cities","fail","cache")),"评论失败时不写入缓存");
+   var issued=await service.Generate("fail","汐澜",MajorDay(),new Preferences(),"key",CancellationToken.None);
+   Check(issued.Articles.Any(a=>a.Genre!="评论")&&failureHandler.Calls>=2,"长评补写失败仍发行合格新闻，不要求玩家重试");
+   Check(!Directory.Exists(Path.Combine(temp,"failed","cities","fail","cache")),"缺长评的已发行稿不锁入完整成稿缓存，后续仍可补齐");
   }
 
   // 6. One targeted revision repairs flagged copy without rewriting the paper.
