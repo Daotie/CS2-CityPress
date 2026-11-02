@@ -4,6 +4,7 @@
 <p align="center">A daily newspaper generated from a living <strong>Cities: Skylines II</strong> city.</p>
 <p align="center">
  <img src="https://img.shields.io/badge/version-0.2.0--beta.14-00a8bb" alt="0.2.0-beta.14">
+ <img src="https://img.shields.io/badge/languages-English%20%7C%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-00a8bb" alt="English and Simplified Chinese">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta prerelease">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
@@ -27,19 +28,20 @@ The base game exposes city information through statistics panels and event notif
 
 ### Editorial pipeline
 
-- Grades city material by news value (routine, notable, major, milestone, critical), covering population, treasury, households, visitors, land, transit service changes, public services and incidents.
-- Uses a deterministic page planner on top of the model response: a flat article list or a single "综合" edition is split into themed editions, and rich material can continue onto an extra edition labelled（续）.
-- Generates one independent commentary edition when a major event has enough factual material. The commentary is produced by a separate API task, validated for length, analysis, sourcing and overlap with news, and retried once with a concrete error if needed.
-- Commentaries can carry two to four subheadings written as `## ` lines, and the opinion page can include short comments beside the long analysis. The dedicated commentary task adds up to two.
-- Runs a quality gate before layout: numbers are checked against collected data (including rounding and unit forms), invented interviews or sources are rejected, repeated openings, mechanical phrasing and duplicate stories are detected, and commentary that merely reprints news is refused.
-- Attempts at most one targeted revision request. If a fatal factual problem remains, the unsafe article is removed rather than published; a commentary that fails is reported instead of silently publishing a news-only issue. When a major event requires commentary, an edition containing only short notes is rejected.
+- Groups construction and management changes locally, formats population and money, and filters routine fleet inventories, low-impact incidents, prefab specifications and unexplained internal fields. Local collection is broader than provider input.
+- Detects confirmed milestones in population, treasury and monthly budget measures. Transit reporting distinguishes construction and settings from actual service opening.
+- Requests a complete long opinion in the primary prompt when a major event has enough material: typically 700–1400 Chinese characters with two to four subheadings. Distinct topics can receive short opinions or additional opinion editions.
+- Reviews the complete numbered manuscript against facts. The editor can add, expand, rewrite, merge and delete articles, followed by another check of numbers, sourcing, wording and duplication.
+- Repairs missing coverage: verified transit openings and milestones still omitted by the model receive local factual briefs. If bounded opinion retries remain unsuccessful, accepted news is published with missing-content quality records; incomplete drafts are excluded from the complete-draft cache.
+- Can recover malformed or truncated model manuscripts from confirmed facts. Unsafe copy is removed; missing commentary, editions or articles no longer veto publication by themselves. Authentication, network and other external failures still require their stated resolution.
+- Continues rich topics over extra editions and adds front-page guides with final edition references; minor briefs stay in their topic edition.
 
 ### Newspaper, archive and export
 
 - Builds themed editions such as front news, economy and finance, construction and transport, livelihoods and society, environment and observation, and an independent opinion edition.
 - Provides in-game page navigation and six layout templates: banner headline, lead/sidebar, vertical headline, brief-news digest, long commentary, and long commentary with short comments.
 - Saves the composition plan with the issue, so the in-game preview and Word export use the same columns and content blocks. Reopening, cache hits and re-exporting do not redraw the layout.
-- Keeps every issue as JSON and Word files. Word exports all planned editions with explicit page breaks and editable text.
+- Archives issue JSON before exporting editable Word files. Locked Word targets receive a new copy; unavailable export directories fall back to the local archive. Even if all writes fail, the completed paper remains readable in game and can be exported again.
 - Supports a custom newspaper name, a custom export directory, a per-save or global settings scope, and opening the actual export folder from the game.
 - Localizes the interface and status/error messages with the game language. English and Simplified Chinese are included with built-in fallbacks; other game languages use English. Newspaper prose follows the editorial policy, and Word furniture follows the language detected in the issue.
 - Keeps generation **manual by default**. Optional automatic publication generates the previous game day's issue and opens it in game.
@@ -51,7 +53,7 @@ The base game exposes city information through statistics panels and event notif
 2. **Journal.** Records are aggregated per game day and saved both in the game save and in local journal files.
 3. **Assess.** The editorial brief grades events and facts, filters noise, and decides whether a major event warrants independent commentary.
 4. **Write.** Eligible facts and the player's editorial instructions are sent to the configured Chat Completions-compatible endpoint. The service returns structured JSON with editions and articles.
-5. **Check.** The quality gate verifies numbers against collected data, checks sourcing and wording, refuses copied commentary, and may request one targeted revision.
+5. **Check and repair.** Verify facts, sourcing and wording; review can add, expand, merge and remove copy. Supplement confirmed omissions and publish accepted news.
 6. **Plan and lay out.** A deterministic planner decides edition themes, article distribution, page continuation and the opinion layout. It never invents filler pages.
 7. **Save and export.** The issue is written to the internal archive, exported as Word and JSON, and can be reopened later.
 
@@ -82,12 +84,21 @@ To confirm which build loaded, check `%USERPROFILE%\AppData\LocalLow\Colossal Or
 
 1. Open the newspaper button in the game UI.
 2. In editorial settings, configure the API endpoint, model and key, or keep the DeepSeek default. A local compatible service can use HTTP and disable authentication.
-3. Save the settings, then click **生成本日新闻** to generate an issue for the current game day. Generation is manual unless automatic publication is enabled.
+3. Save the settings, then click **Generate today’s news** to generate an issue for the current game day. Generation is manual unless automatic publication is enabled.
 4. Use the page directory or previous/next controls to read editions.
 5. Open the archive tab to read past issues or generate an issue for a recorded day.
-6. Use **导出当前报纸** to re-export the open issue without calling the API, and **打开导出文件夹** to open the actual export directory.
+6. Use **Export current newspaper** to re-export the open issue without calling the API, and **Open export folder** to open the actual export directory.
 
 The interface and system messages follow the game language. English and Simplified Chinese are included; other languages fall back to English. Generated newspaper text follows the editorial policy, not the interface language; Word furniture follows the language detected in the newspaper itself. The in-game page navigation, archive rows and settings are documented in the [player guide](docs/USER_GUIDE.zh-CN.md) (Simplified Chinese).
+
+## Language support
+
+| Content | Language behavior |
+| --- | --- |
+| In-game controls, settings, archives, status and errors | Follows the game language; English and Simplified Chinese included, English fallback for other languages |
+| Newspaper stories and opinions | Follows editorial instructions and the model; changing UI language does not translate existing issues |
+| Word dates and edition furniture | English/Chinese formatting selected from the issue’s detected content language |
+| Project documentation | [English](README.md) · [简体中文](README.zh-CN.md) |
 
 ## Configuration
 
@@ -106,7 +117,8 @@ Settings can be stored globally or per save. The main options are:
 | Timeout | Maximum wait for one request | 180 seconds |
 | Token parameter | `max_tokens` or `max_completion_tokens` | `max_tokens` |
 | Layout mode | Content-based template selection or suitable-template variation | Auto |
-| Long commentary | Enable the dedicated commentary task for major events | On |
+| Long commentary | Request a long opinion immediately for major events; supplement if needed | On |
+| Quality check / automatic revision | Review and revise copy; supplementation may add API calls | On |
 | Editorial policy | Additional instructions for the editor | Built-in policy |
 
 Compatible endpoints must accept the OpenAI-style Chat Completions request and JSON response used by the mod. Base URLs are normalized to a `/chat/completions` path; local endpoints can disable authentication. The JSON-mode switch can be turned off for services that do not support `response_format`, but the model must still return the requested JSON structure.
@@ -138,9 +150,11 @@ No frame-rate benchmark or fixed performance guarantee is claimed. Actual impact
 
 **No issue is generated.** The default is manual. Check that city time is ready, the day has eligible material, and no generation is already running. A day with no eligible facts produces a short empty issue without an API request.
 
-**The API request fails.** Check the endpoint, model name, authentication setting, output-token parameter and timeout. Some services do not support JSON mode; disable it if the service rejects `response_format`. Truncated responses are not cached.
+**The API request fails.** HTTP 401 usually means a missing/invalid key or a key that does not match the endpoint. Check the URL, key and authentication setting. For other errors check the model, token parameter and timeout. Disable JSON mode if the service rejects `response_format`. Truncated drafts can recover as factual briefs and are not cached as complete manuscripts.
 
-**The commentary is missing.** Independent commentary requires a major event with enough material and the long-commentary option enabled. A failed commentary is reported as an error and is not cached; a commentary edition containing only short notes is rejected.
+**Word is locked or the export folder is unavailable.** Use Export current newspaper to retry without another generation request. The mod tries a new copy or the local archive and reports the result; export failure no longer hides the completed issue.
+
+**The commentary is missing.** It requires a major event, sufficient facts and the long-commentary option. The primary request asks for the complete opinion; review can supplement it, followed by bounded specialist retries when needed. Accepted news still publishes if commentary remains incomplete, with quality records retained and regeneration available.
 
 **An old issue still uses the old layout.** Archived issues keep their saved layout. Re-generate the day to apply current layout and editorial rules; re-exporting an old issue does not rewrite it.
 
