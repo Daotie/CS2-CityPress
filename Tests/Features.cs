@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -20,6 +20,18 @@ static class FeatureTests {
   Check(File.Exists(Path.Combine(saved.Folder,paper.Day+".docx"))&&File.Exists(Path.Combine(saved.Folder,paper.Day+".json")),"生成后的 Word 与 JSON 导出到自定义目录并按报纸名称分类");
   var changed=Path.Combine(root,"new-export");Check(store.Read("save-a",paper.Day,changed).Folder==saved.Folder,"改根目录后，历史报纸仍打开实际原存储位置");
   var copied=store.Save("save-a",paper,changed,CancellationToken.None);Check(copied.Folder!=saved.Folder&&File.Exists(Path.Combine(saved.Folder,paper.Day+".docx"))&&store.List("save-a").Length==1,"重新导出保留旧文件，更新位置但不重复档案条目");
+  // Simulate Word holding the prior issue open without delete sharing.
+  var target=Path.Combine(copied.Folder,paper.Day+".docx");var originalBytes=File.ReadAllBytes(target);
+  using(var locked=new FileStream(target,FileMode.Open,FileAccess.Read,FileShare.Read)){
+   var alternate=store.Save("save-a",paper,changed,CancellationToken.None);
+   Check(alternate.ExportRenamed&&!alternate.ExportDeferred&&alternate.Paper==paper&&Directory.GetFiles(alternate.Folder,paper.Day+"-*.docx").Length==1,"Word 占用旧文件时自动另存新副本，界面仍得到成稿");
+  }
+  Check(File.ReadAllBytes(target).SequenceEqual(originalBytes),"被占用的原 Word 文件保持完整");
+  var blocked=Path.Combine(root,"blocked-export");File.WriteAllText(blocked,"file blocks directory creation");
+  var fallback=store.Save("save-a",paper,blocked,CancellationToken.None);
+  Check(fallback.ExportRedirected&&!fallback.ExportDeferred&&fallback.Folder==store.Issues("save-a")&&File.Exists(Path.Combine(fallback.Folder,paper.Day+".docx")),"自定义目录不可用时自动保存到本地归档并返回可阅读成稿");
+  var unavailable=new ExportStore(Path.Combine(blocked,"unwritable"));var memory=unavailable.Save("save-a",paper,blocked,CancellationToken.None);
+  Check(memory.ExportDeferred&&memory.ArchiveDeferred&&memory.Paper==paper,"所有保存位置失败时仍返回内存成稿供游戏阅读与重新导出");
   var legacy=Path.Combine(root,"data","cities","legacy","issues");Directory.CreateDirectory(legacy);Storage.Write(Path.Combine(legacy,paper.Day+".json"),JsonConvert.SerializeObject(paper));File.Copy(Path.Combine(saved.Folder,paper.Day+".docx"),Path.Combine(legacy,paper.Day+".docx"));
   Check(store.Read("legacy",paper.Day,export).Folder==legacy,"旧版 AppData 报纸可继续打开原文件夹");
   using(var token=new CancellationTokenSource()){token.Cancel();bool canceled=false;try{store.Save("canceled",paper,export,token.Token);}catch(OperationCanceledException){canceled=true;}Check(canceled&&!Directory.Exists(store.Issues("canceled")),"切换会话取消的导出不会发布新档案");}

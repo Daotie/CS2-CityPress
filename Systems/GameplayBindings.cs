@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,8 @@ namespace CityPress.Systems {
   internal static void Scan(NewsSystem news) {
    var field=typeof(UISystemBase).GetField("m_Bindings",BindingFlags.Instance|BindingFlags.NonPublic);
    if(field==null)throw new MissingFieldException("Gameplay bindings unavailable");
-   foreach(var system in news.World.Systems.ToArray().OfType<UISystemBase>()) {
+   foreach(var candidate in news.World.Systems) {
+    if(!(candidate is UISystemBase system))continue;
     var owner=system.GetType().FullName;
     if(owner==null||!owner.StartsWith("Game.UI.InGame.",StringComparison.Ordinal))continue;
     if(!(field.GetValue(system) is IEnumerable bindings))continue;

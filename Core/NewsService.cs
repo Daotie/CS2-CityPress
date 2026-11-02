@@ -112,7 +112,11 @@ QualityControl.ApplySafeDegradation(paper,review);
    PagePlanner.AddFrontPageGuide(paper,brief);
    paper.LayoutVersion="10";paper.CommentaryFocus=brief.CommentaryFocus??paper.CommentaryFocus;
    PaperLayout.Assign(paper,prefs.LayoutMode);
-   if(!incompleteDraft&&(!commentaryRequired||!MissingCommentary(paper,brief)))Storage.Write(cache,JsonConvert.SerializeObject(paper));return paper;
+   if(!incompleteDraft&&(!commentaryRequired||!MissingCommentary(paper,brief))){
+    try{Storage.Write(cache,JsonConvert.SerializeObject(paper));}
+    catch(IOException){Warn?.Invoke("成稿缓存写入未完成，继续发行。");}
+    catch(UnauthorizedAccessException){Warn?.Invoke("成稿缓存暂不可写，继续发行。");}
+   }return paper;
   }
   static int OpinionCount(EditorialBrief brief)=>brief.MajorEvents.Select(item=>item.Domain).Distinct().Count()>=2||brief.Events.Where(item=>item.Importance>=NewsImportance.Notable).Select(item=>item.Domain).Distinct().Count()>=3?2:1;
   sealed class CommentaryDraftArticle {

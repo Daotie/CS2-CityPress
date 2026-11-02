@@ -153,5 +153,8 @@
   "CityPress.Error.ApiHttp": "API request failed (HTTP {0}). Check the address, model, authentication and parameter compatibility.",
   "CityPress.Error.ApiResponseJson": "The API response is not JSON. Check the compatible endpoint address.",
   "CityPress.Error.ApiStructure": "The API response is not a compatible Chat Completions text response.",
-  "CityPress.Error.ApiTruncated": "The newspaper was not generated completely. Increase the output limit or shorten the editorial policy and retry."
+  "CityPress.Error.ApiTruncated": "The newspaper was not generated completely. Increase the output limit or shorten the editorial policy and retry.",
+  "CityPress.Status.ExportDeferred": "Newspaper ready to read. Some files could not be saved; use Export to retry.",
+  "CityPress.Status.ExportRenamed": "Newspaper saved. The existing Word file could not be replaced; a new copy was saved.",
+  "CityPress.Status.ExportRedirected": "Newspaper ready. The export directory was unavailable; saved to: {0}"
 }

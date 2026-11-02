@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -150,7 +150,10 @@ namespace CityPress.Systems {
    if(timeReady&&day!=lastDay){if(GameCalendar.PruneEmptyHistory(state,day)>0)Changed();Rollover(day);lastDay=day;uiDirty=true;}
    if(pending?.IsCompleted==true){bool current=pendingId==state.Id&&pendingEpoch==epoch;
      try{var result=pending.GetAwaiter().GetResult();if(current){paper=result.Paper;paperFolder=result.Folder;archiveRefresh=true;if(pendingPopup)popup++;int pages=paper.Pages?.Count??1;int dropped=paper.DroppedUnsafeArticles;int score=paper.QualityScore;
-      if(pendingExportOnly)Status("CityPress.Status.ExportDone");
+      if(result.ExportDeferred||result.ArchiveDeferred)Status("CityPress.Status.ExportDeferred");
+      else if(result.ExportRedirected)Status("CityPress.Status.ExportRedirected",result.Folder);
+      else if(result.ExportRenamed)Status("CityPress.Status.ExportRenamed");
+      else if(pendingExportOnly)Status("CityPress.Status.ExportDone");
       else if(paper.LocalOnly)Status("CityPress.Status.LocalOnly");
       else if(paper.LocalCache)Status("CityPress.Status.CacheReused");
       else if(dropped>0&&score<100)Status("CityPress.Status.GeneratedWithheldQuality",pages,dropped,score);
