@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -34,7 +34,7 @@ static class LocalizationTests {
   foreach(var key in codeKeys.Distinct())Check(en.ContainsKey(key)&&zh.ContainsKey(key),"后端状态/错误词条存在："+key);
   Check(codeKeys.Distinct().Count()>=30,"后端状态与错误使用稳定词条而不是硬编码文案");
 
-  Check(I18n.MostlyChinese("汐澜市常住人口突破四十万")&&!I18n.MostlyChinese("The city population passed 400,000"),"中英文内容语言检测");
+  Check(I18n.MostlyChinese("示例市市常住人口突破四十万")&&!I18n.MostlyChinese("The city population passed 400,000"),"中英文内容语言检测");
   var failure=new LocalizedException("CityPress.Error.ApiHttp","API 请求失败（HTTP {0}）",500);
   Check(failure.Key=="CityPress.Error.ApiHttp"&&failure.Message.Contains("500"),"本地化异常保留词条并格式化回退文案");
 

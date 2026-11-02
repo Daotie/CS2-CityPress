@@ -11,11 +11,11 @@ static class FeatureTests {
  static void Check(bool ok,string message){if(!ok)throw new Exception(message);Console.WriteLine("PASS "+message);}
  public static async Task Run(string root) {
   Check(ExportPaths.DefaultDirectory==Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),"CityPress"),"默认导出根目录跟随系统文档位置（包括重定向文档）");
-  var export=Path.Combine(root,"export folder 中文");var safe=ExportPaths.Folder(export,"汐澜/日报","save-a");
+  var export=Path.Combine(root,"export folder 中文");var safe=ExportPaths.Folder(export,"示例市/日报","save-a");
   Check(safe.StartsWith(Path.GetFullPath(export)+Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)&&!ExportPaths.Segment("CON.txt").Equals("CON.txt")&&ExportPaths.Segment("A/B")!=ExportPaths.Segment("A?B"),"报纸目录处理非法/保留名称，避免清洗后重名且不越出根目录");
   bool relative=false;try{ExportPaths.Root("../newspapers");}catch(ArgumentException){relative=true;}Check(relative,"拒绝相对导出路径，避免写入意外工作目录");
   Check(ExportPaths.Folder(export,"同名日报","save-a")!=ExportPaths.Folder(export,"同名日报","save-b"),"同名报纸在不同存档中分开保存");
-  var paper=new Newspaper{Name="汐澜/日报",Day="2027-01-12",Headline="城市新闻",Deck="公开报道",Articles=new System.Collections.Generic.List<Article>{new Article{Section="城市",Title="人口增长",Body="常住人口已达到新的规模。"}}};
+  var paper=new Newspaper{Name="示例市/日报",Day="2027-01-12",Headline="城市新闻",Deck="公开报道",Articles=new System.Collections.Generic.List<Article>{new Article{Section="城市",Title="人口增长",Body="常住人口已达到新的规模。"}}};
   var store=new ExportStore(Path.Combine(root,"data"));var saved=store.Save("save-a",paper,export,CancellationToken.None);
   Check(File.Exists(Path.Combine(saved.Folder,paper.Day+".docx"))&&File.Exists(Path.Combine(saved.Folder,paper.Day+".json")),"生成后的 Word 与 JSON 导出到自定义目录并按报纸名称分类");
   var changed=Path.Combine(root,"new-export");Check(store.Read("save-a",paper.Day,changed).Folder==saved.Folder,"改根目录后，历史报纸仍打开实际原存储位置");
@@ -48,10 +48,10 @@ static class FeatureTests {
   Check(day.Breakthroughs.Any(x=>x.Key=="city/monthlyIncome"&&x.Unit.Contains("/月"))&&day.Breakthroughs.Any(x=>x.Key=="city/money"&&x.Threshold==1500000000),"月收入和市库存量独立检测，支持十亿级资金");
   Milestones.Observe(state,day,"city/monthlyNetIncome",-300000,"11:00");Check(Milestones.Observe(state,day,"city/monthlyNetIncome",10000,"12:00")&&day.Breakthroughs.Any(x=>x.Kind=="预算由亏转盈"),"月度预算由亏转盈有独立事实类型");
   var handler=new Fake();using(var service=new NewsService(handler,Path.Combine(root,"news"))){
-   var prefs=new Preferences{ExportDirectory=export};await service.Generate("test","汐澜",day,prefs,"test",CancellationToken.None);
+   var prefs=new Preferences{ExportDirectory=export};await service.Generate("test","示例市",day,prefs,"test",CancellationToken.None);
    var payload=JObject.Parse(handler.Last);var input=JObject.Parse((string)payload["messages"][1]["content"]);
    Check(input["breakthroughs"].Count()==day.Breakthroughs.Count&&!input.ToString().Contains("export folder 中文")&&handler.Calls==1,"突破事实进入编辑素材并触发新闻，导出路径不发送给 DeepSeek");
-   await service.Generate("test","汐澜",day,prefs,"",CancellationToken.None);Check(handler.Calls==1,"含突破的同一事实仍命中本地缓存");
+   await service.Generate("test","示例市",day,prefs,"",CancellationToken.None);Check(handler.Calls==1,"含突破的同一事实仍命中本地缓存");
   }
   var indexed=new DayLog{Day="2027-01-12"};for(int i=0;i<10000;i++){Aggregator.Add(indexed,"建设","设施"+i,"10:00");Aggregator.Sample(indexed,"metric"+i,"指标","",i,"10:00");}for(int i=0;i<10000;i++)Aggregator.Add(indexed,"建设","设施"+i,"11:00");
   Check(Aggregator.Count(indexed)==20000&&indexed.Actions.Count==10000&&indexed.Metrics.Count==10000,"大批量操作与指标使用索引，合并计数仍准确");

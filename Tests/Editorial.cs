@@ -58,7 +58,7 @@ static class EditorialTests {
  }
  static string NewsBody()=>"全市常住人口升至约41万，市库资金余额突破1800万。常住人口由约40.04万增至约40.99万，家庭数量由约19.52万户增至19.91万户，市库资金余额由约1297万升至约1854万。医疗、教育与交通服务的安排需要与人口变化同步。";
  static string CommentaryBody()=>LongCommentaryBody();
- static Newspaper FirstPaper()=>new Newspaper{Name="汐澜日报",Day="2027-01-12",Headline="市库资金余额与常住人口同步走高",Deck="城市财政与人口指标出现新的变化。",Provider="test",Model="model",Articles=new List<Article>{
+ static Newspaper FirstPaper()=>new Newspaper{Name="示例市日报",Day="2027-01-12",Headline="市库资金余额与常住人口同步走高",Deck="城市财政与人口指标出现新的变化。",Provider="test",Model="model",Articles=new List<Article>{
   Story("城市要闻","常住人口与市库资金余额同步走高",NewsBody()),
   Story("城市建设与交通","社区医疗中心与学校进入建设阶段","社区医疗中心的建设正在推进，周边道路与步行通道同步调整，学校与医院等公共服务设施的布局需要与人口分布匹配。"),
   Story("民生与社会","家庭数量随人口增长上升","家庭数量由约19.52万户增至19.91万户，公共服务需求随之增加，设施分布与人员配置需要进一步统筹。"),
@@ -79,12 +79,12 @@ static class EditorialTests {
  }
  public static async Task Run(string temp) {
   // 1. News value: important events are graded, but a bare threshold is not enough for a commentary.
-  var rich=MajorDay();var richBrief=NewsValue.Evaluate(rich,"汐澜");
+  var rich=MajorDay();var richBrief=NewsValue.Evaluate(rich,"示例市");
   Check(richBrief.HasMajor&&richBrief.MajorEvents.Any(item=>item.MajorToken=="常住人口")&&richBrief.CommentaryWarranted&&!string.IsNullOrWhiteSpace(richBrief.CommentaryFocus),"重大突破被评定为重大事件并满足独立评论的事实条件");
   var sparse=new DayLog{Day="2027-01-12"};sparse.Breakthroughs.Add(new BreakthroughRecord{Key="city/money",Label="市库资金余额",Unit="货币",Kind="数量级突破",Time="10:00",PreviousHigh=12000000,Threshold=15000000,Value=16000000});
-  Check(!NewsValue.Evaluate(sparse,"汐澜").CommentaryWarranted,"仅有单个阈值突破、缺少其他事实时不强行生成评论");
+  Check(!NewsValue.Evaluate(sparse,"示例市").CommentaryWarranted,"仅有单个阈值突破、缺少其他事实时不强行生成评论");
   var monthly=new DayLog{Day="2027-01-12"};monthly.Breakthroughs.Add(new BreakthroughRecord{Key="city/monthlyBalance",Label="月度预算收支结余",Unit="货币",Kind="数量级突破",Time="10:00",PreviousHigh=1,Threshold=2,Value=3});
-  Check(!NewsValue.Evaluate(monthly,"汐澜").HasMajor,"旧错误财政口径不参与重大事件与评论判定");
+  Check(!NewsValue.Evaluate(monthly,"示例市").HasMajor,"旧错误财政口径不参与重大事件与评论判定");
 
   // 2. Deterministic page plan turns a flat mixed list into themed editions.
   var mixed=FirstPaper();int expectedArticles=mixed.Articles.Count;mixed.Headline="多主题版面校样";mixed.Articles.AddRange(new List<Article>{
@@ -93,13 +93,13 @@ static class EditorialTests {
    Story("民生与社会","城区发生一起建筑火灾","城区发生一起建筑火灾，未造成人员伤亡，相关处置已经结束，具体原因未见进一步信息。"),
    Story("城市评论","城市增长的质量比数字更重要",CommentaryBody(),"评论")
   });expectedArticles=mixed.Articles.Count;
-  var mixedBrief=NewsValue.Evaluate(rich,"汐澜");var plan=PagePlanner.Plan(mixed,mixedBrief);
+  var mixedBrief=NewsValue.Evaluate(rich,"示例市");var plan=PagePlanner.Plan(mixed,mixedBrief);
   Check(plan.Pages.Count>=4&&plan.Pages.All(page=>page.Articles.Count>0),"多领域素材被规划为多个非空主题版，不再全部塞进综合版");
   Check(plan.Pages.All(page=>!PagePlanner.IsGenericTheme(page.Theme)),"规划后的每个新闻版都有明确主题");
   Check(plan.Pages.Last().Theme=="评论"&&plan.Pages.Last().Articles.All(PagePlanner.IsCommentary),"评论独立成版并排在最后");
   Check(plan.Pages.SelectMany(page=>page.Articles).Count()==expectedArticles,"分版不丢失也不重复任何稿件");
   Check(mixed.Pages.All(page=>page.Composition==null),"版面规划阶段尚未保存版式，留给排版阶段统一生成");
-  var tiny=new Newspaper{Name="汐澜日报",Day="2027-01-12",Headline="城市短讯",Deck="",Articles=new List<Article>{
+  var tiny=new Newspaper{Name="示例市日报",Day="2027-01-12",Headline="城市短讯",Deck="",Articles=new List<Article>{
    Story("城市建设与交通","一段道路完成施工","城区一段道路完成施工并开放通行，周边步行通道同步调整。"),
    Story("民生与社会","社区服务点启用","社区服务点开始使用，为周边居民提供日常服务。")
   }};
@@ -120,7 +120,7 @@ static class EditorialTests {
   var prefs=new Preferences();
   var root=Path.Combine(temp,"pipeline");
   using(var service=new NewsService(scripted,root)){
-   var before=MajorDay();var result=await service.Generate("save","汐澜",before,prefs,"key",CancellationToken.None).ConfigureAwait(false);
+   var before=MajorDay();var result=await service.Generate("save","示例市",before,prefs,"key",CancellationToken.None).ConfigureAwait(false);
    var firstPrompt=(string)JObject.Parse(scripted.Bodies[0])["messages"][0]["content"];
    Check(firstPrompt.Contains("必须在本次pages中直接写出")&&firstPrompt.Contains("700至1400")&&!firstPrompt.Contains("将另行补写"),"主提示词直接要求完整长评，不再留待后续补写");
    Check(result.RevisionCount==1&&PaperLayout.BodyLength(result.Articles.First(a=>a.Genre=="评论").Body)>=QualityControl.LongCommentaryMinimum,"审校补写的长评达到篇幅要求并记录修订次数");
@@ -145,14 +145,14 @@ static class EditorialTests {
     int breaks=doc.Descendants(w+"br").Count(node=>(string)node.Attribute(w+"type")=="page");
     Check(breaks==result.Pages.Count-1&&text.Contains("评论版")&&text.Contains("城市增长的质量比数字更重要")&&text.Contains("城市建设与交通版"),"Word 导出包含全部版面、显式分页与独立评论");
    }
-   var calls=scripted.Calls;var cached=await service.Generate("save","汐澜",MajorDay(),prefs,"",CancellationToken.None).ConfigureAwait(false);
+   var calls=scripted.Calls;var cached=await service.Generate("save","示例市",MajorDay(),prefs,"",CancellationToken.None).ConfigureAwait(false);
    Check(cached.LocalCache&&scripted.Calls==calls&&cached.Pages.Count==result.Pages.Count,"相同事实命中本地缓存且不重新分版");
   }
 
   // 5. A failed commentary is reported as a failure, never published as news-only.
   var failureHandler=new Scripted{Respond=system=>system.Contains("评论编辑")?JsonConvert.SerializeObject(FirstPaper()):JsonConvert.SerializeObject(FirstPaper())};
   using(var service=new NewsService(failureHandler,Path.Combine(temp,"failed"))) {
-   var issued=await service.Generate("fail","汐澜",MajorDay(),new Preferences(),"key",CancellationToken.None);
+   var issued=await service.Generate("fail","示例市",MajorDay(),new Preferences(),"key",CancellationToken.None);
    Check(issued.Articles.Any(a=>a.Genre!="评论")&&failureHandler.Calls>=2,"长评补写失败仍发行合格新闻，不要求玩家重试");
    Check(!Directory.Exists(Path.Combine(temp,"failed","cities","fail","cache")),"缺长评的已发行稿不锁入完整成稿缓存，后续仍可补齐");
   }
@@ -162,7 +162,7 @@ static class EditorialTests {
    ? "{\"rewrites\":[{\"index\":0,\"title\":\"人口达到新规模\",\"body\":\"全市常住人口达到约41万人，家庭数量与公共服务需求同步变化，设施布局需要与人口分布匹配。\"}]}"
    : JsonConvert.SerializeObject(new Newspaper{Headline="事实核验",Articles=new List<Article>{Story("民生","人口达到新规模","全市常住人口已经达到45万人，城市发展进入新阶段，公共服务需要同步跟进，设施布局也应随人口变化调整。")}})};
   using(var service=new NewsService(revisionHandler,Path.Combine(temp,"revision"))) {
-   var result=await service.Generate("rev","汐澜",referenceDayForRevision(),new Preferences(),"key",CancellationToken.None).ConfigureAwait(false);
+   var result=await service.Generate("rev","示例市",referenceDayForRevision(),new Preferences(),"key",CancellationToken.None).ConfigureAwait(false);
    Check(revisionHandler.Calls==2&&result.RevisionCount==1&&result.Articles[0].Body.Contains("41万")&&result.Articles.All(article=>!article.Issues.Any(issue=>issue.Severity=="fatal")),"事实错误通过一次局部修订修正，不整份重写");
   }
 
@@ -171,7 +171,7 @@ static class EditorialTests {
   shortPaper.Articles.Add(JObject.Parse(CommentaryRevision(CommentaryJson()))["additions"][1].ToObject<Article>());
   Scripted expansion=null;expansion=new Scripted{Respond=system=>system.Contains("质量编辑")?new JObject{["rewrites"]=new JArray(new JObject{["index"]=JObject.Parse((string)JObject.Parse(expansion.Bodies.Last())["messages"][1]["content"])["articles"].First(a=>(string)a["Title"]=="城市服务应跟上人口变化")["index"],["title"]="城市增长的质量比数字更重要",["body"]=LongCommentaryBody()})}.ToString():JsonConvert.SerializeObject(shortPaper)};
   using(var service=new NewsService(expansion,Path.Combine(temp,"expand"))){
-   var result=await service.Generate("expand","汐澜",MajorDay(),new Preferences(),"key",CancellationToken.None);
+   var result=await service.Generate("expand","示例市",MajorDay(),new Preferences(),"key",CancellationToken.None);
    Check(expansion.Calls==2&&result.RevisionCount==1&&result.Articles.Count(a=>a.Genre=="评论")==2&&result.Articles.Any(a=>a.Genre=="评论"&&PaperLayout.BodyLength(a.Body)>=500),"审校扩写现有短稿为长评，不重复补稿或提前拒刊");
   }
   // All indices refer to the original manuscript, even after another edit.
@@ -186,7 +186,7 @@ static class EditorialTests {
   var opsHandler=new Scripted{Respond=system=>system.Contains("质量编辑")?JsonConvert.SerializeObject(editOps):JsonConvert.SerializeObject(fragments)};
   var opsDay=new DayLog{Day="2027-01-12"};Aggregator.Add(opsDay,"城市实况 · 建筑进入施工","现代中学","10:00");
   using(var service=new NewsService(opsHandler,Path.Combine(temp,"operations"))){
-   var result=await service.Generate("ops","汐澜",opsDay,new Preferences(),"key",CancellationToken.None);
+   var result=await service.Generate("ops","示例市",opsDay,new Preferences(),"key",CancellationToken.None);
    var request=JObject.Parse((string)JObject.Parse(opsHandler.Bodies[1])["messages"][1]["content"]);
    Check(request["articles"].Count()==6&&opsHandler.Calls==2,"审校接收完整六篇稿件及问题，不只截取前四篇");
    Check(result.RevisionCount==1&&result.Articles.Count==4&&result.Articles.Any(a=>a.Title=="学校建设集中推进")&&!result.Articles.Any(a=>a.Title=="无关片段"||a.Title=="学校建设消息"),"一次审校执行改写、合并、删除，原稿编号不会错位");
@@ -227,7 +227,7 @@ static class EditorialTests {
   var shortTwo=ShortCommentArticle("人口增长提出新要求","人口增至约41万意味着学校、医院和交通的压力会持续存在，设施布局与人员配置需要同步跟上。长期看，服务能力取决于持续投入与维护，而不是一次性的工程数量。公共服务的衔接需要更细致的安排：新建设施能否真正开放、服务半径是否覆盖新增人口、运营成本是否可承受，都会影响市民的实际体验，也决定城市扩张的质量。这些判断需要结合后续可核实的数据，不能只靠工程数量下结论。");
   var leadCommentary=LongCommentaryArticle();
   var commentaryPage=new NewspaperPage{Theme="评论",Headline=leadCommentary.Title,Deck="",Articles=new List<Article>{leadCommentary,shortOne,shortTwo}};
-  var mixedCommentary=new Newspaper{Name="汐澜日报",Day="2027-01-12",Headline="评论与短评校样",Deck="",Pages=new List<NewspaperPage>{new NewspaperPage{Theme="要闻",Headline="城市新闻",Articles=new List<Article>{Story("要闻","人口与资金变化","常住人口与市库资金余额出现新的变化，公共服务需要同步安排。")}},commentaryPage}};
+  var mixedCommentary=new Newspaper{Name="示例市日报",Day="2027-01-12",Headline="评论与短评校样",Deck="",Pages=new List<NewspaperPage>{new NewspaperPage{Theme="要闻",Headline="城市新闻",Articles=new List<Article>{Story("要闻","人口与资金变化","常住人口与市库资金余额出现新的变化，公共服务需要同步安排。")}},commentaryPage}};
   mixedCommentary.Articles=mixedCommentary.Pages.SelectMany(page=>page.Articles).ToList();
   PaperLayout.Assign(mixedCommentary,"auto");
   Check(commentaryPage.Composition.Template=="opinion-mixed"&&commentaryPage.Composition.Columns.Count==3,"长评论与短评共用一版时使用主版加短评侧栏版式");
@@ -248,7 +248,7 @@ static class EditorialTests {
   var longBody=string.Join("\n",Enumerable.Repeat(repeated,4));
   var economyArticles=new List<Article>();
   for(int i=1;i<=11;i++)economyArticles.Add(Story("经济与财政","预算与产业观察之"+i,longBody));
-  var economyPaper=new Newspaper{Name="汐澜日报",Day="2027-01-12",Headline="经济与财政专版",Deck="",Articles=economyArticles};
+  var economyPaper=new Newspaper{Name="示例市日报",Day="2027-01-12",Headline="经济与财政专版",Deck="",Articles=economyArticles};
   var economyPlan=PagePlanner.Plan(economyPaper,new EditorialBrief());
   Check(economyPlan.Pages.Count>=3&&economyPlan.Pages.All(page=>PagePlanner.BaseTheme(page.Theme)=="经济与财政")&&economyPlan.Pages.Skip(1).All(page=>page.Theme.StartsWith("经济与财政（续",StringComparison.Ordinal)),"同一主题素材多时连续加版并使用（续）版名");
   Check(economyPaper.Articles.Count==11&&economyPlan.Pages.All(page=>page.Articles.Count>0),"加版不丢失稿件也不产生空版");
@@ -257,7 +257,7 @@ static class EditorialTests {
   var mixedCommentaryJson=JsonConvert.SerializeObject(new{title=leadCommentary.Title,deck="资金存量之后，服务能力才是长期问题",section="评论",body=LongCommentaryBody(),shortComments=new[]{new{title=shortOne.Title,body=shortOne.Body},new{title=shortTwo.Title,body=shortTwo.Body}}});
   var mixedHandler=new Scripted{Respond=system=>system.Contains("质量编辑")?CommentaryRevision(mixedCommentaryJson):JsonConvert.SerializeObject(FirstPaper())};
   using(var service=new NewsService(mixedHandler,Path.Combine(temp,"mixed-commentary"))){
-   var result=await service.Generate("mixed","汐澜",MajorDay(),new Preferences(),"key",CancellationToken.None).ConfigureAwait(false);
+   var result=await service.Generate("mixed","示例市",MajorDay(),new Preferences(),"key",CancellationToken.None).ConfigureAwait(false);
    var page=result.Pages.Last();
    Check(mixedHandler.Calls==2&&page.Theme=="评论"&&page.Articles.Count==3,"审校任务可同时返回长评论与短评并放入同一评论版");
    Check(page.Articles[0].CommentaryRole=="长评"&&page.Articles.Skip(1).All(article=>article.CommentaryRole=="短评"),"长评论与短评角色区分，长评论排在最前");
@@ -279,12 +279,12 @@ static class EditorialTests {
    ? "{\"rewrites\":[{\"index\":0,\"title\":\"人口增长带来服务需求\",\"body\":\"全市人口由40.04万增至40.99万，学校与医院需求同步增加，城市公共服务安排需要持续调整。\"}]}"
    : JsonConvert.SerializeObject(processPaper)};
   using(var service=new NewsService(processHandler,Path.Combine(temp,"process-review"))){
-    var result=await service.Generate("process","汐澜",processDay,new Preferences(),"key",CancellationToken.None).ConfigureAwait(false);
+    var result=await service.Generate("process","示例市",processDay,new Preferences(),"key",CancellationToken.None).ConfigureAwait(false);
     Check(processHandler.Calls==2&&result.RevisionCount==1&&result.Articles.All(article=>!EditionRules.ContainsProcessPhrase(article.Title+"\n"+article.Body)),"制作口径先交给模型局部审校，修订成功后正常发刊");
    }
    var fallbackHandler=new Scripted{Respond=system=>JsonConvert.SerializeObject(processPaper)};
    using(var service=new NewsService(fallbackHandler,Path.Combine(temp,"process-fallback"))){
-    var result=await service.Generate("fallback","汐澜",processDay,new Preferences(),"key",CancellationToken.None).ConfigureAwait(false);
+    var result=await service.Generate("fallback","示例市",processDay,new Preferences(),"key",CancellationToken.None).ConfigureAwait(false);
    Check(result.Articles.Count>0&&result.Articles.All(article=>!EditionRules.ContainsProcessPhrase(article.Title+"\n"+article.Body)),"模型未修好时确定性清理残留措辞，不整期丢弃");
   }
   Console.WriteLine("Editorial pipeline checks passed");

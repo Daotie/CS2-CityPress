@@ -27,3 +27,12 @@ Thumbs.db
 *.bak
 *.orig
 /.vscode/
+
+# Player data and credentials must stay local, including copied data trees.
+credentials/
+ModsData/
+**/journal.index.json
+**/exports.json
+**/key.dpapi
+*.jsonl
+*.har

@@ -51,12 +51,12 @@ class Program {
    noisyDay.Actions.Add(new ActionRecord{Kind="NameSystem.SetCustomName",Detail="Entity(1261388:1) | 结束上客 10:35",Count=9999});
    noisyDay.Actions.Add(new ActionRecord{Kind="PoliciesUISystem.SetPolicy",Detail="Entity(2207084:1) | Entity(159:1) | True | 4"});
    var filterHandler=new Fake();using(var filterService=new NewsService(filterHandler,Path.Combine(temp,"filter"))) {
-    var blank=await filterService.Generate("noise","汐澜",noisyDay,prefs,"",CancellationToken.None);
+    var blank=await filterService.Generate("noise","示例市",noisyDay,prefs,"",CancellationToken.None);
     Check(blank.LocalOnly&&blank.Articles.Count==0&&filterHandler.Calls==0,"纯运行状态与不明政策不凑新闻且不调用 API");
     noisyDay.Actions.Add(new ActionRecord{Kind="工具提交",Detail="Object Tool / CN_Hospital01"});
-    var intent=await filterService.Generate("intent","汐澜",noisyDay,prefs,"",CancellationToken.None);Check(intent.LocalOnly&&filterHandler.Calls==0,"仅有医院放置意图不冒充建设事实");
+    var intent=await filterService.Generate("intent","示例市",noisyDay,prefs,"",CancellationToken.None);Check(intent.LocalOnly&&filterHandler.Calls==0,"仅有医院放置意图不冒充建设事实");
     noisyDay.Actions.Add(new ActionRecord{Kind="城市实况 · 建筑进入施工",Detail="CN_Hospital01"});
-    await filterService.Generate("noise","汐澜",noisyDay,prefs,"test",CancellationToken.None);
+    await filterService.Generate("noise","示例市",noisyDay,prefs,"test",CancellationToken.None);
     var request=Newtonsoft.Json.Linq.JObject.Parse(filterHandler.Last);var input=Newtonsoft.Json.Linq.JObject.Parse((string)request["messages"][1]["content"]);
     Check(filterHandler.Calls==1&&input["actions"].Count()==1&&input["actions"][0]["Detail"].ToString().Contains("医疗设施")&&!filterHandler.Last.Contains("结束上客")&&!filterHandler.Last.Contains("2207084"),"高频噪声在发送前剔除，医院建设记录保留");
    }
@@ -69,14 +69,14 @@ class Program {
    Aggregator.Sample(metricDay,"population","人口","人",100,"08:00");Aggregator.Sample(metricDay,"population","人口","人",130,"09:00");Aggregator.Sample(metricDay,"population","人口","人",120,"10:00");Aggregator.Sample(metricDay,"bad","无效","",double.NaN,"10:00");
    var observed=metricDay.Metrics.Single();Check(observed.First==100&&observed.Last==120&&observed.Min==100&&observed.Max==130&&observed.Samples==3&&observed.FirstTime=="08:00"&&observed.LastTime=="10:00","指标保留实际观测区间的起末、极值，忽略无效数值");
    var observationHandler=new Fake();using(var observationService=new NewsService(observationHandler,Path.Combine(temp,"observation"))) {
-    await observationService.Generate("metrics","汐澜",metricDay,prefs,"test",CancellationToken.None);
+    await observationService.Generate("metrics","示例市",metricDay,prefs,"test",CancellationToken.None);
     Aggregator.Sample(metricDay,"population","人口","人",120,"11:00");
-    var sameFacts=await observationService.Generate("metrics","汐澜",metricDay,prefs,"",CancellationToken.None);
+    var sameFacts=await observationService.Generate("metrics","示例市",metricDay,prefs,"",CancellationToken.None);
     Check(sameFacts.LocalCache&&observationHandler.Calls==1,"仅有重复快照、不变的指标命中缓存");
     Aggregator.Sample(metricDay,"population","人口","人",140,"12:00");
-    await observationService.Generate("metrics","汐澜",metricDay,prefs,"test",CancellationToken.None);Check(observationHandler.Calls==2,"指标实际变化使缓存失效，无操作也能按变化编报");
+    await observationService.Generate("metrics","示例市",metricDay,prefs,"test",CancellationToken.None);Check(observationHandler.Calls==2,"指标实际变化使缓存失效，无操作也能按变化编报");
     var largeDay=new DayLog{Day="2027-01-13"};for(int i=0;i<601;i++)Aggregator.Add(largeDay,"城市实况","设施"+i,"10:00");
-    await observationService.Generate("all","汐澜",largeDay,prefs,"test",CancellationToken.None);
+    await observationService.Generate("all","示例市",largeDay,prefs,"test",CancellationToken.None);
     var allInput=Newtonsoft.Json.Linq.JObject.Parse((string)Newtonsoft.Json.Linq.JObject.Parse(observationHandler.Last)["messages"][1]["content"]);
     Check(allInput["actions"].Count()==1&&(int)allInput["actions"][0]["Count"]==601&&largeDay.Actions.Count==601,"同类建筑素材归并发送，完整原始记录留在本地");
    }
@@ -94,7 +94,7 @@ class Program {
    var reloadedHistory=JsonConvert.DeserializeObject<SaveState>(JsonConvert.SerializeObject(emptyHistory));
    Check(!GameCalendar.IsVisibleIssue(reloadedHistory,"2021-01-06","2027-01-12")&&GameCalendar.IsVisibleIssue(reloadedHistory,"2021-01-07","2027-01-12"),"空日期已误生成的报纸隐藏且标记随存档保留，不删除本地归档");
    Check(GameCalendar.IsVisibleIssue(reloadedHistory,"2021-01-06","2021-01-06"),"实际读取到同日期的早期城市时允许正常阅读");
-   bool invalidDayRejected=false;try{await service.Generate("invalid-day","汐澜",new DayLog{Day="0001-01-01"},prefs,"test",CancellationToken.None);}catch(InvalidOperationException){invalidDayRejected=true;}
+   bool invalidDayRejected=false;try{await service.Generate("invalid-day","示例市",new DayLog{Day="0001-01-01"},prefs,"test",CancellationToken.None);}catch(InvalidOperationException){invalidDayRejected=true;}
    Check(invalidDayRejected&&handler.Calls==0,"无效日期不会发起 API 请求或生成报纸");
    var uneven=new[]{new Article{Title="A",Body=new string('a',500)},new Article{Title="B",Body=new string('b',100)},new Article{Title="C",Body=new string('c',100)},new Article{Title="D",Body=new string('d',100)}};
    var columns=PaperLayout.Group(uneven);
@@ -106,14 +106,14 @@ class Program {
    Check(EditorialPolicy.Upgrade(previousPreferences)&&previousPreferences.Editorial==EditorialPolicy.Default,"新闻价值筛选方针升级为专业日报措辞");
    var customPreferences=new Preferences{Editorial="我的自定义方针"};
    Check(!EditorialPolicy.Upgrade(customPreferences)&&customPreferences.Editorial=="我的自定义方针","保留玩家自定义编辑方针");
-   var paper=await service.Generate("a","汐澜",log,prefs,"test",CancellationToken.None);
-   Check(paper.Name=="汐澜日报"&&paper.CacheHitTokens==128,"自动报头与服务端缓存用量");
-   paper=await service.Generate("a","汐澜",log,prefs,"",CancellationToken.None);
+   var paper=await service.Generate("a","示例市",log,prefs,"test",CancellationToken.None);
+   Check(paper.Name=="示例市日报"&&paper.CacheHitTokens==128,"自动报头与服务端缓存用量");
+   paper=await service.Generate("a","示例市",log,prefs,"",CancellationToken.None);
    Check(paper.LocalCache&&handler.Calls==1,"相同事实命中本地缓存且无需密钥");
-   prefs.CustomName="市民时报";await service.Generate("a","汐澜",log,prefs,"test",CancellationToken.None);Check(handler.Calls==2,"改报头使缓存失效");
-   prefs.Editorial+=" 精简篇幅";await service.Generate("a","汐澜",log,prefs,"test",CancellationToken.None);Check(handler.Calls==3,"编辑方针变化使缓存失效");
-   await service.Generate("b","汐澜",log,prefs,"test",CancellationToken.None);Check(handler.Calls==4,"存档缓存隔离");
-   handler.Invalid=true;var repaired=await service.Generate("bad","汐澜",log,prefs,"test",CancellationToken.None);
+   prefs.CustomName="市民时报";await service.Generate("a","示例市",log,prefs,"test",CancellationToken.None);Check(handler.Calls==2,"改报头使缓存失效");
+   prefs.Editorial+=" 精简篇幅";await service.Generate("a","示例市",log,prefs,"test",CancellationToken.None);Check(handler.Calls==3,"编辑方针变化使缓存失效");
+   await service.Generate("b","示例市",log,prefs,"test",CancellationToken.None);Check(handler.Calls==4,"存档缓存隔离");
+   handler.Invalid=true;var repaired=await service.Generate("bad","示例市",log,prefs,"test",CancellationToken.None);
    Check(repaired!=null&&repaired.Articles!=null,"模型结构无效时自动整理已确认事实，不因结构错误拒刊");
    var root=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../"));
    if(!coreOnly)using(var binary=File.OpenRead(Path.Combine(root,"bin/Release/net48/CityPress.dll")))
@@ -124,7 +124,7 @@ class Program {
    }
    Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory,"Templates"));File.Copy(Path.Combine(root,"Templates/newspaper.docx"),Path.Combine(AppContext.BaseDirectory,"Templates/newspaper.docx"),true);
    DocxExporter.TemplatePath=Path.Combine(root,"Templates/newspaper.docx");
-   var output=Path.Combine(root,"artifacts/sample/汐澜日报.docx");DocxExporter.Save(output,paper);
+   var output=Path.Combine(root,"artifacts/sample/示例市日报.docx");DocxExporter.Save(output,paper);
    using(var zip=ZipFile.OpenRead(output)){using var reader=new StreamReader(zip.GetEntry("word/document.xml").Open());var xml=reader.ReadToEnd();Check(xml.Contains("城区建设持续推进")&&!xml.Contains("{{"),"Word 使用模板排版并替换示例正文");}
    // Reproduce the game's actual Assembly.Load(byte[]) behavior, not the
    // normal on-disk test assembly that hid the empty-location regression.
