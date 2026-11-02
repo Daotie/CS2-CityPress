@@ -3,7 +3,7 @@
 <h1 align="center">CityPress</h1>
 <p align="center">A daily newspaper generated from a living <strong>Cities: Skylines II</strong> city.</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.12-00a8bb" alt="0.2.0-beta.12">
+ <img src="https://img.shields.io/badge/version-0.2.0--beta.13-00a8bb" alt="0.2.0-beta.13">
  <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta prerelease">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
@@ -13,7 +13,7 @@ CityPress is a Cities: Skylines II mod that turns a city's recorded activity and
 
 The base game exposes city information through statistics panels and event notifications, but it has no newspaper, editorial selection, issue archive or exportable record. CityPress adds that layer without changing city-management rules.
 
-**Status:** the current source version is `0.2.0-beta.12` (prerelease). Published builds are listed on the [Releases](https://github.com/Daotie/CS2-CityPress/releases) page. The mod is under active development; save data is versioned additively, but APIs, prompts and generated layouts may change between betas. See [release notes](RELEASE_NOTES.md) for the current validation scope.
+**Status:** the current source version is `0.2.0-beta.13` (prerelease). Published builds are listed on the [Releases](https://github.com/Daotie/CS2-CityPress/releases) page. The mod is under active development; save data is versioned additively, but APIs, prompts and generated layouts may change between betas. See [release notes](RELEASE_NOTES.md) for the current validation scope.
 
 ## Features
 

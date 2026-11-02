@@ -1,13 +1,13 @@
-# CityPress 0.2.0-beta.12
+# CityPress 0.2.0-beta.13
 
-- **长评论明确写进主提示词。** 有足够重大事件素材时，本次生成就要给出完整长评，目标700至1400字、包含分层小标题，不再指望玩家自己追加要求。长评最低验收提高至500字。
-- **审校直接修稿。** 发送完整编号稿件，允许补稿、扩写、合并和删稿；缺长评先交给审校补写，修订后重新核实事实、组织版面。仍不足才进入有次数限制的独立评论补写。修订记录、缓存与Word归档保留。
-- **修复书法报头资源加载。** 游戏拒绝原来的内嵌字体地址，现改为随包加载的独立TTF资源。报头仍为可自定义文字，支持城市名与任意自定义报纸名。
+漏稿先补稿，合格内容照常发行。
 
-已通过离线核心回归与浏览器预览；打包时另核对游戏程序集与界面回调。未使用玩家付费API。游戏内字体实际效果和真实模型生成仍需重启后验收。
+- 审校先按缺项补写；若模型仍漏报已确认的新线运营或数值突破，本地事实工具自动补成简讯，再分版和核实，不再因漏项拒刊。
+- 长评补写经过有限重试仍失败时，发行合格新闻，保留缺项审校记录，不伪造观点或用无关段落凑字。缺长评的稿件不锁入完整成稿缓存，可继续补齐。
+- 无效、截断的模型正文自动转入事实补稿；无用或无法核实的稿件清理后，用已确认的本地材料完成发行。关闭可选审校也不会关闭已确认事实的补漏。
 
-安装后重启游戏。新编辑规则需重新生成报纸，仅重新导出不会改写历史正文。原有设置、密钥、存档与本地报纸不变。
+离线回归覆盖漏报新线、长评补写失败、全部原稿不合格、关闭可选审校及模型结构错误/截断。安装后重启游戏；新规则需重新生成报纸。未调用玩家付费API。
 
 ## English
 
-The primary prompt now requests a complete long opinion immediately. Review can add, expand, merge and delete copy using the complete numbered manuscript before final acceptance, with factual rechecking and bounded specialist fallback. Accepted long opinions require at least 500 characters; the requested target remains 700–1400. The calligraphy font now loads as a mounted TTF resource instead of a Cohtml-rejected data URI, preserving editable custom mastheads. Restart and regenerate to apply editorial changes. Native game rendering and live provider output still need acceptance; no paid player API was used.
+Missing content now triggers repair instead of vetoing publication. After model review, verified transit openings and milestones are supplemented using local factual briefs. Accepted news is published even when opinion retries are exhausted, with quality records retained and incomplete editions excluded from the complete-draft cache. Invalid/truncated model manuscripts and unsafe drafts recover using confirmed material. No facts or long opinions are fabricated. Restart and regenerate; no paid player API was used.

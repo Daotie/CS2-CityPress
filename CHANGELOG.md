@@ -1,5 +1,12 @@
 # Changelog / 更新日志
 
+## 0.2.0-beta.13
+
+- Replace missing-content publication vetoes with automatic repair. Review still edits first; verified transit openings and milestones omitted afterward are supplied by local factual briefs.
+- Publish accepted news when commentary repair is exhausted. Keep missing-opinion quality records and leave incomplete editions out of the complete-draft cache so regeneration can finish them.
+- Recover invalid/truncated model manuscripts using verified local material, clear unsafe copy and replan/recheck the final issue. No fabricated long opinions or operational facts are inserted to pass checks.
+- Cover missing transit with optional review disabled, failed commentary, all-unsafe drafts and truncated/invalid model output in offline regression checks.
+
 ## 0.2.0-beta.12
 
 - Require a complete long commentary in the initial generation prompt. Review receives the complete numbered manuscript and can add, expand, merge and remove articles before publication checks; repaired copy is rechecked and replanned.
