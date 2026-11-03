@@ -179,7 +179,7 @@ This project uses AI-assisted development tools to support code analysis, debugg
 
 CityPress source code, newspaper template and branding are licensed under [GPL-3.0-only](LICENSE), copyright (c) 2026 Daotie and contributors. Bundled and referenced dependencies retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md).
 
-The project is not affiliated with Colossal Order, Paradox Interactive, Unity, Cohtml or any API provider. No Paradox Mods listing is claimed.
+The project is not affiliated with Colossal Order, Paradox Interactive, Unity, Cohtml or any API provider.
 
 ## Author and maintenance
 

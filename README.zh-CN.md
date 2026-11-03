@@ -179,7 +179,7 @@ CityPress 在设计上避免在模拟关键路径上集中执行重任务：
 
 CityPress 的源码、报纸模板与标志以 [GPL-3.0-only](LICENSE) 发布，版权归 Daotie 及贡献者所有。随包或引用的依赖遵循各自许可证，详见[第三方声明](THIRD_PARTY_NOTICES.md)。
 
-本项目与 Colossal Order、Paradox Interactive、Unity、Cohtml 或任何 API 服务商无官方隶属关系，也不声称已上架 Paradox Mods。
+本项目与 Colossal Order、Paradox Interactive、Unity、Cohtml 或任何 API 服务商无官方隶属关系。
 
 ## 作者与维护
 
