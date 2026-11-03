@@ -3,9 +3,9 @@
 <h1 align="center">CityPress</h1>
 <p align="center">A daily newspaper generated from a living <strong>Cities: Skylines II</strong> city.</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.14-00a8bb" alt="0.2.0-beta.14">
+ <img src="https://img.shields.io/badge/version-1.0.0-00a8bb" alt="1.0.0">
  <img src="https://img.shields.io/badge/languages-English%20%7C%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-00a8bb" alt="English and Simplified Chinese">
- <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta prerelease">
+ <img src="https://img.shields.io/badge/status-stable-1976d2" alt="Stable release">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
 <p align="center"><a href="https://github.com/Daotie/CS2-CityPress/releases">Releases</a> · <a href="https://github.com/Daotie/CS2-CityPress/issues">Issues</a> · <a href="CHANGELOG.md">Changelog</a> · <a href="SECURITY.md">Privacy and security</a></p>
@@ -14,7 +14,7 @@ CityPress is a Cities: Skylines II mod that turns a city's recorded activity and
 
 The base game exposes city information through statistics panels and event notifications, but it has no newspaper, editorial selection, issue archive or exportable record. CityPress adds that layer without changing city-management rules.
 
-**Status:** the current source version is `0.2.0-beta.14` (prerelease). Published builds are listed on the [Releases](https://github.com/Daotie/CS2-CityPress/releases) page. The mod is under active development; save data is versioned additively, but APIs, prompts and generated layouts may change between betas. See [release notes](RELEASE_NOTES.md) for the current validation scope.
+**Version:** `1.0.0`, the first stable release. Published builds are listed on the [Releases](https://github.com/Daotie/CS2-CityPress/releases) page. Existing save data and archived issues remain readable. See [release notes](RELEASE_NOTES.md) for the actual validation scope.
 
 ## Features
 
@@ -167,6 +167,10 @@ No frame-rate benchmark or fixed performance guarantee is claimed. Actual impact
 ## AI-assisted development
 
 This project uses AI-assisted development tools to support code analysis, debugging, documentation drafting, and development workflow tasks. AI-generated suggestions are reviewed, edited and validated as part of the development process; they are not accepted as finished work without checking.
+
+## Thank you
+
+Thank you for using CityPress and for sharing your feedback, bug reports and newspapers. If you enjoy this mod, you can also check out my other mods, including [RouteFilter on Paradox Mods](https://mods.paradoxplaza.com/mods/155839/Windows), which lets you control access by individual vehicle asset on roads and railways in Cities: Skylines II. Its [source and documentation](https://github.com/Daotie/CS2-RouteFilter) are available on GitHub.
 
 The project direction, architecture, feature decisions, test strategy, release decisions and ongoing maintenance remain the responsibility of the project author. AI tools are not project authors, maintainers or credited contributors.
 

@@ -1,10 +1,10 @@
 # CityPress 城市日报
 
-都市：天际线 II 新闻模组，开发版 0.2.0-beta.14。已针对游戏程序集编译；尚未完成完整游戏内验收，不保证覆盖所有玩家动作。安装新版本后必须退出并重启游戏，内存中已加载的旧程序集不会自动更新。
+都市：天际线 II 新闻模组，1.0.0。已针对游戏程序集编译；尚未完成完整游戏内验收，不保证覆盖所有玩家动作。安装新版本后必须退出并重启游戏，内存中已加载的旧程序集不会自动更新。
 
 ## 使用
 
-解压 `dist/CityPress-0.2.0-beta.14.zip` 全部内容到 `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\Mods\CityPress`，在本地模组环境启用。不要只复制 DLL，界面资源和 Templates 目录也必须安装。发行包不自动安装、不修改游玩集。
+解压 `dist/CityPress-1.0.0.zip` 全部内容到 `%USERPROFILE%\AppData\LocalLow\Colossal Order\Cities Skylines II\Mods\CityPress`，在本地模组环境启用。不要只复制 DLL，界面资源和 Templates 目录也必须安装。发行包不自动安装、不修改游玩集。
 
 进入城市后点左侧报纸按钮，打开“编辑部设置”，设置兼容 API 地址、模型和密钥后保存；初始默认 DeepSeek。官方 DeepSeek 地址也支持启动前设置 `DEEPSEEK_API_KEY`。密钥不会出现在城市存档、日志或界面状态回传中，输入框不会回显已保存密钥。
 

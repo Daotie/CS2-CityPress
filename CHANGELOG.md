@@ -1,5 +1,21 @@
 # Changelog / 更新日志
 
+## 1.0.0 — 2026-11-03
+
+### English
+
+- First stable release of the existing city observation, editorial selection, newspaper reading, archive and editable Word export workflow; manual generation remains the default, with optional daily publication.
+- Retain the Beta fixes for editorial repair, themed continuation editions, commentary, bilingual UI and recovery from locked or unavailable export locations. Existing save data and archived newspapers remain compatible.
+- Synchronize backend, UI, mod metadata and documentation at 1.0.0. Add a closing thank-you and a verified RouteFilter link to both introductions.
+- The version designation does not extend the recorded validation scope; native in-game rendering and live provider output still require player acceptance.
+
+### 简体中文
+
+- 将现有城市观测、素材筛选、新闻编辑、游戏内阅读、历史归档与可编辑 Word 导出流程发布为首个正式版。默认手动生成，可选每日自动发行。
+- 保留 Beta 阶段的补稿与审校、专题续版、评论、双语界面，以及文件占用或导出目录不可用时的恢复逻辑。沿用已有存档数据和历史报纸格式。
+- 后端、界面、模组元数据及文档统一为 1.0.0；中英文介绍末尾加入感谢与已核实的 RouteFilter 链接。
+- 正式版本号不扩大实际验收范围；原生游戏内渲染与真实服务生成效果仍需玩家验收。
+
 ## 0.2.0-beta.14
 
 - Archive generated JSON before Word export. If an existing Word file cannot be replaced, save a uniquely named copy; redirect an unavailable export location to the local issue archive.

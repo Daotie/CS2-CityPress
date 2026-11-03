@@ -3,9 +3,9 @@
 <h1 align="center">CityPress 城市日报</h1>
 <p align="center">把《都市：天际线 II》的城市运行编辑成一份每日报纸。</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-0.2.0--beta.14-00a8bb" alt="0.2.0-beta.14">
+ <img src="https://img.shields.io/badge/version-1.0.0-00a8bb" alt="1.0.0">
  <img src="https://img.shields.io/badge/languages-English%20%7C%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-00a8bb" alt="English and Simplified Chinese">
- <img src="https://img.shields.io/badge/status-beta-orange" alt="Beta 预发行">
+ <img src="https://img.shields.io/badge/status-stable-1976d2" alt="正式版">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
 </p>
 <p align="center"><a href="https://github.com/Daotie/CS2-CityPress/releases">下载</a> · <a href="https://github.com/Daotie/CS2-CityPress/issues">问题反馈</a> · <a href="CHANGELOG.md">更新日志</a> · <a href="SECURITY.md">隐私与安全</a></p>
@@ -14,7 +14,7 @@ CityPress 是一个《都市：天际线 II》模组。它观察城市中实际�
 
 原版游戏通过统计面板和事件提示展示城市信息，但没有报纸、选题、往期档案或可导出的刊物。CityPress 补上这层编辑与出版能力，不改变城市管理的核心规则。
 
-**当前状态：** 当前源码版本为 `0.2.0-beta.14`（预发行），已发布构建见[下载页](https://github.com/Daotie/CS2-CityPress/releases)。项目仍在持续开发，存档数据采用向后兼容的追加字段，但接口、提示词和生成版面可能在 Beta 之间调整。实际验证范围见[版本说明](RELEASE_NOTES.md)。
+**当前版本：** `1.0.0`，首个正式版。已发布构建见[下载页](https://github.com/Daotie/CS2-CityPress/releases)，已有存档数据和历史报纸可继续读取。实际验证范围见[版本说明](RELEASE_NOTES.md)。
 
 ## 功能
 
@@ -167,6 +167,10 @@ CityPress 在设计上避免在模拟关键路径上集中执行重任务：
 ## AI 辅助开发
 
 本项目在开发过程中使用 AI 辅助工具，主要用于代码分析与排查、调试、文档整理和开发流程协助。工具生成的建议会经过检查、修改和测试后才进入项目，不会未经核实直接作为完成结果。
+
+## 感谢
+
+感谢你使用 CityPress，也感谢每一位分享建议、反馈问题和展示城市报纸的玩家。如果你喜欢这个 Mod，也可以看看我的其他 Mod，例如 [RouteFilter（Paradox Mods）](https://mods.paradoxplaza.com/mods/155839/Windows)：为《都市：天际线 II》的道路与轨道提供逐车辆资产通行限制。它的[源码与使用说明](https://github.com/Daotie/CS2-RouteFilter)也已在 GitHub 公开。
 
 项目方向、架构、功能取舍、测试策略、发布决定和后续维护由项目作者负责。AI 工具不是项目作者、维护者或署名贡献者。
 
