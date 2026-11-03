@@ -69,7 +69,9 @@ The language model writes prose; the mod decides structure, validates facts and 
 
 ## Installation
 
-CityPress installs as a local mod. It is not distributed through Steam Workshop or Paradox Mods.
+Subscribe to [CityPress on Paradox Mods](https://mods.paradoxplaza.com/mods/166126/Windows) and enable it in your active playset. Restart the game if prompted.
+
+For manual installation:
 
 1. Download the complete `CityPress-<version>.zip` from [Releases](https://github.com/Daotie/CS2-CityPress/releases). Do not use GitHub's automatically generated source ZIP as an install package.
 2. Close the game.
@@ -181,7 +183,7 @@ The project direction, architecture, feature decisions, test strategy, release d
 
 CityPress source code, newspaper template and branding are licensed under [GPL-3.0-only](LICENSE), copyright (c) 2026 Daotie and contributors. Bundled and referenced dependencies retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md).
 
-The project is not affiliated with Colossal Order, Paradox Interactive, Unity, Cohtml or any API provider. No Paradox Mods listing is claimed.
+The project is not affiliated with Colossal Order, Paradox Interactive, Unity, Cohtml or any API provider.
 
 ## Author and maintenance
 
