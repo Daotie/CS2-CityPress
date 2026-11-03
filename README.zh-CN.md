@@ -69,7 +69,9 @@ CityPress 是一个《都市：天际线 II》模组。它观察城市中实际�
 
 ## 安装
 
-CityPress 以本地模组形式安装，不通过 Steam 创意工坊或 Paradox Mods 分发。
+在 [Paradox Mods](https://mods.paradoxplaza.com/mods/166126/Windows) 订阅 CityPress 并加入当前播放集；如有提示，请重启游戏。
+
+手动安装：
 
 1. 从 [Releases](https://github.com/Daotie/CS2-CityPress/releases) 下载完整的 `CityPress-<版本>.zip`。不要把 GitHub 自动生成的源码包当作安装包。
 2. 关闭游戏。
@@ -181,7 +183,7 @@ CityPress 在设计上避免在模拟关键路径上集中执行重任务：
 
 CityPress 的源码、报纸模板与标志以 [GPL-3.0-only](LICENSE) 发布，版权归 Daotie 及贡献者所有。随包或引用的依赖遵循各自许可证，详见[第三方声明](THIRD_PARTY_NOTICES.md)。
 
-本项目与 Colossal Order、Paradox Interactive、Unity、Cohtml 或任何 API 服务商无官方隶属关系，也不声称已上架 Paradox Mods。
+本项目与 Colossal Order、Paradox Interactive、Unity、Cohtml 或任何 API 服务商无官方隶属关系。
 
 ## 作者与维护
 
