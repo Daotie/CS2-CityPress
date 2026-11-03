@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
- <PropertyGroup><TargetFramework>net48</TargetFramework><LangVersion>latest</LangVersion><AssemblyName>CityPress</AssemblyName><Version>1.0.0</Version><FileVersion>1.0.0.0</FileVersion><AssemblyVersion>1.0.0.0</AssemblyVersion><EnableDefaultCompileItems>false</EnableDefaultCompileItems><PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression><Authors>Daotie</Authors><RepositoryUrl>https://github.com/Daotie/CS2-CityPress</RepositoryUrl></PropertyGroup>
+ <PropertyGroup><TargetFramework>net48</TargetFramework><LangVersion>latest</LangVersion><AssemblyName>CityPress</AssemblyName><Version>1.0.1</Version><FileVersion>1.0.1.0</FileVersion><AssemblyVersion>1.0.0.0</AssemblyVersion><EnableDefaultCompileItems>false</EnableDefaultCompileItems><PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression><Authors>Daotie</Authors><RepositoryUrl>https://github.com/Daotie/CS2-CityPress</RepositoryUrl></PropertyGroup>
  <PropertyGroup><EnableDefaultItems>false</EnableDefaultItems></PropertyGroup>
  <Target Name="CheckGameReferences" BeforeTargets="ResolveReferences"><Error Condition="!Exists('$(ManagedPath)\Game.dll')" Text="Game.dll not found. Set CSII_MANAGED_PATH or pass -p:ManagedPath=... to your own game's Cities2_Data/Managed directory."/></Target>
  <ItemGroup><Compile Include="Mod.cs;Core\*.cs;Systems\*.cs"/><Reference Include="System.Security"/><Reference Include="System.Net.Http"/><Reference Include="System.IO.Compression"/><Reference Include="System.IO.Compression.FileSystem"/><Reference Include="System.Xml.Linq"/>
  <EmbeddedResource Include="Templates\newspaper.docx" LogicalName="CityPress.Templates.newspaper.docx"/>
- <EmbeddedResource Include="Resources\paper-layout.json" LogicalName="CityPress.paper-layout.json"/>
+  <EmbeddedResource Include="Resources\paper-layout.json" LogicalName="CityPress.paper-layout.json"/>
+  <EmbeddedResource Include="lang\*.json" LogicalName="CityPress.lang.%(Filename).json"/>
  <Reference Include="Colossal.IO.AssetDatabase"><HintPath>$(ManagedPath)\Colossal.IO.AssetDatabase.dll</HintPath><Private>false</Private></Reference>
  <Reference Include="Unity.Mathematics"><HintPath>$(ManagedPath)\Unity.Mathematics.dll</HintPath><Private>false</Private></Reference>
  <Reference Include="Colossal.Mathematics"><HintPath>$(ManagedPath)\Colossal.Mathematics.dll</HintPath><Private>false</Private></Reference>

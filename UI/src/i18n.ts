@@ -30,8 +30,8 @@ export interface I18n {
 // renders raw translation ids.
 export function useI18n():I18n {
  const {translate}=useLocalization();
- const sample=translate('Common.YES','Yes')||'Yes';
- const isChinese=/[\u4e00-\u9fff]/.test(sample);
+ const locale=translate('CityPress.Locale','en-US')||'en-US';
+ const isChinese=locale.toLowerCase().startsWith('zh');
  const dict=isChinese?zh:en;
  const tr=(key:string,...args:Array<string|number>)=>{
   const fallback=dict[key];

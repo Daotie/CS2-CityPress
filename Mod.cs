@@ -10,7 +10,8 @@ namespace CityPress {
  public sealed class Mod : IMod {
   public static readonly ILog Log=LogManager.GetLogger("CityPress").SetShowsErrorsInUI(false);
   public void OnLoad(UpdateSystem update) {
-   Log.Info("CityPress 1.0.0 loaded (gameplay bindings, world observations, city statistics)");
+   Log.Info("CityPress 1.0.1 loaded (gameplay bindings, world observations, city statistics)");
+   CityPressLocalization.Register();
    try {
     if(GameManager.instance.modManager.TryGetExecutableAsset(this,out var asset)&&!string.IsNullOrEmpty(asset.path))
      DocxExporter.TemplatePath=Path.Combine(Path.GetDirectoryName(asset.path),"Templates","newspaper.docx");

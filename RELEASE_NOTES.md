@@ -1,33 +1,27 @@
-# CityPress 1.0.0
-
-CityPress 城市日报首个正式版：把《都市：天际线 II》中实际记录到的城市变化，整理成可在游戏内阅读、归档并导出为 Word 的报纸。
-
-- 采集城市操作与统计，在本地归并重复素材、过滤噪声，再交由玩家配置的 Chat Completions 兼容服务写作。
-- 按内容组织要闻、专题与评论版，支持审校补稿、专题续版、往期阅读及自定义报纸名称。
-- 默认手动生成，可选每日自动发行；界面支持简体中文与英文，报纸正文语言由编辑方针决定。
-- 保存失败时保留游戏内成稿；Word 文件被占用时另存副本，导出目录不可用时回退至本地归档，可手动重试导出而不重新调用 API。
-- 版本元数据统一为 1.0.0，沿用现有存档与报纸格式；Beta 历史更新见 [CHANGELOG.md](CHANGELOG.md)。
-
-安装与升级：从 [GitHub Releases](https://github.com/Daotie/CS2-CityPress/releases) 下载完整安装包，关闭游戏后替换整个 CityPress 模组目录，再重新启动。GitHub 发布不代表已上架 Paradox Mods。
-
-验证结果：C# Release 编译无警告、无错误；232 项回归检查、5 项实际游戏回调检查、界面类型检查及构建通过，运行依赖审计未发现漏洞。界面构建保留两项资源体积提示。以上属于离线验证；原生游戏内显示、真实存档运行和真实服务生成效果仍需玩家验收，本次未调用玩家付费 API。
+# CityPress 1.0.1
 
 ## English
 
-The first stable CityPress release turns recorded Cities: Skylines II activity into themed newspapers for in-game reading, local archives and editable Word export.
+- New publishing thumbnail: the in-game newspaper icon, deep blue background and CityPress name.
+- Register the English and Simplified Chinese dictionaries with the game and select the interface fallback through an explicit language ID.
+- Add a complete English editorial policy. Built-in policies follow game-language changes; custom policies remain intact, including after save/load. All generation, commentary and repair requests receive the selected policy.
+- Refresh the bilingual Paradox Mods introduction, game compatibility (1.6.*) and links to the author's other mods. Existing saved issues remain readable.
 
-- Observe city activity and statistics, group duplicate material and filter noise locally before requesting copy from the player's configured Chat Completions-compatible service.
-- Organize front news, themed continuation editions and commentary, with editorial review and repair, custom newspaper names and historical issue reading.
-- Generate manually by default, with optional daily publication. The UI supports English and Simplified Chinese; editorial policy controls the language of the newspaper itself.
-- Keep completed copy visible when saving fails. Locked Word files receive a new copy; unavailable export folders fall back to the local archive. Retry export without another API request.
-- Align all current version metadata at 1.0.0 while preserving existing save and issue formats. Historical Beta changes remain in [CHANGELOG.md](CHANGELOG.md).
+Validation: 239 offline regression checks and five gameplay-callback checks passed; C# Release builds with zero warnings/errors. UI type checking and build pass; runtime audit reports zero vulnerabilities. Native in-game acceptance remains separate.
 
-Download the full install archive from [GitHub Releases](https://github.com/Daotie/CS2-CityPress/releases), close the game, replace the complete mod folder and restart. A GitHub release does not imply a Paradox Mods listing.
+Subscribe to [CityPress on Paradox Mods](https://mods.paradoxplaza.com/mods/166126/Windows), or install the full GitHub archive with the game closed, then restart.
 
-Validation: C# Release builds with zero warnings and errors; 232 regression checks, five actual game-callback checks, UI type checking and UI build pass. The runtime dependency audit reports zero vulnerabilities. Two UI asset-size warnings remain. These are offline checks; native rendering, live-save behavior and real provider output still require in-game acceptance. No paid player API was used for this release work.
+## 简体中文
+
+- 发布缩略图换为游戏内现有报纸图标、深蓝背景和 CityPress 名称。
+- 向游戏注册英文与简体中文词条，通过明确语言 ID 选择界面回退文案。
+- 新增完整英文编辑方针；内置方针跟随游戏语言切换，自定义方针在切换、保存与读档后保持不变。生成、评论与补稿请求均使用所选方针。
+- 更新中英文 PMod 介绍、支持游戏版本（1.6.*）和作者其他模组链接；原有报纸可继续读取。
+
+在 [Paradox Mods](https://mods.paradoxplaza.com/mods/166126/Windows) 订阅，或关闭游戏后安装 GitHub 完整安装包，再重新启动游戏。
 
 ## Thank you / 感谢
 
-感谢你使用 CityPress，也感谢每一位提出建议、反馈问题和分享报纸的玩家。如果你喜欢这个 Mod，也可以看看我的其他 Mod：[RouteFilter（Paradox Mods）](https://mods.paradoxplaza.com/mods/155839/Windows)，为《都市：天际线 II》的道路与轨道提供逐车辆资产通行限制；[源码与使用说明](https://github.com/Daotie/CS2-RouteFilter)见 GitHub。
+Thank you for using CityPress. If you enjoy it, explore [my other mods](https://mods.paradoxplaza.com/authors/Firetomcat302/cities_skylines_2), including [RouteFilter](https://mods.paradoxplaza.com/mods/155839/Windows).
 
-Thank you for using CityPress and sharing your feedback, bug reports and newspapers. If you enjoy this mod, you can also check out my other mods, including [RouteFilter on Paradox Mods](https://mods.paradoxplaza.com/mods/155839/Windows), for individual vehicle-asset restrictions on roads and railways in Cities: Skylines II. Its [source and documentation](https://github.com/Daotie/CS2-RouteFilter) are on GitHub.
+感谢你使用 CityPress！如果你喜欢这个 Mod，也可以看看[我的其他 Mod](https://mods.paradoxplaza.com/authors/Firetomcat302/cities_skylines_2)，例如 [RouteFilter](https://mods.paradoxplaza.com/mods/155839/Windows)。

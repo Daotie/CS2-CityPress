@@ -156,5 +156,6 @@
   "CityPress.Error.ApiTruncated": "The newspaper was not generated completely. Increase the output limit or shorten the editorial policy and retry.",
   "CityPress.Status.ExportDeferred": "Newspaper ready to read. Some files could not be saved; use Export to retry.",
   "CityPress.Status.ExportRenamed": "Newspaper saved. The existing Word file could not be replaced; a new copy was saved.",
-  "CityPress.Status.ExportRedirected": "Newspaper ready. The export directory was unavailable; saved to: {0}"
+  "CityPress.Status.ExportRedirected": "Newspaper ready. The export directory was unavailable; saved to: {0}",
+  "CityPress.Locale": "en-US"
 }

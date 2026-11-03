@@ -11,7 +11,7 @@ namespace CityPress.Core {
  public sealed class Preferences {
   public bool AutoGenerate;
   public string CustomName = "";
-  public string Editorial = EditorialPolicy.Default;
+  public string Editorial = EditorialPolicy.ForLocale(I18n.ActiveLocale);
   public string Model = "deepseek-chat";
   public string ExportDirectory = "";
   public string ApiEndpoint=ApiOptions.DefaultEndpoint;

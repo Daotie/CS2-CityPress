@@ -1,9 +1,9 @@
 <p align="center"><strong>English</strong> · <a href="README.zh-CN.md">简体中文</a></p>
-<p align="center"><img src="assets/branding/citypress.svg" width="120" alt="CityPress newspaper icon"></p>
+<p align="center"><img src="assets/branding/thumbnail.png" width="160" alt="CityPress newspaper icon"></p>
 <h1 align="center">CityPress</h1>
 <p align="center">A daily newspaper generated from a living <strong>Cities: Skylines II</strong> city.</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-1.0.0-00a8bb" alt="1.0.0">
+ <img src="https://img.shields.io/badge/version-1.0.1-00a8bb" alt="1.0.1">
  <img src="https://img.shields.io/badge/languages-English%20%7C%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-00a8bb" alt="English and Simplified Chinese">
  <img src="https://img.shields.io/badge/status-stable-1976d2" alt="Stable release">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
@@ -14,7 +14,7 @@ CityPress is a Cities: Skylines II mod that turns a city's recorded activity and
 
 The base game exposes city information through statistics panels and event notifications, but it has no newspaper, editorial selection, issue archive or exportable record. CityPress adds that layer without changing city-management rules.
 
-**Version:** `1.0.0`, the first stable release. Published builds are listed on the [Releases](https://github.com/Daotie/CS2-CityPress/releases) page. Existing save data and archived issues remain readable. See [release notes](RELEASE_NOTES.md) for the actual validation scope.
+**Version:** `1.0.1`, a maintenance update to the first stable release. Published builds are listed on the [Releases](https://github.com/Daotie/CS2-CityPress/releases) page. Existing save data and archived issues remain readable. See [release notes](RELEASE_NOTES.md) for the actual validation scope.
 
 ## Features
 
@@ -69,7 +69,7 @@ The language model writes prose; the mod decides structure, validates facts and 
 
 ## Installation
 
-CityPress installs as a local mod. It is not distributed through Steam Workshop or Paradox Mods.
+Subscribe to [CityPress on Paradox Mods](https://mods.paradoxplaza.com/mods/166126/Windows), add it to your active playset and restart the game. Manual installation from GitHub is also available:
 
 1. Download the complete `CityPress-<version>.zip` from [Releases](https://github.com/Daotie/CS2-CityPress/releases). Do not use GitHub's automatically generated source ZIP as an install package.
 2. Close the game.
@@ -89,14 +89,14 @@ To confirm which build loaded, check `%USERPROFILE%\AppData\LocalLow\Colossal Or
 5. Open the archive tab to read past issues or generate an issue for a recorded day.
 6. Use **Export current newspaper** to re-export the open issue without calling the API, and **Open export folder** to open the actual export directory.
 
-The interface and system messages follow the game language. English and Simplified Chinese are included; other languages fall back to English. Generated newspaper text follows the editorial policy, not the interface language; Word furniture follows the language detected in the newspaper itself. The in-game page navigation, archive rows and settings are documented in the [player guide](docs/USER_GUIDE.zh-CN.md) (Simplified Chinese).
+The interface and system messages follow the game language. English and Simplified Chinese are included; other languages fall back to English. Built-in English and Chinese editorial policies follow the interface language; custom policies and existing issues keep their text. Word furniture follows the language detected in the newspaper itself. The in-game page navigation, archive rows and settings are documented in the [player guide](docs/USER_GUIDE.zh-CN.md) (Simplified Chinese).
 
 ## Language support
 
 | Content | Language behavior |
 | --- | --- |
 | In-game controls, settings, archives, status and errors | Follows the game language; English and Simplified Chinese included, English fallback for other languages |
-| Newspaper stories and opinions | Follows editorial instructions and the model; changing UI language does not translate existing issues |
+| Newspaper stories and opinions | Built-in English/Chinese policy follows the UI; custom policies and existing issues keep their text |
 | Word dates and edition furniture | English/Chinese formatting selected from the issue’s detected content language |
 | Project documentation | [English](README.md) · [简体中文](README.zh-CN.md) |
 
@@ -128,7 +128,7 @@ API keys are stored per normalized endpoint, encrypted with Windows DPAPI for th
 ## Compatibility
 
 - **Platform:** Windows.
-- **Game version:** the current build is compiled against assemblies from Cities: Skylines II `1.6.3f1`; this is the only version used for local checks. Other game versions have not been verified.
+- **Game version:** Supports `1.6.*`. The current build is compiled against assemblies from Cities: Skylines II `1.6.3f1`; this is the only version used for local checks. Other game versions have not been verified.
 - **Runtime:** packaged as a `net48` game mod; Harmony 2.2.2 is bundled. The UI is built as a game UI module; React, React DOM and the UI runtime are supplied by the game.
 - **API protocol:** Chat Completions-compatible HTTP services. This is protocol compatibility, not native support for every provider-specific API.
 - **Save data:** the save envelope remains version 1 with additive fields. Existing installations and earlier issues remain readable.
@@ -167,12 +167,6 @@ No frame-rate benchmark or fixed performance guarantee is claimed. Actual impact
 ## AI-assisted development
 
 This project uses AI-assisted development tools to support code analysis, debugging, documentation drafting, and development workflow tasks. AI-generated suggestions are reviewed, edited and validated as part of the development process; they are not accepted as finished work without checking.
-
-## Thank you
-
-Thank you for using CityPress and for sharing your feedback, bug reports and newspapers. If you enjoy this mod, you can also check out my other mods, including [RouteFilter on Paradox Mods](https://mods.paradoxplaza.com/mods/155839/Windows), which lets you control access by individual vehicle asset on roads and railways in Cities: Skylines II. Its [source and documentation](https://github.com/Daotie/CS2-RouteFilter) are available on GitHub.
-
-The project direction, architecture, feature decisions, test strategy, release decisions and ongoing maintenance remain the responsibility of the project author. AI tools are not project authors, maintainers or credited contributors.
 
 ## Feedback and contributing
 
@@ -219,3 +213,9 @@ The public GitHub Actions workflow runs the offline core checks and the UI check
 - [Architecture](docs/ARCHITECTURE.md)
 - [Build and verification](docs/BUILD.md)
 - [Changelog](CHANGELOG.md) · [Release notes](RELEASE_NOTES.md)
+
+## Thank you
+
+Thank you for using CityPress and for sharing your feedback, bug reports and newspapers. If you enjoy this mod, you can also check out [my other mods](https://mods.paradoxplaza.com/authors/Firetomcat302/cities_skylines_2), including [RouteFilter on Paradox Mods](https://mods.paradoxplaza.com/mods/155839/Windows), which lets you control access by individual vehicle asset on roads and railways in Cities: Skylines II. Its [source and documentation](https://github.com/Daotie/CS2-RouteFilter) are available on GitHub.
+
+The project direction, architecture, feature decisions, test strategy, release decisions and ongoing maintenance remain the responsibility of the project author. AI tools are not project authors, maintainers or credited contributors.

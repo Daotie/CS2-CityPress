@@ -13,9 +13,26 @@ static class LocalizationTests {
  static void Check(bool ok,string message){if(!ok)throw new Exception(message);Console.WriteLine("PASS "+message);}
  static Dictionary<string,string> Load(string root,string locale)=>JsonConvert.DeserializeObject<Dictionary<string,string>>(File.ReadAllText(Path.Combine(root,"lang",locale+".json"),System.Text.Encoding.UTF8));
  public static void Run(string root) {
+  var previousLocale=I18n.ActiveLocale;
+  try {
+   I18n.ActiveLocale="en-US";
+   Check(new Preferences().Editorial==EditorialPolicy.English,"英文游戏的新设置采用完整英文编辑方针");
+   var inherited=new Preferences{Editorial=EditorialPolicy.Default};
+   Check(EditorialPolicy.Upgrade(inherited)&&inherited.Editorial==EditorialPolicy.English,"已有内置中文方针在切换英文时迁移");
+   I18n.ActiveLocale="zh-HANS";
+   Check(EditorialPolicy.Upgrade(inherited)&&inherited.Editorial==EditorialPolicy.Default,"切回中文恢复内置中文方针");
+   var custom=new Preferences{Editorial="Write a neighborhood newspaper; retain my custom focus."};
+   I18n.ActiveLocale="en-US";
+   Check(!EditorialPolicy.Upgrade(custom)&&custom.Editorial=="Write a neighborhood newspaper; retain my custom focus.","切换语言保留玩家自定义编辑方针");
+   var reloaded=JsonConvert.DeserializeObject<Preferences>(JsonConvert.SerializeObject(custom));
+   I18n.ActiveLocale="zh-HANS";
+   Check(!EditorialPolicy.Upgrade(reloaded)&&reloaded.Editorial==custom.Editorial,"自定义方针保存并重载后仍不被内置方针覆盖");
+  } finally {I18n.ActiveLocale=previousLocale;}
   var en=Load(root,"en-US");var zh=Load(root,"zh-HANS");
   Check(en.Count>100&&en.Keys.OrderBy(key=>key,StringComparer.Ordinal).SequenceEqual(zh.Keys.OrderBy(key=>key,StringComparer.Ordinal)),"中英文语言文件键一致且包含完整词条");
   Check(en.Keys.All(key=>key.StartsWith("CityPress.",StringComparison.Ordinal))&&en.Values.All(value=>!string.IsNullOrWhiteSpace(value)),"语言文件只包含 CityPress 命名空间且无空值");
+  Check(en["CityPress.Locale"]=="en-US"&&zh["CityPress.Locale"]=="zh-HANS","界面使用明确语言标识，不猜测原版按钮语言");
+  Check(en.Keys.All(key=>Regex.Matches(en[key],@"\{\d+\}").Cast<Match>().Select(m=>m.Value).OrderBy(x=>x).SequenceEqual(Regex.Matches(zh[key],@"\{\d+\}").Cast<Match>().Select(m=>m.Value).OrderBy(x=>x))),"中英文格式占位符逐条一致");
 
   var uiSource=File.ReadAllText(Path.Combine(root,"UI","src","index.tsx"));
   Check(!Regex.IsMatch(uiSource,"[\\u4e00-\\u9fff]"),"游戏内界面不再硬编码中文");

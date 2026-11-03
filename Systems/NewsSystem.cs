@@ -138,6 +138,13 @@ namespace CityPress.Systems {
   protected override void OnUpdate() {
    base.OnUpdate();
    if(DateTime.UtcNow<nextUi)return;nextUi=DateTime.UtcNow.AddMilliseconds(250);
+   var locale=Game.SceneFlow.GameManager.instance.localizationManager.activeLocaleId;
+   if(locale!=I18n.ActiveLocale){
+    I18n.ActiveLocale=locale;
+    EditorialPolicy.Upgrade(global);
+    if(EditorialPolicy.Upgrade(state.Override))dirty=true;
+    uiDirty=true;nextFullUi=default;
+   }
    // The city entity is not a named prefab. Rendering its label passes a null
    // localization key to NameSystem (and localization mods) during loading.
    // Read the authoritative city configuration instead; this is also safe

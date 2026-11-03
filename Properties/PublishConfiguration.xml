@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Publish>
+  <ModId Value="166126" />
+  <DisplayName Value="CityPress" />
+  <ShortDescription Value="Daily city newspapers, themed editions, commentary, archives and Word export. 城市日报：主题版面、评论、归档与 Word 导出。" />
+  <LongDescription># English
+
+# CityPress
+
+Your city. Your stories. Your newspaper.
+
+CityPress turns recorded activity in Cities: Skylines II into a daily newspaper you can read in game, revisit in the archive and export as an editable Word document.
+
+## Features
+
+- Select newsworthy city changes and statistics, merge repeated material and organize the day's story into themed editions.
+- Report confirmed population and financial milestones, construction, public services and transit openings. Add substantial commentary when the facts support it.
+- Read front news, themed continuation pages and opinion editions in a newspaper layout. Review and repair copy before publication.
+- Generate manually by default, or enable automatic daily publication and an in-game popup.
+- Customize your newspaper name, use per-save or global settings, browse earlier issues and export again without another generation request.
+- Use English or Simplified Chinese. Built-in editorial policies follow the game language; custom policies and archived newspapers retain their text.
+
+## Quick start
+
+Subscribe, add CityPress to the active playset and restart the game. Open the newspaper panel and enter your service address, model and API key under Editorial settings. Save, then select Generate today's issue.
+
+A Chat Completions-compatible service is required for writing; DeepSeek is the default. Compatible local services are supported. Service usage and charges follow your chosen provider.
+
+## 1.0.1
+
+New deep-blue thumbnail using the in-game newspaper icon. English and Chinese localization is registered with the game. Default editorial policies now follow language changes, including commentary and repair, while custom writing instructions are preserved.
+
+**Game version:** 1.6.*
+
+**Source, releases and documentation:** https://github.com/Daotie/CS2-CityPress
+
+**Bug reports:** https://github.com/Daotie/CS2-CityPress/issues
+
+# 简体中文
+
+# CityPress 城市日报
+
+你的城市，值得一份日报。
+
+CityPress 把《都市：天际线 II》中记录到的城市变化编辑成报纸，支持游戏内阅读、回看往期和导出为可编辑的 Word 文件。
+
+## 功能
+
+- 筛选值得报道的城市变化与统计，归并重复素材，按当日内容组织主题版面。
+- 报道有依据的人口与财政突破、城市建设、公共服务和线路开通；重大事件素材充分时配发长评论与短评。
+- 用报纸版式阅读要闻、专题续版与评论版，出刊前进行审校与补稿。
+- 默认手动生成，可选每日自动发行并在游戏内弹出。
+- 自定义报纸名称，使用单存档或全局设置，阅读往期报纸；重新导出不再调用写作服务。
+- 支持英文与简体中文，内置编辑方针跟随游戏语言；玩家自定义方针和已归档报纸保留原文。
+
+## 使用
+
+订阅后加入启用的游玩集并重启游戏。打开报纸面板，在“编辑部设置”中填写服务地址、模型和 API 密钥，保存后点击“生成本日新闻”。
+
+写作需要 Chat Completions 兼容服务，默认使用 DeepSeek，也支持兼容的本地服务。服务使用与费用以你选择的提供商为准。
+
+## 1.0.1
+
+缩略图换为游戏内报纸图标、深蓝背景与模组名称。向游戏注册中英文词条；默认编辑方针跟随语言切换，生成、评论与补稿均使用所选方针，保留玩家自定义内容。
+
+**支持游戏版本：** 1.6.*
+
+**源码、发行版本与说明：** https://github.com/Daotie/CS2-CityPress
+
+**问题反馈：** https://github.com/Daotie/CS2-CityPress/issues
+
+## Thank you / 感谢
+
+Thank you for using CityPress and sharing your feedback and newspapers. If you enjoy this mod, you can also explore [my other mods](https://mods.paradoxplaza.com/authors/Firetomcat302/cities_skylines_2), including [RouteFilter](https://mods.paradoxplaza.com/mods/155839/Windows), for vehicle-asset access control on roads and railways.
+
+感谢你使用 CityPress，也感谢每一位提出建议、反馈问题和分享城市报纸的玩家。如果你喜欢这个 Mod，也可以看看[我的其他 Mod](https://mods.paradoxplaza.com/authors/Firetomcat302/cities_skylines_2)，例如 [RouteFilter](https://mods.paradoxplaza.com/mods/155839/Windows)：为道路与轨道提供逐车辆资产通行限制。
+</LongDescription>
+  <Thumbnail Value="assets/branding/thumbnail.png" />
+  <Screenshot Value="assets/showcase/1.0.0/01.jpg" />
+  <Screenshot Value="assets/showcase/1.0.0/02.jpg" />
+  <Screenshot Value="assets/showcase/1.0.0/03.jpg" />
+  <Tag Value="Code Mod" />
+  <ModVersion Value="1.0.1" />
+  <GameVersion Value="1.6.*" />
+  <AccessLevel Value="Public" />
+  <ExternalLink Type="github" Url="https://github.com/Daotie/CS2-CityPress" />
+  <ChangeLog># CityPress 1.0.1
+
+## English
+- New thumbnail using the existing newspaper icon and deep-blue CityPress branding.
+- Register English and Simplified Chinese with the game; built-in editorial policies follow language changes in writing, commentary and repair. Custom policies are preserved.
+
+## 简体中文
+- 缩略图使用现有报纸图标、深蓝背景及 CityPress 名称。
+- 向游戏注册中英文词条，内置编辑方针跟随语言切换，应用于写作、评论与补稿，保留自定义方针。</ChangeLog>
+</Publish>

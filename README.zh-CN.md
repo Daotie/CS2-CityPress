@@ -1,9 +1,9 @@
 <p align="center"><a href="README.md">English</a> · <strong>简体中文</strong></p>
-<p align="center"><img src="assets/branding/citypress.svg" width="120" alt="CityPress 报纸标志"></p>
+<p align="center"><img src="assets/branding/thumbnail.png" width="160" alt="CityPress 报纸标志"></p>
 <h1 align="center">CityPress 城市日报</h1>
 <p align="center">把《都市：天际线 II》的城市运行编辑成一份每日报纸。</p>
 <p align="center">
- <img src="https://img.shields.io/badge/version-1.0.0-00a8bb" alt="1.0.0">
+ <img src="https://img.shields.io/badge/version-1.0.1-00a8bb" alt="1.0.1">
  <img src="https://img.shields.io/badge/languages-English%20%7C%20%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-00a8bb" alt="English and Simplified Chinese">
  <img src="https://img.shields.io/badge/status-stable-1976d2" alt="正式版">
  <img src="https://img.shields.io/badge/license-GPL--3.0--only-blue" alt="GPL-3.0-only">
@@ -14,7 +14,7 @@ CityPress 是一个《都市：天际线 II》模组。它观察城市中实际�
 
 原版游戏通过统计面板和事件提示展示城市信息，但没有报纸、选题、往期档案或可导出的刊物。CityPress 补上这层编辑与出版能力，不改变城市管理的核心规则。
 
-**当前版本：** `1.0.0`，首个正式版。已发布构建见[下载页](https://github.com/Daotie/CS2-CityPress/releases)，已有存档数据和历史报纸可继续读取。实际验证范围见[版本说明](RELEASE_NOTES.md)。
+**当前版本：** `1.0.1`，首个正式版的维护更新。已发布构建见[下载页](https://github.com/Daotie/CS2-CityPress/releases)，已有存档数据和历史报纸可继续读取。实际验证范围见[版本说明](RELEASE_NOTES.md)。
 
 ## 功能
 
@@ -69,7 +69,7 @@ CityPress 是一个《都市：天际线 II》模组。它观察城市中实际�
 
 ## 安装
 
-CityPress 以本地模组形式安装，不通过 Steam 创意工坊或 Paradox Mods 分发。
+在 [Paradox Mods](https://mods.paradoxplaza.com/mods/166126/Windows) 订阅 CityPress，加入启用的游玩集并重启游戏。也可从 GitHub 下载完整安装包手动安装。
 
 1. 从 [Releases](https://github.com/Daotie/CS2-CityPress/releases) 下载完整的 `CityPress-<版本>.zip`。不要把 GitHub 自动生成的源码包当作安装包。
 2. 关闭游戏。
@@ -89,14 +89,14 @@ CityPress 以本地模组形式安装，不通过 Steam 创意工坊或 Paradox 
 5. 在往期档案中阅读已出版报纸，或补编有记录的历史日期。
 6. 使用“导出当前报纸”重新导出当前报纸（不调用 API），使用“打开导出文件夹”打开实际目录。
 
-界面与系统消息跟随游戏语言，内置英文与简体中文，其他语言回退为英文。生成的报纸正文语言由编辑方针决定，不随界面语言自动切换；Word 版签跟随报纸内容检测到的语言。版面切换、档案列表和设置项的具体说明见[完整使用指南](docs/USER_GUIDE.zh-CN.md)。
+界面与系统消息跟随游戏语言，内置英文与简体中文，其他语言回退为英文。内置编辑方针随中英文界面语言切换，玩家自定义方针保持不变；Word 版签跟随报纸内容检测到的语言。版面切换、档案列表和设置项的具体说明见[完整使用指南](docs/USER_GUIDE.zh-CN.md)。
 
 ## 双语支持
 
 | 内容 | 语言行为 |
 | --- | --- |
 | 游戏内按钮、设置、档案、状态与错误 | 跟随游戏语言，支持简体中文与英文，其他语言回退为英文 |
-| 报纸正文与评论 | 由编辑方针和模型决定；切换界面语言不会翻译已有报纸 |
+| 报纸正文与评论 | 内置编辑方针跟随中英文界面；自定义方针和已有报纸保持原文 |
 | Word 日期与版签 | 按报纸内容检测语言，选择中英文格式 |
 | 项目说明 | [English](README.md) · [简体中文](README.zh-CN.md) |
 
@@ -128,7 +128,7 @@ API 密钥按归一化后的请求地址分别保存，使用 Windows DPAPI 加�
 ## 兼容性
 
 - **平台：** Windows。
-- **游戏版本：** 当前构建使用《都市：天际线 II》`1.6.3f1` 的游戏程序集编译，本地检查也基于该版本；其他游戏版本尚未验证。
+- **游戏版本：** 支持 `1.6.*`。 当前构建使用《都市：天际线 II》`1.6.3f1` 的游戏程序集编译，本地检查也基于该版本；其他游戏版本尚未验证。
 - **运行方式：** 以 `net48` 游戏模组运行，随包附带 Harmony 2.2.2；界面构建为游戏 UI 模块，React、React DOM 与 UI 运行时由游戏提供。
 - **接口协议：** Chat Completions 兼容的 HTTP 服务。这里指的是协议兼容，不表示原生支持所有服务商的专有 API。
 - **存档数据：** 存档外层保持版本 1，新字段为追加式；已有安装和旧报纸可继续读取。
@@ -167,12 +167,6 @@ CityPress 在设计上避免在模拟关键路径上集中执行重任务：
 ## AI 辅助开发
 
 本项目在开发过程中使用 AI 辅助工具，主要用于代码分析与排查、调试、文档整理和开发流程协助。工具生成的建议会经过检查、修改和测试后才进入项目，不会未经核实直接作为完成结果。
-
-## 感谢
-
-感谢你使用 CityPress，也感谢每一位分享建议、反馈问题和展示城市报纸的玩家。如果你喜欢这个 Mod，也可以看看我的其他 Mod，例如 [RouteFilter（Paradox Mods）](https://mods.paradoxplaza.com/mods/155839/Windows)：为《都市：天际线 II》的道路与轨道提供逐车辆资产通行限制。它的[源码与使用说明](https://github.com/Daotie/CS2-RouteFilter)也已在 GitHub 公开。
-
-项目方向、架构、功能取舍、测试策略、发布决定和后续维护由项目作者负责。AI 工具不是项目作者、维护者或署名贡献者。
 
 ## 问题反馈与贡献
 
@@ -219,3 +213,9 @@ npm audit --prefix UI --omit=dev
 - [架构说明](docs/ARCHITECTURE.md)
 - [构建与验证](docs/BUILD.md)
 - [更新日志](CHANGELOG.md) · [版本说明](RELEASE_NOTES.md)
+
+## 感谢
+
+感谢你使用 CityPress，也感谢每一位分享建议、反馈问题和展示城市报纸的玩家。如果你喜欢这个 Mod，也可以看看[我的其他 Mod](https://mods.paradoxplaza.com/authors/Firetomcat302/cities_skylines_2)，例如 [RouteFilter（Paradox Mods）](https://mods.paradoxplaza.com/mods/155839/Windows)：为《都市：天际线 II》的道路与轨道提供逐车辆资产通行限制。它的[源码与使用说明](https://github.com/Daotie/CS2-RouteFilter)也已在 GitHub 公开。
+
+项目方向、架构、功能取舍、测试策略、发布决定和后续维护由项目作者负责。AI 工具不是项目作者、维护者或署名贡献者。

@@ -156,5 +156,6 @@
   "CityPress.Error.ApiTruncated": "新闻未完整生成，请提高输出上限或缩短编辑方针后重试。",
   "CityPress.Status.ExportDeferred": "报纸已生成，可在此阅读；部分文件保存未完成，可点击导出重试。",
   "CityPress.Status.ExportRenamed": "报纸已生成并保存；原 Word 文件暂不能覆盖，已另存一份。",
-  "CityPress.Status.ExportRedirected": "报纸已生成；导出目录暂不可用，已保存到：{0}"
+  "CityPress.Status.ExportRedirected": "报纸已生成；导出目录暂不可用，已保存到：{0}",
+  "CityPress.Locale": "zh-HANS"
 }

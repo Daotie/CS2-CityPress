@@ -1,5 +1,21 @@
 # Changelog / 更新日志
 
+## 1.0.1 — 2026-11-03
+
+### English
+
+- Replace the publishing thumbnail with the existing in-game newspaper icon on a deep blue background and CityPress branding.
+- Register the bundled English and Simplified Chinese dictionaries with the game and identify the interface language explicitly.
+- Add a complete English editorial policy. Built-in policies follow game-language changes; player-written policies remain intact, including after saving and loading. Generation, specialist commentary and repair requests all receive the selected policy.
+- Refresh Paradox Mods installation instructions, bilingual publishing copy and reciprocal author-mod links. Game compatibility is listed as 1.6.*.
+
+### 简体中文
+
+- 发布缩略图换为游戏内现有报纸图标、深蓝背景及 CityPress 名称。
+- 向游戏注册内置英文与简体中文词条，界面通过明确的语言标识选择回退词条。
+- 新增完整英文编辑方针；内置方针跟随游戏语言切换，玩家自定义方针在切换、保存与读档后保持不变。生成、独立评论和审校补稿均使用所选方针。
+- 更新 PMod 安装说明、中英文发布介绍与作者模组互链，支持游戏版本标为 1.6.*。
+
 ## 1.0.0 — 2026-11-03
 
 ### English
